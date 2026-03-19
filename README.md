@@ -267,3 +267,5 @@ AgentHub/
 ## 开源协议
 
 [MIT](LICENSE) - 自由使用、修改和分发。
+作者：Mark Tang
+贡献：杭州维舟科技有限公司（WayJoy.Tec.Global@gmail.com）
