@@ -223,11 +223,11 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
       <div class="ni" data-p="crawl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 014 9 15 15 0 01-4 9"/><path d="M3 12h18"/></svg>Crawler<span class="bd lv">LIVE</span></div>
     </div>
     <div class="ns"><div class="ns-l">Library</div>
-      <div class="ni" data-p="lib-sk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Skills<span class="bd">2,847</span></div>
-      <div class="ni" data-p="lib-ag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 00-16 0"/></svg>Agents<span class="bd">186</span></div>
+      <div class="ni" data-p="lib-sk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Skills<span class="bd">0</span></div>
+      <div class="ni" data-p="lib-ag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 00-16 0"/></svg>Agents<span class="bd">0</span></div>
     </div>
     <div class="ns"><div class="ns-l">Workspace</div>
-      <div class="ni" data-p="projs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>My projects<span class="bd">3</span></div>
+      <div class="ni" data-p="projs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>My projects<span class="bd">0</span></div>
       <div class="ni" data-p="ws"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg>Active project</div>
     </div>
     <div class="ns"><div class="ns-l">System</div>
@@ -255,18 +255,18 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
       <p>Complete setup to start building with AI agents</p>
       <div class="ob-steps">
         <div class="ob-step done">1. Installed</div>
-        <div class="ob-step" onclick="go('settings')">2. Add AI model</div>
-        <div class="ob-step" onclick="go('crawl')">3. Skills auto-crawling</div>
-        <div class="ob-step" onclick="openMo()">4. Create project</div>
+        <div class="ob-step" onclick="go('settings')">2. Connect OpenClaw</div>
+        <div class="ob-step" onclick="openMo()">3. Create project</div>
+        <div class="ob-step" onclick="loadDemoData()">4. Load examples</div>
       </div>
     </div>
     <button class="btn-sm btn" style="color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2)" onclick="this.closest('.onboard').style.display='none'">Dismiss</button>
   </div>
   <div class="stats">
-    <div class="sc"><div class="sc-l">Total skills</div><div class="sc-v" id="stat-sk">2,847</div><div class="sc-c">↑ 124 this week</div></div>
-    <div class="sc"><div class="sc-l">Active agents</div><div class="sc-v">186</div><div class="sc-c">↑ 12 this week</div></div>
-    <div class="sc"><div class="sc-l">Projects</div><div class="sc-v">3</div><div class="sc-c">↑ 1 today</div></div>
-    <div class="sc"><div class="sc-l">Success rate</div><div class="sc-v">94.2%</div><div class="sc-c">↑ 1.8%</div></div>
+    <div class="sc"><div class="sc-l">Total skills</div><div class="sc-v" id="stat-sk">0</div><div class="sc-c">Connect OpenClaw or load demo</div></div>
+    <div class="sc"><div class="sc-l">Active agents</div><div class="sc-v">0</div><div class="sc-c">Create or load demo</div></div>
+    <div class="sc"><div class="sc-l">Projects</div><div class="sc-v">0</div><div class="sc-c">Create your first project</div></div>
+    <div class="sc"><div class="sc-l">Success rate</div><div class="sc-v">—</div><div class="sc-c">No data yet</div></div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 320px;gap:22px">
     <div><h3 style="font-size:15px;font-weight:500;margin-bottom:12px">Activity</h3><div id="d-act"></div></div>
@@ -890,11 +890,12 @@ function toast(msg){
 /* ══ Modal — FIX M-05: clear fields ══ */
 function openMo(){document.getElementById('modal').classList.add('open')}
 function closeMo(){document.getElementById('modal').classList.remove('open')}
-const PROJS=[
+const DEMO_PROJS=[
   {n:'E-Commerce Platform',d:'Full-stack with Stripe, auth, admin panel',p:72,c:'var(--gn)',ph:'Build'},
   {n:'SaaS Dashboard',d:'Analytics, funnels, reports, billing',p:25,c:'var(--ac)',ph:'Plan'},
   {n:'Blog Platform',d:'Markdown blog with SSR, CMS, RSS',p:91,c:'var(--am)',ph:'Deliver'},
 ];
+const PROJS=[];
 const projColors=['var(--bl)','var(--pk)','var(--tl)','var(--co)','var(--am)','var(--gn)','var(--ac)'];
 function createProj(){
   const nm=document.getElementById('mo-name').value||'New Project';
@@ -986,7 +987,7 @@ let approved=false;
 function approve(){if(approved)return;approved=true;document.getElementById('plx').innerHTML='<span style="font-size:11px;color:var(--gn);font-family:var(--fm)">✓ Plan approved — agents executing</span>';toast('Plan approved — 5 agents deploying')}
 
 /* ══ Library — FIX M-01: separate source/category groups, FIX L-06: real counts ══ */
-const SKS=[
+const DEMO_SKS=[
   {n:'code-reviewer',s:'github/anthropic',d:'Automated code review with security, style, and performance analysis',t:['python','review'],i:'λ',b:'var(--acb2)',c:'var(--ac)',r:'4.8',src:'github',cat:'code'},
   {n:'api-generator',s:'clawhub/devtools',d:'Generate REST and GraphQL APIs from natural language schema',t:['api','codegen'],i:'⚡',b:'var(--tlb)',c:'var(--tl)',r:'4.6',src:'clawhub',cat:'code'},
   {n:'test-writer',s:'github/testing-ai',d:'Auto-generate unit, integration and E2E tests',t:['testing','jest'],i:'⬡',b:'var(--cob)',c:'var(--co)',r:'4.5',src:'github',cat:'test'},
@@ -1000,6 +1001,7 @@ const SKS=[
   {n:'nlp-processor',s:'clawhub/ml',d:'NER, sentiment analysis and summarization',t:['nlp','ml'],i:'◎',b:'var(--acb2)',c:'var(--pk)',r:'4.4',src:'clawhub',cat:'ai'},
   {n:'vue-scaffold',s:'github/frontend-ai',d:'Vue 3 + Nuxt with Pinia and TypeScript',t:['vue','nuxt'],i:'⬡',b:'var(--gnb)',c:'var(--gn)',r:'4.3',src:'github',cat:'ui'},
 ];
+const SKS=[];
 let skSrc='all',skCat='all';
 function fltSk(el){
   const g=el.dataset.g,f=el.dataset.f;
@@ -1015,7 +1017,7 @@ function renderSk(){
   const parts=[];if(skSrc!=='all')parts.push(skSrc.charAt(0).toUpperCase()+skSrc.slice(1));if(skCat!=='all')parts.push(skCat);
   document.getElementById('sk-title').textContent=parts.length?parts.join(' ')+' skills':'All skills';
   document.getElementById('sk-count').textContent=f.length+' results';
-  document.getElementById('sk-grid').innerHTML=f.length?f.map(s=>skCard(s)).join(''):'<div style="text-align:center;padding:40px;color:var(--t4)">No skills match this filter</div>';
+  document.getElementById('sk-grid').innerHTML=f.length?f.map(s=>skCard(s)).join(''):SKS.length===0?'<div style="text-align:center;padding:60px 20px"><div style="font-size:32px;margin-bottom:12px;opacity:.3">⚡</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">No skills loaded</div><div style="font-size:12px;color:var(--t4);margin-bottom:16px">Connect OpenClaw to load real skills, or explore with demo data</div><button class="btn btn-p btn-sm" onclick="loadDemoData()">Load demo data</button> <button class="btn btn-sm" style="margin-left:6px" onclick="go(\'settings\')">Connect OpenClaw</button></div>':'<div style="text-align:center;padding:40px;color:var(--t4)">No skills match this filter</div>';
   const cnt=(k,v)=>SKS.filter(s=>s[k]===v).length;
   ['github','clawhub','trending'].forEach(v=>{const el=document.getElementById('sk-cnt-'+v);if(el)el.textContent=cnt('src',v)});
   ['code','test','infra','data','sec','doc','ai','ui'].forEach(v=>{const el=document.getElementById('sk-cnt-'+v);if(el)el.textContent=cnt('cat',v)});
@@ -1023,7 +1025,7 @@ function renderSk(){
   const cae=document.getElementById('sk-cnt-cat-all');if(cae)cae.textContent=SKS.length;
 }
 
-const AGS=[
+const DEMO_AGS=[
   {n:'FullStack-Dev',d:'Code gen, testing, deploy',sk:['code-reviewer','api-gen','test-writer'],c:'var(--ac)',st:'Active',tp:'dev'},
   {n:'Security-Auditor',d:'Scanning, vulnerability assessment',sk:['security-scanner','code-reviewer'],c:'var(--co)',st:'Active',tp:'sec'},
   {n:'Data-Engineer',d:'Database, ETL, data quality',sk:['db-designer','perf-optimizer'],c:'var(--tl)',st:'Active',tp:'data'},
@@ -1032,6 +1034,7 @@ const AGS=[
   {n:'Doc-Writer',d:'Auto-generate documentation',sk:['doc-writer'],c:'var(--gn)',st:'Idle',tp:'doc'},
   {n:'QA-Lead',d:'Test strategy, coverage analysis',sk:['test-writer'],c:'var(--tl)',st:'Active',tp:'qa'},
 ];
+const AGS=[];
 let agTp='all',agSt='all';
 function fltAg(el){
   const g=el.dataset.g,f=el.dataset.f;
@@ -1047,7 +1050,7 @@ function renderAg(){
   const parts=[];if(agTp!=='all')parts.push(agTp.charAt(0).toUpperCase()+agTp.slice(1));if(agSt!=='all')parts.push(agSt);
   document.getElementById('ag-title').textContent=parts.length?parts.join(' ')+' agents':'All agents';
   document.getElementById('ag-count').textContent=f.length+' agents';
-  document.getElementById('ag-grid').innerHTML=f.length?f.map(a=>agCard(a)).join(''):'<div style="text-align:center;padding:40px;color:var(--t4)">No agents match</div>';
+  document.getElementById('ag-grid').innerHTML=f.length?f.map(a=>agCard(a)).join(''):AGS.length===0?'<div style="text-align:center;padding:60px 20px"><div style="font-size:32px;margin-bottom:12px;opacity:.3">🤖</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">No agents yet</div><div style="font-size:12px;color:var(--t4);margin-bottom:16px">Create a custom agent or load demo data to explore</div><button class="btn btn-p btn-sm" onclick="openCreateAgent()">+ Create agent</button> <button class="btn btn-sm" style="margin-left:6px" onclick="loadDemoData()">Load demo data</button></div>':'<div style="text-align:center;padding:40px;color:var(--t4)">No agents match</div>';
   const cnt=(k,v)=>AGS.filter(a=>a[k]===v||(k==='st'&&a.st.toLowerCase()===v)).length;
   ['dev','ops','qa','sec','data','doc'].forEach(v=>{const el=document.getElementById('ag-cnt-'+v);if(el)el.textContent=cnt('tp',v)});
   ['active','idle'].forEach(v=>{const el=document.getElementById('ag-cnt-'+v);if(el)el.textContent=cnt('st',v)});
@@ -1192,23 +1195,68 @@ function switchProject(idx){
   else currentSessionKey = 'main';
 }
 function renderDashProjs(){
+  if(PROJS.length===0){document.getElementById('d-proj').innerHTML='<div style="text-align:center;padding:30px 14px"><div style="font-size:13px;color:var(--t3);margin-bottom:12px">No projects yet</div><button class="btn btn-p btn-sm" onclick="openMo()">+ Create project</button></div>';return}
   document.getElementById('d-proj').innerHTML=PROJS.map((p,i)=>'<div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;cursor:pointer;margin-bottom:8px;transition:border-color .15s" onclick="switchProject('+i+');go(\'ws\')" onmouseover="this.style.borderColor=\'var(--b2)\'" onmouseout="this.style.borderColor=\'var(--b0)\'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:13.5px;font-weight:500">'+esc(p.n)+'</span><span style="font-size:10px;padding:2px 7px;border-radius:5px;background:'+p.c+'12;color:'+p.c+';font-family:var(--fm)">'+p.p+'%</span></div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div style="font-size:10.5px;color:var(--t4)">'+esc(p.ph)+'</div></div>').join('');
 }
 function renderProjs(){
+  if(PROJS.length===0){document.getElementById('pj-list').innerHTML='<div style="text-align:center;padding:60px 20px;grid-column:1/-1"><div style="font-size:32px;margin-bottom:12px;opacity:.3">📁</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">No projects yet</div><div style="font-size:12px;color:var(--t4);margin-bottom:16px">Create your first project to start building with AI agents</div><button class="btn btn-p" onclick="openMo()">+ Create project</button> <button class="btn" style="margin-left:6px" onclick="loadDemoData()">Load demo data</button></div>';return}
   document.getElementById('pj-list').innerHTML=PROJS.map((p,i)=>'<div class="lcd" onclick="switchProject('+i+');go(\'ws\')"><div class="lh"><div class="li" style="background:'+p.c+'15;color:'+p.c+';font-size:16px;font-weight:600">'+p.n[0]+'</div><div><div class="ln">'+esc(p.n)+'</div><div class="ls">'+esc(p.ph)+'</div></div></div><div class="ld">'+esc(p.d)+'</div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin:8px 0"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div class="lf"><span>'+p.p+'% complete</span></div></div>').join('');
 }
 
+/* ══ Demo data management ══ */
+let demoLoaded = false;
+function loadDemoData() {
+  if (demoLoaded) return;
+  demoLoaded = true;
+  SKS.push(...DEMO_SKS);
+  AGS.push(...DEMO_AGS);
+  PROJS.push(...DEMO_PROJS);
+  renderAll();
+  toast('Demo data loaded — explore the platform!');
+}
+function clearDemoData() {
+  SKS.length = 0; AGS.length = 0; PROJS.length = 0;
+  demoLoaded = false;
+  renderAll();
+  toast('Demo data cleared');
+}
+function renderAll() {
+  renderSk(); renderAg(); renderProjs(); renderDashProjs(); renderDashActivity(); updateStats();
+  const skB = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skB) skB.textContent = SKS.length || '0';
+  const agB = document.querySelector('.ni[data-p="lib-ag"] .bd'); if(agB) agB.textContent = AGS.length || '0';
+  const pjB = document.querySelector('.ni[data-p="projs"] .bd'); if(pjB) pjB.textContent = PROJS.length || '0';
+}
+function updateStats() {
+  const cards = document.querySelectorAll('.sc');
+  if(cards[0]) cards[0].querySelector('.sc-v').textContent = SKS.length ? SKS.length.toLocaleString() : '0';
+  if(cards[1]) cards[1].querySelector('.sc-v').textContent = AGS.length || '0';
+  if(cards[2]) cards[2].querySelector('.sc-v').textContent = PROJS.length || '0';
+  if(cards[3]) cards[3].querySelector('.sc-v').textContent = PROJS.length ? '94.2%' : '—';
+  // Update sub-text
+  if(cards[0]) cards[0].querySelector('.sc-c').textContent = SKS.length ? '↑ 124 this week' : 'Connect OpenClaw or load demo';
+  if(cards[1]) cards[1].querySelector('.sc-c').textContent = AGS.length ? '↑ 12 this week' : 'Create or load demo';
+  if(cards[2]) cards[2].querySelector('.sc-c').textContent = PROJS.length ? '↑ 1 today' : 'Create your first project';
+  if(cards[3]) cards[3].querySelector('.sc-c').textContent = PROJS.length ? '↑ 1.8%' : 'No data yet';
+}
+
 /* ══ Render all ══ */
-renderSk();renderAg();
+renderSk();renderAg();updateStats();
 
 /* Dashboard */
-document.getElementById('d-act').innerHTML=[
-  {c:'var(--am)',t:'<strong>GitHub trending</strong> synced — 25 repos',d:'3m ago'},
-  {c:'var(--tl)',t:'<strong>Crawler</strong> indexed 47 new skills',d:'12m ago'},
-  {c:'var(--gn)',t:'<strong>E-Commerce</strong> — auth module done',d:'28m ago'},
-  {c:'var(--ac)',t:'<strong>PM-Agent</strong> assigned agents to SaaS project',d:'42m ago'},
-  {c:'var(--co)',t:'<strong>Fix</strong> resolved 2 test failures',d:'1h ago'},
-].map(a=>'<div style="display:flex;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .12s" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'transparent\'"><div style="width:7px;height:7px;border-radius:50%;background:'+a.c+';margin-top:7px;flex-shrink:0"></div><div><div style="font-size:12.5px;color:var(--t2);line-height:1.5">'+a.t+'</div><div style="font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:2px">'+a.d+'</div></div></div>').join('');
+function renderDashActivity(){
+  if(PROJS.length===0 && SKS.length===0){
+    document.getElementById('d-act').innerHTML='<div style="text-align:center;padding:30px 14px;color:var(--t4)"><div style="font-size:13px;margin-bottom:8px">No activity yet</div><div style="font-size:11px">Create a project or connect OpenClaw to get started</div></div>';
+    return;
+  }
+  document.getElementById('d-act').innerHTML=[
+    {c:'var(--am)',t:'<strong>GitHub trending</strong> synced — 25 repos',d:'3m ago'},
+    {c:'var(--tl)',t:'<strong>Crawler</strong> indexed 47 new skills',d:'12m ago'},
+    {c:'var(--gn)',t:'<strong>E-Commerce</strong> — auth module done',d:'28m ago'},
+    {c:'var(--ac)',t:'<strong>PM-Agent</strong> assigned agents to SaaS project',d:'42m ago'},
+    {c:'var(--co)',t:'<strong>Fix</strong> resolved 2 test failures',d:'1h ago'},
+  ].map(a=>'<div style="display:flex;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .12s" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'transparent\'"><div style="width:7px;height:7px;border-radius:50%;background:'+a.c+';margin-top:7px;flex-shrink:0"></div><div><div style="font-size:12.5px;color:var(--t2);line-height:1.5">'+a.t+'</div><div style="font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:2px">'+a.d+'</div></div></div>').join('');
+}
+renderDashActivity();
 
 /* FIX M-04: dynamic project rendering */
 renderDashProjs();
