@@ -1,0 +1,29 @@
+{
+  "name": "agenthub",
+  "version": "5.0.0",
+  "description": "AgentHub - Intelligent Agent Orchestration Platform / AI智能体编排平台",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -l 3000 --no-clipboard",
+    "dev": "npx serve . -l 3000 --no-clipboard",
+    "preview": "npx serve . -l 3000 -o"
+  },
+  "keywords": [
+    "ai-agents",
+    "agent-orchestration",
+    "multi-agent",
+    "llm",
+    "claude",
+    "gpt",
+    "gemini",
+    "ai-workflow",
+    "agent-hub"
+  ],
+  "author": "MarkGlobal98",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarkGlobal98/AgentHub.git"
+  },
+  "homepage": "https://github.com/MarkGlobal98/AgentHub"
+}

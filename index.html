@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentHub — Intelligent Agent Orchestration</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#090a0e;--bg2:#111218;--bg3:#181921;--bg4:#21222c;--bg5:#2b2c38;
+  --b0:#1c1d28;--b1:#292a36;--b2:#3a3b4a;
+  --t1:#edeaf4;--t2:#a09eb2;--t3:#716f84;--t4:#504e60;
+  --ac:#b57efc;--ac2:#8b5cf6;--ac3:#6d3fd4;--acb:rgba(181,126,252,.07);--acb2:rgba(181,126,252,.14);
+  --tl:#34d4b8;--tlb:rgba(52,212,184,.07);
+  --co:#f87185;--cob:rgba(248,113,133,.07);
+  --am:#f9c74f;--amb:rgba(249,199,79,.07);
+  --bl:#6aafff;--blb:rgba(106,175,255,.07);
+  --gn:#5ae08a;--gnb:rgba(90,224,138,.07);
+  --pk:#f084c0;
+  --fn:'DM Sans',system-ui,sans-serif;--fm:'JetBrains Mono',monospace;
+}
+html{font-family:var(--fn);background:var(--bg);color:var(--t1);font-size:15px;line-height:1.6}
+button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:var(--fn)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--b1);border-radius:3px}
+
+.app{display:flex;height:100vh;overflow:hidden}
+.sb{width:228px;background:var(--bg2);border-right:1px solid var(--b0);display:flex;flex-direction:column;flex-shrink:0}
+.mn{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tb{height:54px;border-bottom:1px solid var(--b0);display:flex;align-items:center;padding:0 24px;gap:14px;background:var(--bg2);flex-shrink:0}
+.logo{padding:18px 18px 22px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b0)}
+.logo .ic{width:30px;height:30px;background:linear-gradient(135deg,var(--ac),var(--tl));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#090a0e}
+.logo h1{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.logo small{font-size:10px;color:var(--t4);margin-left:auto;background:var(--acb);padding:2px 6px;border-radius:4px;font-family:var(--fm)}
+.nv{flex:1;padding:14px 10px;overflow-y:auto}
+.ns{margin-bottom:18px}.ns-l{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t4);padding:0 10px 6px;font-weight:500}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:10px;font-size:13.5px;color:var(--t2);cursor:pointer;transition:all .15s;position:relative;user-select:none}
+.ni:hover{background:var(--bg4);color:var(--t1)}.ni.on{background:var(--acb);color:var(--ac)}
+.ni.on::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--ac);border-radius:0 3px 3px 0}
+.ni svg{width:17px;height:17px;opacity:.55;flex-shrink:0}
+.ni .bd{margin-left:auto;font-size:10px;font-family:var(--fm);background:var(--acb);color:var(--ac);padding:1px 6px;border-radius:8px}
+.ni .bd.lv{background:var(--gnb);color:var(--gn)}
+
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:9px;font-size:12.5px;border:1px solid var(--b1);background:transparent;color:var(--t2);transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--bg5);color:var(--t1);border-color:var(--b2)}
+.btn-p{background:var(--ac3);border-color:var(--ac3);color:#fff}.btn-p:hover{background:var(--ac2)}
+.btn-d{border-color:var(--co);color:var(--co)}.btn-s{border-color:var(--gn);color:var(--gn)}
+.btn-w{border-color:var(--am);color:var(--am)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.tag{font-size:10.5px;padding:3px 8px;border-radius:6px;background:var(--bg5);color:var(--t3);font-family:var(--fm)}
+.sb-in{flex:1;max-width:420px;position:relative}
+.sb-in input{width:100%;background:var(--bg3);border:1px solid var(--b0);border-radius:10px;padding:8px 14px 8px 34px;color:var(--t1);font-size:12.5px;outline:none}
+.sb-in input:focus{border-color:var(--ac)}
+.sb-in svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);width:15px;height:15px}
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--co),var(--am));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#090a0e;cursor:pointer}
+.page{display:none;height:100%;overflow:hidden}.page.on{display:flex;flex-direction:column}
+.psc{flex:1;overflow-y:auto;padding:26px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.sc{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:-10px;right:-10px;width:60px;height:60px;border-radius:50%;filter:blur(30px);opacity:.1;pointer-events:none}
+.sc:nth-child(1)::after{background:var(--ac)}.sc:nth-child(2)::after{background:var(--tl)}.sc:nth-child(3)::after{background:var(--co)}.sc:nth-child(4)::after{background:var(--am)}
+.sc-l{font-size:11.5px;color:var(--t4);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.sc-v{font-size:26px;font-weight:600;letter-spacing:-.03em}
+.sc-c{font-size:11px;color:var(--gn);font-family:var(--fm);margin-top:4px}
+
+/* Library */
+.ll{display:flex;height:100%;overflow:hidden}
+.lsb{width:210px;border-right:1px solid var(--b0);padding:18px 14px;overflow-y:auto;flex-shrink:0}
+.lct{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--t4);padding:10px 0 6px;font-weight:500}
+.lci{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;font-size:12.5px;color:var(--t2);cursor:pointer;transition:all .12s;margin-bottom:2px}
+.lci:hover{background:var(--bg4);color:var(--t1)}.lci.on{background:var(--acb2);color:var(--ac)}
+.lci .dt{width:7px;height:7px;border-radius:50%;flex-shrink:0}.lci .ct{margin-left:auto;font-size:10px;font-family:var(--fm);color:var(--t4)}
+.lmn{flex:1;overflow-y:auto;padding:22px}
+.lgr{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:14px}
+.lcd{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:16px;cursor:pointer;transition:all .18s}
+.lcd:hover{border-color:var(--b2);transform:translateY(-1px)}
+.lcd .lh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.lcd .li{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.lcd .ln{font-size:13.5px;font-weight:500}.lcd .ls{font-size:10.5px;color:var(--t4);font-family:var(--fm)}
+.lcd .ld{font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lcd .lf{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--t3);padding-top:8px;border-top:1px solid var(--b0)}
+
+/* Workspace */
+.ws{display:grid;grid-template-columns:1fr 370px;height:100%;overflow:hidden}
+.wsl{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--b0)}
+.wsr{display:flex;flex-direction:column;overflow-y:auto;background:var(--bg2)}
+.ppb{display:flex;align-items:center;gap:0;padding:12px 20px;border-bottom:1px solid var(--b0);background:var(--bg2);flex-shrink:0;flex-wrap:wrap}
+.pps{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:7px;font-size:11.5px;font-weight:500;color:var(--t4)}
+.pps .ddd{width:8px;height:8px;border-radius:50%;border:2px solid var(--t4);flex-shrink:0}
+.pps.dn .ddd{background:var(--gn);border-color:var(--gn)}.pps.dn{color:var(--gn)}
+.pps.ac .ddd{background:var(--ac);border-color:var(--ac);box-shadow:0 0 8px rgba(181,126,252,.35)}.pps.ac{color:var(--ac)}
+.ppc{width:20px;height:1.5px;background:var(--b0)}.ppc.dn{background:var(--gn)}
+.wsc{flex:1;overflow-y:auto}
+.al{padding:16px 20px;display:flex;flex-direction:column;gap:3px}
+.ag{margin-bottom:16px}
+.agh{display:flex;align-items:center;gap:8px;padding:4px 0;margin-bottom:6px}
+.agh .pt{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.03em}
+.agh .ln{flex:1;height:1px;background:var(--b0)}.agh .st{font-size:10px;font-family:var(--fm)}
+.ai{display:flex;gap:10px;padding:8px 12px;border-radius:12px;transition:background .12s}
+.ai:hover{background:rgba(255,255,255,.02)}
+.ai .aa{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ai .ab{flex:1;min-width:0}.ai .an{font-size:11px;font-weight:500;font-family:var(--fm);margin-bottom:2px}
+.ai .am{font-size:12.5px;color:var(--t2);line-height:1.55}.ai .am strong{color:var(--t1);font-weight:500}
+.ai .at{font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:3px}
+.ai .ax{display:flex;gap:5px;margin-top:6px}
+.ai.sy{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:12px 14px;margin:4px 0}
+.ai.usr{background:var(--bg4);border:1px solid var(--b1);border-radius:14px;padding:12px 14px;margin:4px 0}
+.plb{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;margin:8px 0}
+.plb .plt{font-size:12.5px;font-weight:500;margin-bottom:8px}.plb .pli{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:var(--t2)}
+.plb .pln{width:20px;height:20px;border-radius:50%;background:var(--bg5);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--fm);color:var(--t3);flex-shrink:0}
+.plb .pla{font-size:10px;font-family:var(--fm);margin-left:auto;padding:2px 6px;border-radius:4px}
+.plx{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--b0)}
+.cha{border-top:1px solid var(--b0);flex-shrink:0;background:var(--bg2)}
+.chm{display:flex;gap:2px;padding:8px 14px;border-bottom:1px solid var(--b0)}
+.cmb{flex:1;padding:6px 0;text-align:center;font-size:11px;color:var(--t4);cursor:pointer;border-radius:7px;transition:all .15s}.cmb.on{background:var(--acb2);color:var(--ac)}
+.chi{display:flex;gap:8px;padding:10px 14px}
+.chi input{flex:1;background:var(--bg);border:1px solid var(--b0);border-radius:10px;padding:10px 14px;color:var(--t1);font-size:13px;outline:none}
+.chi input:focus{border-color:var(--ac)}
+.wp{padding:14px 16px;border-bottom:1px solid var(--b0)}
+.wp h4{font-size:12px;font-weight:500;margin-bottom:10px;color:var(--t2);display:flex;align-items:center;gap:6px}
+.rng{width:96px;height:96px;position:relative;margin:0 auto 10px}.rng svg{transform:rotate(-90deg)}
+.rng-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rng-c .rv{font-size:22px;font-weight:600}.rng-c .rl{font-size:9px;color:var(--t4);text-transform:uppercase;letter-spacing:.04em}
+.agc{background:var(--bg3);border:1px solid var(--b0);border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.agc .ah{display:flex;align-items:center;gap:8px;margin-bottom:5px}.agc .aav{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.agc .anm{font-size:12px;font-weight:500;flex:1}.agc .ast{font-size:9.5px;font-family:var(--fm);padding:2px 6px;border-radius:4px}
+.agc .atx{font-size:11px;color:var(--t3)}.agc .abr{height:3px;background:var(--bg5);border-radius:2px;margin-top:6px;overflow:hidden}.agc .abr .fl{height:100%;border-radius:2px}
+.ial{background:var(--cob);border:1px solid rgba(248,113,133,.15);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;transition:all .3s}
+.ial .it{flex:1}.ial .itx{font-size:12px;color:var(--co);margin-bottom:2px;transition:color .3s}.ial .ifl{font-size:10px;color:var(--t4);font-family:var(--fm)}
+.dli{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}.dli .dlnm{flex:1}.dli .dlag{font-size:10px;color:var(--t4);font-family:var(--fm)}
+
+/* Settings page */
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.set-card{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:20px}
+.set-card h3{font-size:14px;font-weight:500;margin-bottom:4px}.set-card .set-desc{font-size:12px;color:var(--t3);margin-bottom:16px}
+.set-card.full{grid-column:1/-1}
+.ff{margin-bottom:14px}.ff label{display:block;font-size:12px;color:var(--t2);margin-bottom:5px;font-weight:500}
+.ff input,.ff textarea,.ff select{width:100%;background:var(--bg4);border:1px solid var(--b0);border-radius:10px;padding:10px 14px;color:var(--t1);font-size:13px;outline:none}
+.ff input:focus,.ff textarea:focus,.ff select:focus{border-color:var(--ac)}.ff textarea{resize:vertical;min-height:60px}
+.ff .hint{font-size:11px;color:var(--t4);margin-top:4px}
+.ff .hint a{color:var(--ac)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0)}
+.toggle-row:last-child{border:none}.toggle-row .tl{font-size:13px}.toggle-row .td{font-size:11px;color:var(--t3)}
+.toggle{width:40px;height:22px;background:var(--bg5);border-radius:11px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--ac3)}.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}
+.toggle.on::after{transform:translateX(18px)}
+.model-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg4);border:1px solid var(--b0);border-radius:12px;margin-bottom:8px;flex-wrap:wrap}
+.mr-left{display:flex;align-items:center;gap:10px;min-width:150px}
+.mr-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.mr-name{font-size:13px;font-weight:500}.mr-provider{font-size:10.5px;color:var(--t4);font-family:var(--fm)}
+.mr-mid{flex:1;min-width:180px;display:flex;align-items:center;gap:8px}
+.mr-key{flex:1;background:var(--bg);border:1px solid var(--b0);border-radius:8px;padding:7px 10px;color:var(--t1);font-size:12px;font-family:var(--fm);outline:none;min-width:0}
+.mr-key:focus{border-color:var(--ac)}
+.mr-status{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:6px;white-space:nowrap}
+.mr-status.ok{background:var(--gnb);color:var(--gn)}.mr-status.miss{background:var(--cob);color:var(--co)}.mr-status.testing{background:var(--amb);color:var(--am)}
+.mr-right{display:flex;align-items:center;gap:6px}
+.mr-right select{background:var(--bg);border:1px solid var(--b0);border-radius:7px;padding:5px 8px;color:var(--t1);font-size:11px;outline:none;font-family:var(--fn)}
+.builtin-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b0)}
+.builtin-item:last-of-type{border:none}
+.bi-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.bi-info{flex:1}.bi-name{font-size:13px;font-weight:500}.bi-desc{font-size:11px;color:var(--t3)}
+.bi-status{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:6px}.bi-status.on{background:var(--gnb);color:var(--gn)}
+.auth-tab{padding:6px 14px;border-radius:7px;font-size:11.5px;color:var(--t4);cursor:pointer;transition:all .12s}
+.auth-tab.on{background:var(--bg);color:var(--t1)}
+.auth-badge{font-size:9px;font-family:var(--fm);padding:1px 5px;border-radius:4px;margin-left:4px;vertical-align:middle}
+.auth-badge.key{background:var(--acb2);color:var(--ac)}
+.auth-badge.oauth{background:var(--gnb);color:var(--gn)}
+.oauth-status{display:flex;align-items:center;gap:8px;flex:1}
+.oauth-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--bl),var(--tl));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#090a0e;flex-shrink:0}
+.oauth-email{font-size:12px;font-weight:500}.oauth-plan{font-size:10px;color:var(--t3);font-family:var(--fm)}
+.oauth-login-btn{white-space:nowrap}
+.model-pick{background:var(--bg);border:1px solid var(--b0);border-radius:10px;padding:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px}
+.model-pick:hover{border-color:var(--b2);background:var(--bg3)}
+.model-pick .mp-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.model-pick .mp-name{font-size:12.5px;font-weight:500}.model-pick .mp-type{font-size:10px;color:var(--t4);font-family:var(--fm)}
+
+/* Onboarding banner */
+.onboard{background:linear-gradient(135deg,var(--ac3),rgba(52,212,184,.3));border-radius:16px;padding:24px;margin-bottom:26px;display:flex;align-items:center;gap:20px}
+.onboard .ob-text h2{font-size:18px;font-weight:500;margin-bottom:4px}.onboard .ob-text p{font-size:13px;color:rgba(255,255,255,.7)}
+.onboard .ob-steps{display:flex;gap:10px;margin-top:12px}
+.ob-step{display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);cursor:pointer;transition:all .15s}
+.ob-step:hover{background:rgba(255,255,255,.18)}
+.ob-step.done{opacity:.5;text-decoration:line-through}
+
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.open{opacity:1;pointer-events:auto}
+.mo-box{background:var(--bg2);border:1px solid var(--b1);border-radius:20px;width:540px;max-height:80vh;overflow-y:auto;padding:28px}
+.mo-box h2{font-size:20px;font-weight:500;margin-bottom:4px}.mo-box .ms{font-size:13px;color:var(--t2);margin-bottom:22px}
+.mf{display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--b0)}
+
+/* Toast - FIX C-05: proper timer management */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg4);border:1px solid var(--b1);border-radius:12px;padding:10px 20px;font-size:13px;color:var(--t1);z-index:300;transition:transform .3s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Trend */
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.tc{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:16px;transition:all .18s}.tc:hover{border-color:var(--b2)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}.pulse{animation:pulse 2s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin 1s linear infinite;display:inline-block}
+.fi>*{animation:fadeUp .3s ease both}.fi>*:nth-child(2){animation-delay:.05s}.fi>*:nth-child(3){animation-delay:.1s}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sb">
+  <div class="logo"><div class="ic">A</div><h1>AgentHub</h1><small>v5</small></div>
+  <div class="nv">
+    <div class="ns"><div class="ns-l">Overview</div>
+      <div class="ni on" data-p="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Dashboard</div>
+      <div class="ni" data-p="trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Trending<span class="bd lv">NEW</span></div>
+      <div class="ni" data-p="crawl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 014 9 15 15 0 01-4 9"/><path d="M3 12h18"/></svg>Crawler<span class="bd lv">LIVE</span></div>
+    </div>
+    <div class="ns"><div class="ns-l">Library</div>
+      <div class="ni" data-p="lib-sk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Skills<span class="bd">2,847</span></div>
+      <div class="ni" data-p="lib-ag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 00-16 0"/></svg>Agents<span class="bd">186</span></div>
+    </div>
+    <div class="ns"><div class="ns-l">Workspace</div>
+      <div class="ni" data-p="projs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>My projects<span class="bd">3</span></div>
+      <div class="ni" data-p="ws"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg>Active project</div>
+    </div>
+    <div class="ns"><div class="ns-l">System</div>
+      <div class="ni" data-p="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Settings</div>
+    </div>
+  </div>
+</nav>
+
+<div class="mn">
+<div class="tb">
+  <div class="sb-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input id="gs" placeholder="Search skills, agents, projects... (Ctrl+K)" oninput="globalSearch(this.value)"></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
+    <button class="btn" onclick="toast('Syncing all sources...')">⟳ Sync</button>
+    <button class="btn btn-p" onclick="openMo()">+ New project</button>
+    <div class="av" onclick="go('settings')">Y</div>
+  </div>
+</div>
+
+<!-- ═══ Dashboard ═══ -->
+<div class="page on" id="p-dash"><div class="psc fi">
+  <div class="onboard" id="onboard">
+    <div class="ob-text" style="flex:1">
+      <h2>Welcome to AgentHub</h2>
+      <p>Complete setup to start building with AI agents</p>
+      <div class="ob-steps">
+        <div class="ob-step done">1. Installed</div>
+        <div class="ob-step" onclick="go('settings')">2. Add AI model</div>
+        <div class="ob-step" onclick="go('crawl')">3. Skills auto-crawling</div>
+        <div class="ob-step" onclick="openMo()">4. Create project</div>
+      </div>
+    </div>
+    <button class="btn-sm btn" style="color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2)" onclick="this.closest('.onboard').style.display='none'">Dismiss</button>
+  </div>
+  <div class="stats">
+    <div class="sc"><div class="sc-l">Total skills</div><div class="sc-v" id="stat-sk">2,847</div><div class="sc-c">↑ 124 this week</div></div>
+    <div class="sc"><div class="sc-l">Active agents</div><div class="sc-v">186</div><div class="sc-c">↑ 12 this week</div></div>
+    <div class="sc"><div class="sc-l">Projects</div><div class="sc-v">3</div><div class="sc-c">↑ 1 today</div></div>
+    <div class="sc"><div class="sc-l">Success rate</div><div class="sc-v">94.2%</div><div class="sc-c">↑ 1.8%</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:22px">
+    <div><h3 style="font-size:15px;font-weight:500;margin-bottom:12px">Activity</h3><div id="d-act"></div></div>
+    <div><h3 style="font-size:15px;font-weight:500;margin-bottom:12px">Projects</h3><div id="d-proj"></div></div>
+  </div>
+</div></div>
+
+<!-- ═══ Trending ═══ -->
+<div class="page" id="p-trend"><div class="psc fi"><div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><h2 style="font-size:18px;font-weight:500;flex:1">GitHub daily trending</h2><button class="btn btn-sm" onclick="toast('Syncing...')">⟳</button></div><div class="tg" id="tr-list"></div></div></div>
+
+<!-- ═══ Crawler ═══ -->
+<div class="page" id="p-crawl"><div class="psc fi"><h2 style="font-size:18px;font-weight:500;margin-bottom:16px">Crawler status</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:22px" id="cr-cards"></div><h3 style="font-size:14px;font-weight:500;margin-bottom:10px">Crawl log</h3><div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;font-family:var(--fm);font-size:11px;line-height:2.1;color:var(--t2);max-height:220px;overflow-y:auto" id="cr-log"></div></div></div>
+
+<!-- ═══ Skills Library ═══ -->
+<div class="page" id="p-lib-sk"><div class="ll">
+  <div class="lsb">
+    <div style="font-size:14px;font-weight:500;margin-bottom:14px">Skills</div>
+    <div class="lct">Source</div>
+    <div class="lci on" data-g="src" data-f="all" onclick="fltSk(this)"><div class="dt" style="background:var(--t3)"></div>All<span class="ct" id="sk-cnt-all"></span></div>
+    <div class="lci" data-g="src" data-f="github" onclick="fltSk(this)"><div class="dt" style="background:var(--tl)"></div>GitHub<span class="ct" id="sk-cnt-github"></span></div>
+    <div class="lci" data-g="src" data-f="clawhub" onclick="fltSk(this)"><div class="dt" style="background:var(--ac)"></div>ClawHub<span class="ct" id="sk-cnt-clawhub"></span></div>
+    <div class="lci" data-g="src" data-f="trending" onclick="fltSk(this)"><div class="dt" style="background:var(--am)"></div>Trending<span class="ct" id="sk-cnt-trending"></span></div>
+    <div class="lct">Category</div>
+    <div class="lci on" data-g="cat" data-f="all" onclick="fltSk(this)"><div class="dt" style="background:var(--t3)"></div>All<span class="ct" id="sk-cnt-cat-all"></span></div>
+    <div class="lci" data-g="cat" data-f="code" onclick="fltSk(this)"><div class="dt" style="background:var(--ac)"></div>Code gen<span class="ct" id="sk-cnt-code"></span></div>
+    <div class="lci" data-g="cat" data-f="test" onclick="fltSk(this)"><div class="dt" style="background:var(--tl)"></div>Testing<span class="ct" id="sk-cnt-test"></span></div>
+    <div class="lci" data-g="cat" data-f="infra" onclick="fltSk(this)"><div class="dt" style="background:var(--bl)"></div>DevOps<span class="ct" id="sk-cnt-infra"></span></div>
+    <div class="lci" data-g="cat" data-f="data" onclick="fltSk(this)"><div class="dt" style="background:var(--am)"></div>Data / DB<span class="ct" id="sk-cnt-data"></span></div>
+    <div class="lci" data-g="cat" data-f="sec" onclick="fltSk(this)"><div class="dt" style="background:var(--co)"></div>Security<span class="ct" id="sk-cnt-sec"></span></div>
+    <div class="lci" data-g="cat" data-f="doc" onclick="fltSk(this)"><div class="dt" style="background:var(--gn)"></div>Docs<span class="ct" id="sk-cnt-doc"></span></div>
+    <div class="lci" data-g="cat" data-f="ai" onclick="fltSk(this)"><div class="dt" style="background:var(--pk)"></div>AI / ML<span class="ct" id="sk-cnt-ai"></span></div>
+    <div class="lci" data-g="cat" data-f="ui" onclick="fltSk(this)"><div class="dt" style="background:var(--bl)"></div>Frontend<span class="ct" id="sk-cnt-ui"></span></div>
+  </div>
+  <div class="lmn"><div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><h2 id="sk-title" style="font-size:17px;font-weight:500;flex:1">All skills</h2><span id="sk-count" style="font-size:11px;color:var(--t4);font-family:var(--fm)"></span></div><div class="lgr" id="sk-grid"></div></div>
+</div></div>
+
+<!-- ═══ Agents Library ═══ -->
+<div class="page" id="p-lib-ag"><div class="ll">
+  <div class="lsb">
+    <div style="font-size:14px;font-weight:500;margin-bottom:14px">Agents</div>
+    <div class="lct">Type</div>
+    <div class="lci on" data-g="tp" data-f="all" onclick="fltAg(this)"><div class="dt" style="background:var(--t3)"></div>All<span class="ct" id="ag-cnt-all"></span></div>
+    <div class="lci" data-g="tp" data-f="dev" onclick="fltAg(this)"><div class="dt" style="background:var(--ac)"></div>Development<span class="ct" id="ag-cnt-dev"></span></div>
+    <div class="lci" data-g="tp" data-f="ops" onclick="fltAg(this)"><div class="dt" style="background:var(--bl)"></div>DevOps<span class="ct" id="ag-cnt-ops"></span></div>
+    <div class="lci" data-g="tp" data-f="qa" onclick="fltAg(this)"><div class="dt" style="background:var(--tl)"></div>QA<span class="ct" id="ag-cnt-qa"></span></div>
+    <div class="lci" data-g="tp" data-f="sec" onclick="fltAg(this)"><div class="dt" style="background:var(--co)"></div>Security<span class="ct" id="ag-cnt-sec"></span></div>
+    <div class="lci" data-g="tp" data-f="data" onclick="fltAg(this)"><div class="dt" style="background:var(--am)"></div>Data<span class="ct" id="ag-cnt-data"></span></div>
+    <div class="lci" data-g="tp" data-f="doc" onclick="fltAg(this)"><div class="dt" style="background:var(--gn)"></div>Docs<span class="ct" id="ag-cnt-doc"></span></div>
+    <div class="lct">Status</div>
+    <div class="lci on" data-g="st" data-f="all" onclick="fltAg(this)"><div class="dt" style="background:var(--t3)"></div>All<span class="ct" id="ag-cnt-st-all"></span></div>
+    <div class="lci" data-g="st" data-f="active" onclick="fltAg(this)"><div class="dt" style="background:var(--gn)"></div>Active<span class="ct" id="ag-cnt-active"></span></div>
+    <div class="lci" data-g="st" data-f="idle" onclick="fltAg(this)"><div class="dt" style="background:var(--t4)"></div>Idle<span class="ct" id="ag-cnt-idle"></span></div>
+  </div>
+  <div class="lmn"><div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><h2 id="ag-title" style="font-size:17px;font-weight:500;flex:1">All agents</h2><span id="ag-count" style="font-size:11px;color:var(--t4);font-family:var(--fm)"></span><button class="btn btn-p btn-sm" onclick="openCreateAgent()">+ Create</button></div><div class="lgr" id="ag-grid"></div></div>
+</div></div>
+
+<!-- ═══ Projects ═══ -->
+<div class="page" id="p-projs"><div class="psc fi"><div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><h2 style="font-size:18px;font-weight:500;flex:1">My projects</h2><button class="btn btn-p" onclick="openMo()">+ New</button></div><div class="lgr" id="pj-list"></div></div></div>
+
+<!-- ═══ Settings ═══ -->
+<div class="page" id="p-settings"><div class="psc fi">
+  <h2 style="font-size:20px;font-weight:500;margin-bottom:6px">Settings</h2>
+  <p style="font-size:13px;color:var(--t3);margin-bottom:24px">Configure your AI models and preferences. Crawlers and tools are pre-installed — zero config needed.</p>
+
+  <div class="set-grid">
+    <!-- ── AI Models: API Key OR OAuth ── -->
+    <div class="set-card full">
+      <h3>AI models</h3>
+      <div class="set-desc">Add models via API key or log in with your subscription account (OAuth). Auto-switches between models on rate limit / error. You can mix both methods.</div>
+
+      <!-- Auth method tabs -->
+      <div style="display:flex;gap:2px;background:var(--bg4);border-radius:9px;padding:3px;margin-bottom:16px;width:fit-content">
+        <div class="auth-tab on" id="tab-all" onclick="filterModels('all')">All models</div>
+        <div class="auth-tab" id="tab-key" onclick="filterModels('key')">API key</div>
+        <div class="auth-tab" id="tab-oauth" onclick="filterModels('oauth')">Account login</div>
+      </div>
+
+      <div id="model-list">
+        <!-- API key models -->
+        <div class="model-row" data-id="m1" data-auth="key">
+          <div class="mr-left"><div class="mr-icon" style="background:var(--acb2);color:var(--ac)">C</div><div><div class="mr-name">Claude Sonnet 4</div><div class="mr-provider">Anthropic <span class="auth-badge key">API key</span></div></div></div>
+          <div class="mr-mid"><input type="password" value="sk-ant-***configured***" placeholder="sk-ant-..." class="mr-key" oninput="validateKey(this)"><div class="mr-status ok">Connected</div></div>
+          <div class="mr-right"><select class="mr-priority"><option>Primary</option><option>Fallback</option><option>Disabled</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div>
+        </div>
+
+        <div class="model-row" data-id="m2" data-auth="key">
+          <div class="mr-left"><div class="mr-icon" style="background:var(--acb2);color:var(--ac)">C</div><div><div class="mr-name">Claude Opus 4</div><div class="mr-provider">Anthropic <span class="auth-badge key">API key</span></div></div></div>
+          <div class="mr-mid"><input type="password" value="sk-ant-***configured***" placeholder="sk-ant-..." class="mr-key" oninput="validateKey(this)"><div class="mr-status ok">Connected</div></div>
+          <div class="mr-right"><select class="mr-priority"><option>Fallback</option><option>Primary</option><option>Disabled</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div>
+        </div>
+
+        <!-- OAuth model examples -->
+        <div class="model-row" data-id="m3" data-auth="oauth">
+          <div class="mr-left"><div class="mr-icon" style="background:var(--blb);color:var(--bl)">G</div><div><div class="mr-name">Gemini 2.5 Pro</div><div class="mr-provider">Google <span class="auth-badge oauth">Google account</span></div></div></div>
+          <div class="mr-mid">
+            <div class="oauth-status logged-in"><div class="oauth-avatar">Y</div><div class="oauth-info"><div class="oauth-email">you@gmail.com</div><div class="oauth-plan">Gemini Advanced subscriber</div></div></div>
+            <div class="mr-status ok">Logged in</div>
+          </div>
+          <div class="mr-right"><select class="mr-priority"><option>Fallback</option><option>Primary</option><option>Disabled</option></select><button class="btn btn-sm" onclick="toast('Refreshing session...')">Refresh</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Logout</button></div>
+        </div>
+
+        <div class="model-row" data-id="m4" data-auth="oauth">
+          <div class="mr-left"><div class="mr-icon" style="background:var(--gnb);color:var(--gn)">O</div><div><div class="mr-name">ChatGPT (GPT-4o)</div><div class="mr-provider">OpenAI <span class="auth-badge oauth">OpenAI account</span></div></div></div>
+          <div class="mr-mid">
+            <button class="btn btn-sm btn-p oauth-login-btn" onclick="simulateOAuth(this,'OpenAI')">Log in with OpenAI</button>
+            <div class="mr-status miss">Not logged in</div>
+          </div>
+          <div class="mr-right"><select class="mr-priority"><option>Disabled</option><option>Fallback</option><option>Primary</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div>
+        </div>
+
+        <div class="model-row" data-id="m5" data-auth="key">
+          <div class="mr-left"><div class="mr-icon" style="background:var(--tlb);color:var(--tl)">D</div><div><div class="mr-name">Deepseek V3</div><div class="mr-provider">Deepseek <span class="auth-badge key">API key</span></div></div></div>
+          <div class="mr-mid"><input type="password" placeholder="sk-..." class="mr-key" oninput="validateKey(this)"><div class="mr-status miss">Not configured</div></div>
+          <div class="mr-right"><select class="mr-priority"><option>Disabled</option><option>Fallback</option><option>Primary</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div>
+        </div>
+      </div>
+
+      <!-- Add model -->
+      <div style="margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-sm btn-p" onclick="showAddModel()">+ Add model</button>
+        <span style="font-size:11px;color:var(--t4)">API key or account login — whatever you have</span>
+      </div>
+
+      <!-- Add model panel (hidden by default) -->
+      <div id="add-model-panel" style="display:none;margin-top:14px;padding:16px;background:var(--bg4);border:1px solid var(--b1);border-radius:12px">
+        <div style="font-size:13px;font-weight:500;margin-bottom:12px">Choose a model to add</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px" id="model-picker"></div>
+      </div>
+
+      <!-- Smart routing -->
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--b0)">
+        <div style="font-size:12.5px;font-weight:500;margin-bottom:8px">Smart routing</div>
+        <div class="toggle-row"><div><div class="tl">Auto-fallback on rate limit</div><div class="td">Switch to next model when rate limited</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row"><div><div class="tl">Auto-fallback on error</div><div class="td">Switch if API returns error or timeout</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row"><div><div class="tl">Cost optimization</div><div class="td">Cheap models for simple tasks, powerful for complex</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row"><div><div class="tl">Session persistence</div><div class="td">Keep OAuth sessions alive, auto-refresh tokens</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+    </div>
+
+    <!-- ── Built-in Tools ── -->
+    <div class="set-card">
+      <h3>Built-in tools</h3>
+      <div class="set-desc">Pre-installed, zero configuration. Everything works out of the box.</div>
+      <div class="builtin-item"><div class="bi-icon" style="background:var(--tlb);color:var(--tl)">S</div><div class="bi-info"><div class="bi-name">Scrapling</div><div class="bi-desc">Web scraper — GitHub, ClawHub, any site</div></div><div class="bi-status on">Active</div></div>
+      <div class="builtin-item"><div class="bi-icon" style="background:var(--acb2);color:var(--ac)">C</div><div class="bi-info"><div class="bi-name">ChromaDB</div><div class="bi-desc">Vector DB for semantic skill search</div></div><div class="bi-status on">Active</div></div>
+      <div class="builtin-item"><div class="bi-icon" style="background:var(--amb);color:var(--am)">R</div><div class="bi-info"><div class="bi-name">Redis + Celery</div><div class="bi-desc">Task queue and scheduler</div></div><div class="bi-status on">Active</div></div>
+      <div class="builtin-item"><div class="bi-icon" style="background:var(--blb);color:var(--bl)">P</div><div class="bi-info"><div class="bi-name">PostgreSQL</div><div class="bi-desc">Main database</div></div><div class="bi-status on">Active</div></div>
+      <div class="builtin-item"><div class="bi-icon" style="background:var(--gnb);color:var(--gn)">N</div><div class="bi-info"><div class="bi-name">Nginx + SSL</div><div class="bi-desc">Auto HTTPS</div></div><div class="bi-status on">Active</div></div>
+      <div class="builtin-item"><div class="bi-icon" style="background:var(--cob);color:var(--co)">G</div><div class="bi-info"><div class="bi-name">Git integration</div><div class="bi-desc">Repo clone and analysis</div></div><div class="bi-status on">Active</div></div>
+      <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px;font-size:11.5px;color:var(--t3)">All pre-installed. No setup needed.</div>
+    </div>
+
+    <!-- ── Crawlers ── -->
+    <div class="set-card">
+      <h3>Crawlers</h3>
+      <div class="set-desc">Scrapling handles all scraping automatically. Just toggle on/off.</div>
+      <div class="toggle-row"><div><div class="tl">GitHub repos</div><div class="td">Scan for SKILL.md files</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="toggle-row"><div><div class="tl">GitHub trending</div><div class="td">Daily trending analysis</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="toggle-row"><div><div class="tl">ClawHub</div><div class="td">Agent marketplace</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="toggle-row"><div><div class="tl">Auto-index uploads</div><div class="td">Auto-approve user skills</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+      <div class="ff" style="margin-top:10px"><label>Scan interval</label><select><option>Every 15 min</option><option>Every 30 min</option><option>Every hour</option></select></div>
+      <div class="ff"><label>GitHub token (optional)</label><input type="password" placeholder="ghp_... (increases rate limit)"><div class="hint">Without: 60 req/hr. With: 5,000 req/hr</div></div>
+    </div>
+
+    <!-- ── System ── -->
+    <div class="set-card full">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <div><div class="ff"><label>Max concurrent tasks</label><input type="number" value="8" min="1" max="32"></div></div>
+        <div><div class="ff"><label>Task timeout (seconds)</label><input type="number" value="300"></div></div>
+        <div><div class="ff"><label>Language</label><select><option>English</option><option>中文</option><option>日本語</option></select></div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-sm btn-p" onclick="toast('All settings saved')">Save all</button><button class="btn btn-sm btn-d" onclick="toast('Cache cleared')">Clear cache</button></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ═══ Workspace ═══ -->
+<div class="page" id="p-ws">
+  <div class="ppb">
+    <span style="font-size:13px;font-weight:500;margin-right:16px" id="ws-proj-name">E-Commerce Platform</span>
+    <div class="pps dn"><div class="ddd"></div>Analyze</div><div class="ppc dn"></div>
+    <div class="pps dn"><div class="ddd"></div>Plan</div><div class="ppc dn"></div>
+    <div class="pps dn"><div class="ddd"></div>Assign</div><div class="ppc dn"></div>
+    <div class="pps ac"><div class="ddd"></div>Build</div><div class="ppc"></div>
+    <div class="pps"><div class="ddd"></div>Review</div><div class="ppc"></div>
+    <div class="pps"><div class="ddd"></div>Deliver</div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:6px"><span style="font-size:11px;color:var(--gn);font-family:var(--fm);font-weight:500" id="ws-pct">72%</span><div style="width:70px;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden"><div style="width:72%;height:100%;background:var(--gn);border-radius:2px" id="ws-bar"></div></div></div>
+  </div>
+  <div class="ws">
+    <div class="wsl">
+      <div class="wsc"><div class="al" id="alog">
+        <div class="ag"><div class="agh"><span class="pt" style="background:var(--acb2);color:var(--ac)">Analyze</span><div class="ln"></div><span class="st" style="color:var(--gn)">Done</span></div>
+          <div class="ai sy"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">Analyzed your requirements: <strong>E-Commerce Platform</strong> with user auth, product catalog, shopping cart, Stripe payments, order management, admin panel.</div><div class="at">14:20:01</div></div></div></div>
+        <div class="ag"><div class="agh"><span class="pt" style="background:var(--tlb);color:var(--tl)">Plan</span><div class="ln"></div><span class="st" style="color:var(--gn)">Done</span></div>
+          <div class="ai sy"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am"><strong>23 tasks, 5 agents</strong>:</div>
+            <div class="plb"><div class="plt">Execution plan</div>
+              <div class="pli"><span class="pln">1</span>System architecture<span class="pla" style="background:var(--acb2);color:var(--ac)">Architect</span></div>
+              <div class="pli"><span class="pln">2</span>Database ERD<span class="pla" style="background:var(--acb2);color:var(--ac)">Architect</span></div>
+              <div class="pli"><span class="pln">3</span>API contracts (18 endpoints)<span class="pla" style="background:var(--acb2);color:var(--ac)">Architect</span></div>
+              <div class="pli"><span class="pln">4</span>User auth + OAuth<span class="pla" style="background:var(--tlb);color:var(--tl)">Backend</span></div>
+              <div class="pli"><span class="pln">5</span>Product CRUD API<span class="pla" style="background:var(--tlb);color:var(--tl)">Backend</span></div>
+              <div class="pli"><span class="pln">6</span>Stripe payment<span class="pla" style="background:var(--tlb);color:var(--tl)">Backend</span></div>
+              <div class="pli"><span class="pln">7</span>Design system<span class="pla" style="background:var(--cob);color:var(--co)">Frontend</span></div>
+              <div class="pli" style="color:var(--t4)"><span class="pln">..</span>+16 more tasks<span class="pla" style="background:var(--bg5)">Various</span></div>
+              <div class="plx" id="plx"><button class="btn btn-p btn-sm" onclick="approve()">Approve & execute</button><button class="btn btn-sm" onclick="toast('Edit mode coming soon')">Edit plan</button><button class="btn btn-w btn-sm" style="margin-left:auto" onclick="approve()">Auto</button></div>
+            </div><div class="at">14:20:28</div></div></div></div>
+        <div class="ag"><div class="agh"><span class="pt" style="background:var(--amb);color:var(--am)">Assign</span><div class="ln"></div><span class="st" style="color:var(--gn)">Done</span></div>
+          <div class="ai sy"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">Deployed: <strong>Architect</strong> (4) / <strong>Backend</strong> (6) / <strong>Frontend</strong> (6) / <strong>Test</strong> (4) / <strong>DevOps</strong> (3)</div><div class="at">14:21:03</div></div></div></div>
+        <div class="ag" id="build-phase"><div class="agh"><span class="pt" style="background:var(--gnb);color:var(--gn)">Build</span><div class="ln"></div><span class="st pulse" style="color:var(--gn)">In progress</span></div>
+          <div class="ai"><div class="aa" style="background:var(--acb2);color:var(--ac)">A</div><div class="ab"><div class="an" style="color:var(--ac)">Architect-Agent</div><div class="am">System design complete. Docs pushed to shared context.</div><div class="at">14:28:12</div></div></div>
+          <div class="ai"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">Architect complete. Unblocking Backend and Frontend for parallel work.</div><div class="at">14:28:15</div></div></div>
+          <div class="ai"><div class="aa" style="background:var(--tlb);color:var(--tl)">B</div><div class="ab"><div class="an" style="color:var(--tl)">Backend-Agent</div><div class="am">Auth module: <strong>POST /auth/login</strong>, <strong>POST /auth/register</strong>, <strong>GET /auth/me</strong>.</div><div class="at">14:29:01</div></div></div>
+          <div class="ai"><div class="aa" style="background:var(--tlb);color:var(--tl)">B</div><div class="ab"><div class="an" style="color:var(--tl)">Backend → <span style="color:var(--co)">Frontend</span></div><div class="am">Product API ready: <strong>GET /api/products</strong>, <strong>POST /api/cart</strong>. Schema pushed.</div><div class="at">14:35:22</div></div></div>
+          <div class="ai"><div class="aa" style="background:var(--amb);color:var(--am)">T</div><div class="ab"><div class="an" style="color:var(--am)">Test-Agent → PM</div><div class="am">Auth: <strong>24/24</strong>. Products: <strong>18/18</strong>. Coverage: 92%.</div><div class="at">14:42:08</div></div></div>
+          <div class="ai sy" id="issue-log" style="border-color:rgba(248,113,133,.2);background:var(--cob)"><div class="aa" style="background:var(--co);color:#fff">!</div><div class="ab"><div class="an" style="color:var(--co)">PM-Agent — Issue</div><div class="am"><strong>payment-service.ts:142</strong> — Stripe webhook timeout.</div><div class="ax"><button class="btn btn-d btn-sm" onclick="fixLog(this)">Fix</button><button class="btn btn-sm" onclick="toast('Code viewer coming soon')">View code</button></div><div class="at">14:44:30</div></div></div>
+          <div class="ai usr"><div class="aa" style="background:linear-gradient(135deg,var(--co),var(--am));color:#090a0e">Y</div><div class="ab"><div class="an" style="color:var(--t1)">You → PM-Agent</div><div class="am">Prioritize payment. Need Stripe by Friday.</div><div class="at">14:45:12</div></div></div>
+          <div class="ai"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">Re-prioritized: Backend → payment first, Frontend → checkout moved up, Test → payment E2E queued. ETA: <strong>~2 hours</strong>.</div><div class="at">14:45:18</div></div></div>
+        </div>
+      </div></div>
+      <div class="cha">
+        <div class="chm"><div class="cmb on" id="m-plan" onclick="setM('plan')">Plan first</div><div class="cmb" id="m-auto" onclick="setM('auto')">Auto execute</div></div>
+        <div class="chi"><input id="ci" placeholder="Talk to PM-Agent..." onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn btn-p" onclick="sendMsg()">Send</button></div>
+      </div>
+    </div>
+    <div class="wsr">
+      <div class="wp" style="text-align:center">
+        <div class="rng"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="var(--b0)" stroke-width="6"/><circle id="ring-fill" cx="48" cy="48" r="40" fill="none" stroke="var(--gn)" stroke-width="6" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="70.4"/></svg><div class="rng-c"><div class="rv" style="color:var(--gn)" id="ring-pct">72%</div><div class="rl">Complete</div></div></div>
+        <div style="display:flex;justify-content:center;gap:16px;font-size:10px;font-family:var(--fm)"><span style="color:var(--gn)">17 done</span><span style="color:var(--ac)">4 active</span><span style="color:var(--t4)">2 queued</span></div>
+      </div>
+      <div class="wp"><h4>Agent team</h4>
+        <div class="agc"><div class="ah"><div class="aav" style="background:var(--acb2);color:var(--ac)">A</div><div class="anm">Architect</div><span class="ast" style="background:var(--gnb);color:var(--gn)">Done</span></div><div class="atx">4/4 complete</div><div class="abr"><div class="fl" style="width:100%;background:var(--gn)"></div></div></div>
+        <div class="agc"><div class="ah"><div class="aav" style="background:var(--tlb);color:var(--tl)">B</div><div class="anm">Backend</div><span class="ast" style="background:var(--acb2);color:var(--ac)">Working</span></div><div class="atx">3/6 — payment</div><div class="abr"><div class="fl" style="width:50%;background:var(--tl)"></div></div></div>
+        <div class="agc"><div class="ah"><div class="aav" style="background:var(--cob);color:var(--co)">F</div><div class="anm">Frontend</div><span class="ast" style="background:var(--acb2);color:var(--ac)">Working</span></div><div class="atx">3/6 — cart</div><div class="abr"><div class="fl" style="width:50%;background:var(--co)"></div></div></div>
+        <div class="agc"><div class="ah"><div class="aav" style="background:var(--amb);color:var(--am)">T</div><div class="anm">Test</div><span class="ast" style="background:var(--acb2);color:var(--ac)">Working</span></div><div class="atx">2/4 — integration</div><div class="abr"><div class="fl" style="width:50%;background:var(--am)"></div></div></div>
+        <div class="agc"><div class="ah"><div class="aav" style="background:var(--blb);color:var(--bl)">D</div><div class="anm">DevOps</div><span class="ast" style="background:var(--bg5);color:var(--t4)">Queued</span></div><div class="atx">1/3</div><div class="abr"><div class="fl" style="width:33%;background:var(--bl)"></div></div></div>
+      </div>
+      <div class="wp"><h4 id="issue-count"><span style="color:var(--co)">!</span> Issues (2)</h4>
+        <div class="ial" id="wi1"><div class="it"><div class="itx">Stripe webhook timeout</div><div class="ifl">payment-service.ts:142</div></div><button class="btn btn-d btn-sm" onclick="fixP(1,this)">Fix</button></div>
+        <div class="ial" id="wi2"><div class="it"><div class="itx">Cart re-render perf</div><div class="ifl">CartView.tsx:78</div></div><button class="btn btn-d btn-sm" onclick="fixP(2,this)">Fix</button></div>
+      </div>
+      <div class="wp"><h4>Deliverables</h4>
+        <div class="dli"><span>📋</span><span class="dlnm">system-architecture.md</span><span class="dlag">Architect</span></div>
+        <div class="dli"><span>🔌</span><span class="dlnm">api-contracts.yaml</span><span class="dlag">Architect</span></div>
+        <div class="dli"><span>🗄</span><span class="dlnm">database-schema.sql</span><span class="dlag">Backend</span></div>
+        <div class="dli"><span>⚙</span><span class="dlnm">backend/src/ (42 files)</span><span class="dlag">Backend</span></div>
+        <div class="dli"><span>🎨</span><span class="dlnm">frontend/src/ (38 files)</span><span class="dlag">Frontend</span></div>
+        <div class="dli"><span>✅</span><span class="dlnm">test-reports/</span><span class="dlag">Test</span></div>
+        <div class="dli" style="opacity:.35"><span>📦</span><span class="dlnm">production-build/</span><span class="dlag">Pending</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div></div>
+
+<!-- Modal -->
+<div class="mo" id="modal" onclick="if(event.target===this)closeMo()">
+  <div class="mo-box">
+    <h2>Create new project</h2>
+    <div class="ms">Describe your project — PM-Agent will decompose tasks, match agents, and start building.</div>
+    <div class="ff"><label>Project name</label><input id="mo-name" placeholder="e.g. SaaS Analytics Dashboard"></div>
+    <div class="ff"><label>What do you want to build?</label><textarea id="mo-desc" placeholder="Describe your project in plain language. For example: A real-time analytics dashboard with user tracking, conversion funnels, custom reports, and Stripe billing."></textarea></div>
+    <div class="ff"><label>Priority</label><select id="mo-pri"><option>Normal</option><option>High — faster</option><option>Critical — all agents</option></select></div>
+    <div class="mf"><button class="btn" onclick="closeMo()">Cancel</button><button class="btn btn-p" onclick="createProj()">Create & deploy agents</button></div>
+  </div>
+</div>
+<div class="mo" id="detail-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="mo-box" id="detail-content"></div>
+</div>
+<div class="mo" id="agent-create-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="mo-box">
+    <h2>Create new agent</h2>
+    <div class="ms">Configure a new AI agent with skills from your library.</div>
+    <div class="ff"><label>Agent name</label><input id="ca-name" placeholder="e.g. Frontend-Pro"></div>
+    <div class="ff"><label>Description</label><input id="ca-desc" placeholder="What does this agent do?"></div>
+    <div class="ff"><label>Type</label><select id="ca-type"><option value="dev">Development</option><option value="ops">DevOps</option><option value="qa">QA</option><option value="sec">Security</option><option value="data">Data</option><option value="doc">Docs</option></select></div>
+    <div class="ff"><label>Skills (comma-separated)</label><input id="ca-skills" placeholder="e.g. code-reviewer, test-writer"></div>
+    <div class="mf"><button class="btn" onclick="document.getElementById('agent-create-modal').classList.remove('open')">Cancel</button><button class="btn btn-p" onclick="createAgent()">Create agent</button></div>
+  </div>
+</div>
+<div class="toast" id="toast-el"></div>
+
+<script>
+/* ══ Nav ══ */
+document.querySelectorAll('.ni[data-p]').forEach(n=>n.onclick=()=>go(n.dataset.p));
+function go(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
+  const e=document.getElementById('p-'+p);if(e)e.classList.add('on');
+  document.querySelectorAll('.ni').forEach(n=>{if(n.dataset.p===p)n.classList.add('on')});
+  if(p==='ws')setTimeout(()=>{const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight},50);
+}
+/* FIX M-07: Ctrl+K shortcut */
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.getElementById('gs').focus()}});
+
+/* ══ Toast — FIX C-05: clear previous timer ══ */
+let toastTimer=null;
+function toast(msg){
+  clearTimeout(toastTimer);
+  const t=document.getElementById('toast-el');
+  t.textContent=msg;t.classList.add('show');
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ══ Modal — FIX M-05: clear fields ══ */
+function openMo(){document.getElementById('modal').classList.add('open')}
+function closeMo(){document.getElementById('modal').classList.remove('open')}
+const PROJS=[
+  {n:'E-Commerce Platform',d:'Full-stack with Stripe, auth, admin panel',p:72,c:'var(--gn)',ph:'Build'},
+  {n:'SaaS Dashboard',d:'Analytics, funnels, reports, billing',p:25,c:'var(--ac)',ph:'Plan'},
+  {n:'Blog Platform',d:'Markdown blog with SSR, CMS, RSS',p:91,c:'var(--am)',ph:'Deliver'},
+];
+const projColors=['var(--bl)','var(--pk)','var(--tl)','var(--co)','var(--am)','var(--gn)','var(--ac)'];
+function createProj(){
+  const nm=document.getElementById('mo-name').value||'New Project';
+  const ds=document.getElementById('mo-desc').value||'Custom project';
+  const pri=document.getElementById('mo-pri').value;
+  PROJS.push({n:nm,d:ds,p:0,c:projColors[PROJS.length%projColors.length],ph:'Analyze'});
+  closeMo();toast('"'+nm+'" created — PM-Agent deploying...');
+  document.getElementById('mo-name').value='';
+  document.getElementById('mo-desc').value='';
+  renderProjs();renderDashProjs();
+  document.querySelector('.sc:nth-child(3) .sc-v').textContent=PROJS.length;
+  document.querySelector('.ni[data-p="projs"] .bd').textContent=PROJS.length;
+  setTimeout(()=>{switchProject(PROJS.length-1);go('ws')},600);
+}
+
+/* ══ Mode ══ */
+let mode='plan';
+function setM(m){mode=m;document.getElementById('m-plan').classList.toggle('on',m==='plan');document.getElementById('m-auto').classList.toggle('on',m==='auto');toast(m==='auto'?'Auto mode — agents execute immediately':'Plan mode — review before execution')}
+
+/* ══ Chat — FIX C-01 XSS, FIX M-06 animation fill ══ */
+const replies=[
+  {k:['prioritize','priority','urgent','asap','friday'],r:'Re-prioritizing now. Bumping to top of queue and notifying agents.'},
+  {k:['fix','bug','error','issue','broken'],r:'Flagged for immediate fix. Dispatching the responsible agent now.'},
+  {k:['status','progress','how','update','where'],r:'17/23 tasks done (72%). Backend on payment, Frontend on cart, Test at 92% coverage. 2 issues pending.'},
+  {k:['add','feature','also','include','want','need'],r:'Added to backlog. Re-evaluating assignments — if it\'s a dependency, I\'ll slot it in immediately.'},
+  {k:['deploy','ship','launch','production','release'],r:'Deploy is Phase 6. Blockers: payment + 2 issues. Once cleared, DevOps-Agent runs CI/CD. ETA ~4 hours.'},
+  {k:['test','coverage','qa'],r:'Test-Agent: 42/42 unit, 18/18 integration passing. E2E queued. Coverage at 92%.'},
+  {k:['hello','hi','hey'],r:'Hey! I\'m your PM-Agent. Tell me what you need — I\'ll coordinate the team.'},
+  {k:['help','what can','how do'],r:'You can: ask for status, prioritize tasks, add features, request fixes, or ask me to deploy. I coordinate all agents for you.'},
+];
+function getReply(txt){
+  const low=txt.toLowerCase();
+  for(const r of replies)if(r.k.some(k=>low.includes(k)))return r.r;
+  return mode==='auto'?'Executing now — dispatching agents. Updates will appear in the log.':'Got it. Drafting an execution plan for your review.';
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function sendMsg(){
+  const inp=document.getElementById('ci'),txt=inp.value.trim();if(!txt)return;
+  const log=document.getElementById('build-phase');
+  const d=document.createElement('div');d.className='ai usr';d.style.animation='fadeUp .25s ease both';
+  d.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--co),var(--am));color:#090a0e">Y</div><div class="ab"><div class="an" style="color:var(--t1)">You → PM-Agent</div><div class="am">'+esc(txt)+'</div><div class="at">'+now()+'</div></div>';
+  log.appendChild(d);inp.value='';scrollLog();
+  setTimeout(()=>{
+    const r=document.createElement('div');r.className='ai';r.style.animation='fadeUp .25s ease both';
+    r.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">'+getReply(txt)+'</div><div class="at">'+now()+'</div></div>';
+    log.appendChild(r);scrollLog();
+  },600+Math.random()*600);
+}
+function now(){return new Date().toLocaleTimeString('en',{hour12:false})}
+function scrollLog(){const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight}
+
+/* ══ Fix — FIX C-04: immediate disable + FIX L-03: update count ══ */
+let issuesFixed=0;
+function fixLog(b){b.style.pointerEvents='none';b.innerHTML='<span class="spin">⟳</span>';setTimeout(()=>{b.innerHTML='Fixed';b.className='btn btn-s btn-sm';b.style.pointerEvents='';const p=b.closest('.ai');p.style.borderColor='rgba(90,224,138,.15)';p.style.background='var(--gnb)'},1800)}
+function fixP(id,b){b.style.pointerEvents='none';b.innerHTML='<span class="spin">⟳</span>';const e=document.getElementById('wi'+id);setTimeout(()=>{e.style.borderColor='rgba(90,224,138,.15)';e.style.background='var(--gnb)';e.querySelector('.itx').style.color='var(--gn)';b.innerHTML='Done';b.className='btn btn-s btn-sm';issuesFixed++;document.getElementById('issue-count').innerHTML=issuesFixed>=2?'<span style="color:var(--gn)">✓</span> All issues resolved':'<span style="color:var(--co)">!</span> Issues ('+(2-issuesFixed)+')';toast('Issue fixed')},1500)}
+/* FIX C-03: approve with state preservation */
+let approved=false;
+function approve(){if(approved)return;approved=true;document.getElementById('plx').innerHTML='<span style="font-size:11px;color:var(--gn);font-family:var(--fm)">✓ Plan approved — agents executing</span>';toast('Plan approved — 5 agents deploying')}
+
+/* ══ Library — FIX M-01: separate source/category groups, FIX L-06: real counts ══ */
+const SKS=[
+  {n:'code-reviewer',s:'github/anthropic',d:'Automated code review with security, style, and performance analysis',t:['python','review'],i:'λ',b:'var(--acb2)',c:'var(--ac)',r:'4.8',src:'github',cat:'code'},
+  {n:'api-generator',s:'clawhub/devtools',d:'Generate REST and GraphQL APIs from natural language schema',t:['api','codegen'],i:'⚡',b:'var(--tlb)',c:'var(--tl)',r:'4.6',src:'clawhub',cat:'code'},
+  {n:'test-writer',s:'github/testing-ai',d:'Auto-generate unit, integration and E2E tests',t:['testing','jest'],i:'⬡',b:'var(--cob)',c:'var(--co)',r:'4.5',src:'github',cat:'test'},
+  {n:'doc-writer',s:'clawhub/docs',d:'Generate technical documentation from codebase',t:['docs','openapi'],i:'◈',b:'var(--amb)',c:'var(--am)',r:'4.7',src:'clawhub',cat:'doc'},
+  {n:'db-designer',s:'github/data-ai',d:'Database schema design and query optimization',t:['sql','postgres'],i:'◇',b:'var(--blb)',c:'var(--bl)',r:'4.4',src:'github',cat:'data'},
+  {n:'deploy-manager',s:'clawhub/infra',d:'Automated CI/CD pipeline and infrastructure provisioning',t:['docker','k8s'],i:'△',b:'var(--tlb)',c:'var(--tl)',r:'4.3',src:'clawhub',cat:'infra'},
+  {n:'security-scanner',s:'github/sec-tools',d:'Vulnerability scanning and OWASP compliance',t:['security','audit'],i:'⬢',b:'var(--cob)',c:'var(--co)',r:'4.6',src:'github',cat:'sec'},
+  {n:'react-builder',s:'github/frontend-ai',d:'React scaffolding with Tailwind and state management',t:['react','tailwind'],i:'⬡',b:'var(--acb2)',c:'var(--ac)',r:'4.7',src:'github',cat:'ui'},
+  {n:'agent-router',s:'trending/swarm',d:'Agent routing from trending multi-agent framework',t:['agent','routing'],i:'⚡',b:'var(--blb)',c:'var(--bl)',r:'4.5',src:'trending',cat:'ai'},
+  {n:'perf-optimizer',s:'trending/perf',d:'Performance profiling and bottleneck detection',t:['perf','cache'],i:'◉',b:'var(--amb)',c:'var(--am)',r:'4.2',src:'trending',cat:'code'},
+  {n:'nlp-processor',s:'clawhub/ml',d:'NER, sentiment analysis and summarization',t:['nlp','ml'],i:'◎',b:'var(--acb2)',c:'var(--pk)',r:'4.4',src:'clawhub',cat:'ai'},
+  {n:'vue-scaffold',s:'github/frontend-ai',d:'Vue 3 + Nuxt with Pinia and TypeScript',t:['vue','nuxt'],i:'⬡',b:'var(--gnb)',c:'var(--gn)',r:'4.3',src:'github',cat:'ui'},
+];
+let skSrc='all',skCat='all';
+function fltSk(el){
+  const g=el.dataset.g,f=el.dataset.f;
+  if(g==='src'){skSrc=f;el.closest('.lsb').querySelectorAll('.lci[data-g="src"]').forEach(x=>x.classList.remove('on'))}
+  else{skCat=f;el.closest('.lsb').querySelectorAll('.lci[data-g="cat"]').forEach(x=>x.classList.remove('on'))}
+  el.classList.add('on');renderSk();
+}
+function skCard(s){return '<div class="lcd" onclick="viewSkill('+SKS.indexOf(s)+')"><div class="lh"><div class="li" style="background:'+s.b+';color:'+s.c+'">'+s.i+'</div><div><div class="ln">'+s.n+'</div><div class="ls">'+s.s+'</div></div></div><div class="ld">'+s.d+'</div><div style="display:flex;gap:4px;margin-bottom:6px">'+s.t.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div><div class="lf"><span>★ '+s.r+'</span></div></div>'}
+function renderSk(){
+  let f=SKS;
+  if(skSrc!=='all')f=f.filter(s=>s.src===skSrc);
+  if(skCat!=='all')f=f.filter(s=>s.cat===skCat);
+  const parts=[];if(skSrc!=='all')parts.push(skSrc.charAt(0).toUpperCase()+skSrc.slice(1));if(skCat!=='all')parts.push(skCat);
+  document.getElementById('sk-title').textContent=parts.length?parts.join(' ')+' skills':'All skills';
+  document.getElementById('sk-count').textContent=f.length+' results';
+  document.getElementById('sk-grid').innerHTML=f.length?f.map(s=>skCard(s)).join(''):'<div style="text-align:center;padding:40px;color:var(--t4)">No skills match this filter</div>';
+  const cnt=(k,v)=>SKS.filter(s=>s[k]===v).length;
+  ['github','clawhub','trending'].forEach(v=>{const el=document.getElementById('sk-cnt-'+v);if(el)el.textContent=cnt('src',v)});
+  ['code','test','infra','data','sec','doc','ai','ui'].forEach(v=>{const el=document.getElementById('sk-cnt-'+v);if(el)el.textContent=cnt('cat',v)});
+  const ae=document.getElementById('sk-cnt-all');if(ae)ae.textContent=SKS.length;
+  const cae=document.getElementById('sk-cnt-cat-all');if(cae)cae.textContent=SKS.length;
+}
+
+const AGS=[
+  {n:'FullStack-Dev',d:'Code gen, testing, deploy',sk:['code-reviewer','api-gen','test-writer'],c:'var(--ac)',st:'Active',tp:'dev'},
+  {n:'Security-Auditor',d:'Scanning, vulnerability assessment',sk:['security-scanner','code-reviewer'],c:'var(--co)',st:'Active',tp:'sec'},
+  {n:'Data-Engineer',d:'Database, ETL, data quality',sk:['db-designer','perf-optimizer'],c:'var(--tl)',st:'Active',tp:'data'},
+  {n:'Frontend-Pro',d:'React UI, design system',sk:['react-builder','test-writer'],c:'var(--bl)',st:'Idle',tp:'dev'},
+  {n:'DevOps-Master',d:'Infra, CI/CD, monitoring',sk:['deploy-manager'],c:'var(--am)',st:'Active',tp:'ops'},
+  {n:'Doc-Writer',d:'Auto-generate documentation',sk:['doc-writer'],c:'var(--gn)',st:'Idle',tp:'doc'},
+  {n:'QA-Lead',d:'Test strategy, coverage analysis',sk:['test-writer'],c:'var(--tl)',st:'Active',tp:'qa'},
+];
+let agTp='all',agSt='all';
+function fltAg(el){
+  const g=el.dataset.g,f=el.dataset.f;
+  if(g==='tp'){agTp=f;el.closest('.lsb').querySelectorAll('.lci[data-g="tp"]').forEach(x=>x.classList.remove('on'))}
+  else{agSt=f;el.closest('.lsb').querySelectorAll('.lci[data-g="st"]').forEach(x=>x.classList.remove('on'))}
+  el.classList.add('on');renderAg();
+}
+function agCard(a){return '<div class="lcd" onclick="viewAgent('+AGS.indexOf(a)+')"><div class="lh"><div class="li" style="background:'+a.c+'15;color:'+a.c+';border-radius:50%;font-weight:700;font-size:13px">'+a.n[0]+'</div><div><div class="ln">'+a.n+'</div><div class="ls">'+a.sk.length+' skills</div></div></div><div class="ld">'+a.d+'</div><div style="display:flex;gap:4px;margin-bottom:6px">'+a.sk.map(s=>'<span class="tag">'+s+'</span>').join('')+'</div><div class="lf"><span style="color:'+(a.st==='Active'?'var(--gn)':'var(--t4)')+'">'+a.st+'</span></div></div>'}
+function renderAg(){
+  let f=AGS;
+  if(agTp!=='all')f=f.filter(a=>a.tp===agTp);
+  if(agSt!=='all')f=f.filter(a=>a.st.toLowerCase()===agSt);
+  const parts=[];if(agTp!=='all')parts.push(agTp.charAt(0).toUpperCase()+agTp.slice(1));if(agSt!=='all')parts.push(agSt);
+  document.getElementById('ag-title').textContent=parts.length?parts.join(' ')+' agents':'All agents';
+  document.getElementById('ag-count').textContent=f.length+' agents';
+  document.getElementById('ag-grid').innerHTML=f.length?f.map(a=>agCard(a)).join(''):'<div style="text-align:center;padding:40px;color:var(--t4)">No agents match</div>';
+  const cnt=(k,v)=>AGS.filter(a=>a[k]===v||(k==='st'&&a.st.toLowerCase()===v)).length;
+  ['dev','ops','qa','sec','data','doc'].forEach(v=>{const el=document.getElementById('ag-cnt-'+v);if(el)el.textContent=cnt('tp',v)});
+  ['active','idle'].forEach(v=>{const el=document.getElementById('ag-cnt-'+v);if(el)el.textContent=cnt('st',v)});
+  const ae=document.getElementById('ag-cnt-all');if(ae)ae.textContent=AGS.length;
+  const sae=document.getElementById('ag-cnt-st-all');if(sae)sae.textContent=AGS.length;
+}
+
+/* ══ Global search — FIX C-01: handle 0 match, FIX C-02: reset state ══ */
+function globalSearch(q){
+  if(!q){skSrc='all';skCat='all';agTp='all';agSt='all';
+    document.querySelectorAll('.lci').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.lci[data-f="all"]').forEach(x=>x.classList.add('on'));
+    renderSk();renderAg();return}
+  const low=q.toLowerCase();
+  const skm=SKS.filter(s=>s.n.includes(low)||s.d.toLowerCase().includes(low)||s.t.some(t=>t.includes(low)));
+  const agm=AGS.filter(a=>a.n.toLowerCase().includes(low)||a.d.toLowerCase().includes(low)||a.sk.some(s=>s.includes(low)));
+  if(skm.length>=agm.length&&skm.length>0){go('lib-sk');document.getElementById('sk-grid').innerHTML=skm.map(s=>skCard(s)).join('');document.getElementById('sk-count').textContent=skm.length+' results';document.getElementById('sk-title').textContent='Search: '+q}
+  else if(agm.length>0){go('lib-ag');document.getElementById('ag-grid').innerHTML=agm.map(a=>agCard(a)).join('');document.getElementById('ag-count').textContent=agm.length+' results';document.getElementById('ag-title').textContent='Search: '+q}
+  else{toast('No results for "'+q+'"')}
+}
+
+/* ══ Settings: model management with OAuth support ══ */
+let modelCounter=6;
+const MODELS=[
+  {name:'Claude Haiku 3.5',prov:'Anthropic',icon:'C',ib:'var(--acb2)',ic:'var(--ac)',auth:'key',ph:'sk-ant-...'},
+  {name:'GPT-4o Mini',prov:'OpenAI',icon:'O',ib:'var(--gnb)',ic:'var(--gn)',auth:'both',ph:'sk-... or login',login:'OpenAI'},
+  {name:'Gemini 2.0 Flash',prov:'Google',icon:'G',ib:'var(--blb)',ic:'var(--bl)',auth:'both',ph:'AIza... or login',login:'Google'},
+  {name:'Deepseek V3',prov:'Deepseek',icon:'D',ib:'var(--tlb)',ic:'var(--tl)',auth:'key',ph:'sk-...'},
+  {name:'Groq Llama 3.3',prov:'Groq',icon:'Q',ib:'var(--amb)',ic:'var(--am)',auth:'key',ph:'gsk_...'},
+  {name:'Ollama (Local)',prov:'localhost:11434',icon:'L',ib:'var(--bg5)',ic:'var(--t2)',auth:'none',ph:'No key needed'},
+  {name:'Azure OpenAI',prov:'Microsoft',icon:'A',ib:'var(--blb)',ic:'var(--bl)',auth:'both',ph:'endpoint key or login',login:'Microsoft'},
+  {name:'Claude via subscription',prov:'Anthropic',icon:'C',ib:'var(--acb2)',ic:'var(--ac)',auth:'oauth',login:'Anthropic'},
+  {name:'Mistral Large',prov:'Mistral',icon:'M',ib:'var(--cob)',ic:'var(--co)',auth:'key',ph:'...'},
+  {name:'Custom OpenAI-compatible',prov:'Any endpoint',icon:'*',ib:'var(--bg5)',ic:'var(--t2)',auth:'key',ph:'base_url + key'},
+];
+
+function validateKey(inp){
+  const st=inp.closest('.model-row').querySelector('.mr-status');
+  if(inp.value.length>8){st.textContent='Connected';st.className='mr-status ok'}
+  else if(inp.value.length>0){st.textContent='Invalid';st.className='mr-status miss'}
+  else{st.textContent='Not configured';st.className='mr-status miss'}
+}
+function testModel(btn){
+  const row=btn.closest('.model-row'),st=row.querySelector('.mr-status');
+  const key=row.querySelector('.mr-key');
+  if(key&&(!key.value||key.value.length<5)){toast('Enter a key first');return}
+  btn.style.pointerEvents='none';st.textContent='Testing...';st.className='mr-status testing';
+  setTimeout(()=>{st.textContent='Connected';st.className='mr-status ok';toast('Model responded OK');btn.style.pointerEvents=''},1500);
+}
+function removeModel(btn){
+  const row=btn.closest('.model-row');
+  row.style.opacity='.3';row.style.pointerEvents='none';
+  setTimeout(()=>{row.remove();toast('Model removed')},300);
+}
+function simulateOAuth(btn,provider){
+  btn.style.pointerEvents='none';btn.textContent='Connecting...';
+  setTimeout(()=>{
+    const mid=btn.closest('.mr-mid');
+    mid.innerHTML='<div class="oauth-status logged-in"><div class="oauth-avatar">Y</div><div class="oauth-info"><div class="oauth-email">you@'+provider.toLowerCase()+'.com</div><div class="oauth-plan">'+provider+' subscriber</div></div></div><div class="mr-status ok">Logged in</div>';
+    toast('Logged in to '+provider+' successfully');
+  },1800);
+}
+function filterModels(type){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+type).classList.add('on');
+  document.querySelectorAll('.model-row').forEach(r=>{
+    if(type==='all')r.style.display='';
+    else r.style.display=r.dataset.auth===type?'':'none';
+  });
+}
+function showAddModel(){
+  const panel=document.getElementById('add-model-panel');
+  if(panel.style.display==='none'){
+    panel.style.display='block';
+    const picker=document.getElementById('model-picker');
+    picker.innerHTML=MODELS.map((m,i)=>{
+      const authLabel=m.auth==='key'?'API key':m.auth==='oauth'?'Account login':m.auth==='both'?'Key or login':'No key';
+      return '<div class="model-pick" onclick="addModel('+i+')"><div class="mp-icon" style="background:'+m.ib+';color:'+m.ic+'">'+m.icon+'</div><div><div class="mp-name">'+m.name+'</div><div class="mp-type">'+m.prov+' — '+authLabel+'</div></div></div>';
+    }).join('');
+  }else{panel.style.display='none'}
+}
+function addModel(idx){
+  const m=MODELS[idx];modelCounter++;
+  document.getElementById('add-model-panel').style.display='none';
+  const authType=m.auth==='oauth'||m.auth==='both'?'oauth':'key';
+  const badge=authType==='oauth'?'<span class="auth-badge oauth">'+m.login+' account</span>':'<span class="auth-badge key">API key</span>';
+  let midHTML;
+  if(m.auth==='none'){
+    midHTML='<div style="font-size:12px;color:var(--t3);flex:1">No API key needed — runs locally</div><div class="mr-status ok">Ready</div>';
+  }else if(m.auth==='oauth'){
+    midHTML='<button class="btn btn-sm btn-p oauth-login-btn" onclick="simulateOAuth(this,\''+m.login+'\')">Log in with '+m.login+'</button><div class="mr-status miss">Not logged in</div>';
+  }else if(m.auth==='both'){
+    midHTML='<input type="password" placeholder="'+m.ph+'" class="mr-key" oninput="validateKey(this)" style="flex:1"><span style="font-size:11px;color:var(--t4);padding:0 4px">or</span><button class="btn btn-sm" onclick="simulateOAuth(this,\''+m.login+'\')">'+m.login+' login</button><div class="mr-status miss">Not configured</div>';
+  }else{
+    midHTML='<input type="password" placeholder="'+(m.ph||'API key...')+'" class="mr-key" oninput="validateKey(this)"><div class="mr-status miss">Not configured</div>';
+  }
+  const html='<div class="model-row" data-id="m'+modelCounter+'" data-auth="'+authType+'" style="animation:fadeUp .25s ease both"><div class="mr-left"><div class="mr-icon" style="background:'+m.ib+';color:'+m.ic+'">'+m.icon+'</div><div><div class="mr-name">'+m.name+'</div><div class="mr-provider">'+m.prov+' '+badge+'</div></div></div><div class="mr-mid">'+midHTML+'</div><div class="mr-right"><select class="mr-priority"><option>Fallback</option><option>Primary</option><option>Disabled</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div></div>';
+  document.getElementById('model-list').insertAdjacentHTML('beforeend',html);
+  toast(m.name+' added');
+}
+
+/* ══ View detail modals ══ */
+function viewSkill(idx){
+  const s=SKS[idx];if(!s)return;
+  const catNames={code:'Code gen',test:'Testing',infra:'DevOps',data:'Data / DB',sec:'Security',doc:'Docs',ai:'AI / ML',ui:'Frontend'};
+  const srcNames={github:'GitHub',clawhub:'ClawHub',trending:'Trending'};
+  document.getElementById('detail-content').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div style="width:48px;height:48px;border-radius:12px;background:'+s.b+';color:'+s.c+';display:flex;align-items:center;justify-content:center;font-size:22px">'+s.i+'</div><div><h2 style="margin:0">'+s.n+'</h2><div class="ms" style="margin:0">'+s.s+'</div></div></div><p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">'+s.d+'</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'+s.t.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px"><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600;color:var(--am)">★ '+s.r+'</div><div style="font-size:10px;color:var(--t4)">Rating</div></div><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600">'+(srcNames[s.src]||s.src)+'</div><div style="font-size:10px;color:var(--t4)">Source</div></div><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600">'+(catNames[s.cat]||s.cat)+'</div><div style="font-size:10px;color:var(--t4)">Category</div></div></div><div class="mf"><button class="btn" onclick="document.getElementById(\'detail-modal\').classList.remove(\'open\')">Close</button><button class="btn btn-p" onclick="toast(\''+s.n+' added to project\');document.getElementById(\'detail-modal\').classList.remove(\'open\')">+ Add to project</button></div>';
+  document.getElementById('detail-modal').classList.add('open');
+}
+function viewAgent(idx){
+  const a=AGS[idx];if(!a)return;
+  const tpNames={dev:'Development',ops:'DevOps',qa:'QA',sec:'Security',data:'Data',doc:'Docs'};
+  document.getElementById('detail-content').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div style="width:48px;height:48px;border-radius:50%;background:'+a.c+'15;color:'+a.c+';display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700">'+a.n[0]+'</div><div><h2 style="margin:0">'+a.n+'</h2><div class="ms" style="margin:0">'+(tpNames[a.tp]||a.tp)+' agent</div></div><span style="margin-left:auto;font-size:11px;padding:4px 10px;border-radius:6px;background:'+(a.st==='Active'?'var(--gnb)':'var(--bg5)')+';color:'+(a.st==='Active'?'var(--gn)':'var(--t4)')+'">'+a.st+'</span></div><p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">'+a.d+'</p><div style="margin-bottom:16px"><div style="font-size:12px;font-weight:500;margin-bottom:8px">Equipped skills ('+a.sk.length+')</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+a.sk.map(s=>'<span class="tag" style="cursor:pointer" onclick="event.stopPropagation();document.getElementById(\'detail-modal\').classList.remove(\'open\');const i=SKS.findIndex(x=>x.n===\''+s+'\');if(i>=0)viewSkill(i);else toast(\'Skill not found\')">'+s+'</span>').join('')+'</div></div><div class="mf"><button class="btn" onclick="document.getElementById(\'detail-modal\').classList.remove(\'open\')">Close</button><button class="btn btn-p" onclick="toast(\''+a.n+' assigned to project\');document.getElementById(\'detail-modal\').classList.remove(\'open\')">Assign to project</button></div>';
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+/* ══ Create agent ══ */
+function openCreateAgent(){document.getElementById('agent-create-modal').classList.add('open')}
+function createAgent(){
+  const nm=document.getElementById('ca-name').value||'New-Agent';
+  const ds=document.getElementById('ca-desc').value||'Custom agent';
+  const tp=document.getElementById('ca-type').value;
+  const sks=(document.getElementById('ca-skills').value||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const colors={dev:'var(--ac)',ops:'var(--bl)',qa:'var(--tl)',sec:'var(--co)',data:'var(--am)',doc:'var(--gn)'};
+  AGS.push({n:nm,d:ds,sk:sks.length?sks:['general'],c:colors[tp]||'var(--ac)',st:'Idle',tp:tp});
+  document.getElementById('agent-create-modal').classList.remove('open');
+  document.getElementById('ca-name').value='';document.getElementById('ca-desc').value='';document.getElementById('ca-skills').value='';
+  renderAg();toast('"'+nm+'" created');
+  document.querySelector('.ni[data-p="lib-ag"] .bd').textContent=AGS.length;
+}
+
+/* ══ Projects ══ */
+function switchProject(idx){
+  const p=PROJS[idx];if(!p)return;
+  document.getElementById('ws-proj-name').textContent=p.n;
+  document.getElementById('ws-pct').textContent=p.p+'%';
+  document.getElementById('ws-bar').style.width=p.p+'%';
+  const offset=251.3*(1-p.p/100);
+  document.getElementById('ring-fill').setAttribute('stroke-dashoffset',offset);
+  document.getElementById('ring-pct').textContent=p.p+'%';
+}
+function renderDashProjs(){
+  document.getElementById('d-proj').innerHTML=PROJS.map((p,i)=>'<div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;cursor:pointer;margin-bottom:8px;transition:border-color .15s" onclick="switchProject('+i+');go(\'ws\')" onmouseover="this.style.borderColor=\'var(--b2)\'" onmouseout="this.style.borderColor=\'var(--b0)\'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:13.5px;font-weight:500">'+esc(p.n)+'</span><span style="font-size:10px;padding:2px 7px;border-radius:5px;background:'+p.c+'12;color:'+p.c+';font-family:var(--fm)">'+p.p+'%</span></div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div style="font-size:10.5px;color:var(--t4)">'+esc(p.ph)+'</div></div>').join('');
+}
+function renderProjs(){
+  document.getElementById('pj-list').innerHTML=PROJS.map((p,i)=>'<div class="lcd" onclick="switchProject('+i+');go(\'ws\')"><div class="lh"><div class="li" style="background:'+p.c+'15;color:'+p.c+';font-size:16px;font-weight:600">'+p.n[0]+'</div><div><div class="ln">'+esc(p.n)+'</div><div class="ls">'+esc(p.ph)+'</div></div></div><div class="ld">'+esc(p.d)+'</div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin:8px 0"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div class="lf"><span>'+p.p+'% complete</span></div></div>').join('');
+}
+
+/* ══ Render all ══ */
+renderSk();renderAg();
+
+/* Dashboard */
+document.getElementById('d-act').innerHTML=[
+  {c:'var(--am)',t:'<strong>GitHub trending</strong> synced — 25 repos',d:'3m ago'},
+  {c:'var(--tl)',t:'<strong>Crawler</strong> indexed 47 new skills',d:'12m ago'},
+  {c:'var(--gn)',t:'<strong>E-Commerce</strong> — auth module done',d:'28m ago'},
+  {c:'var(--ac)',t:'<strong>PM-Agent</strong> assigned agents to SaaS project',d:'42m ago'},
+  {c:'var(--co)',t:'<strong>Fix</strong> resolved 2 test failures',d:'1h ago'},
+].map(a=>'<div style="display:flex;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .12s" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'transparent\'"><div style="width:7px;height:7px;border-radius:50%;background:'+a.c+';margin-top:7px;flex-shrink:0"></div><div><div style="font-size:12.5px;color:var(--t2);line-height:1.5">'+a.t+'</div><div style="font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:2px">'+a.d+'</div></div></div>').join('');
+
+/* FIX M-04: dynamic project rendering */
+renderDashProjs();
+
+/* Trending — FIX L-01: escape repo names properly */
+document.getElementById('tr-list').innerHTML=[
+  {r:1,n:'openai/swarm',l:'Python',lc:'#3572A5',d:'Lightweight multi-agent orchestration with handoffs',s:'24.2k',t:'+1,847'},
+  {r:2,n:'anthropic/claude-code',l:'TypeScript',lc:'#3178c6',d:'Agentic coding tool for your terminal',s:'31.8k',t:'+1,203'},
+  {r:3,n:'browser-use/browser-use',l:'Python',lc:'#3572A5',d:'Make websites accessible for AI agents',s:'18.5k',t:'+982'},
+  {r:4,n:'crewAI/crewAI',l:'Python',lc:'#3572A5',d:'Role-playing autonomous AI agents for complex tasks',s:'22.1k',t:'+876'},
+  {r:5,n:'langchain-ai/langgraph',l:'Python',lc:'#3572A5',d:'Build resilient language agents as graphs',s:'8.4k',t:'+654'},
+  {r:6,n:'vercel/ai',l:'TypeScript',lc:'#3178c6',d:'AI-powered applications with React, streaming-first',s:'15.7k',t:'+521'},
+].map(t=>'<div class="tc"><div style="font-size:10.5px;font-family:var(--fm);color:var(--am);margin-bottom:6px">★ #'+t.r+' trending</div><div style="font-size:14px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+t.lc+'"></span>'+t.n+'</div><div style="font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:10px">'+t.d+'</div><div style="display:flex;gap:12px;font-size:10.5px;color:var(--t4);font-family:var(--fm);margin-bottom:10px"><span>★ '+t.s+'</span><span style="color:var(--gn)">▲ '+t.t+'</span><span>'+t.l+'</span></div><div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--b0)"><button class="btn btn-sm" onclick="toast(\'Extracting skills from '+esc(t.n)+'...\')">Extract skills</button><button class="btn btn-p btn-sm" onclick="toast(\''+esc(t.n)+' added to library\')">+ Library</button></div></div>').join('');
+
+/* Crawler */
+document.getElementById('cr-cards').innerHTML=[
+  {n:'GitHub crawler',ic:'⬡',b:'var(--tlb)',c:'var(--tl)',rows:[['Repos','342'],['Skills','2,104'],['Sync','2m ago']],pw:78},
+  {n:'Trending sync',ic:'★',b:'var(--amb)',c:'var(--am)',rows:[['Today','25 repos'],['Extracted','67'],['Schedule','6h']],pw:100},
+  {n:'ClawHub',ic:'◆',b:'var(--acb2)',c:'var(--ac)',rows:[['Endpoints','28'],['Skills','743'],['Sync','8m ago']],pw:52},
+  {n:'Uploads',ic:'↑',b:'var(--cob)',c:'var(--co)',rows:[['Pending','7'],['Approved','89'],['Review','~4m']],pw:92},
+].map(c=>'<div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:28px;height:28px;border-radius:8px;background:'+c.b+';color:'+c.c+';display:flex;align-items:center;justify-content:center;font-size:13px">'+c.ic+'</div><span style="font-size:13px;font-weight:500">'+c.n+'</span><span style="margin-left:auto;font-size:10px;padding:2px 7px;border-radius:5px;background:var(--gnb);color:var(--gn);font-family:var(--fm)">Running</span></div>'+c.rows.map(r=>'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--t3)">'+r[0]+'</span><span style="font-family:var(--fm)">'+r[1]+'</span></div>').join('')+'<div style="height:3px;background:var(--bg5);border-radius:2px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+c.pw+'%;background:'+c.c+';border-radius:2px"></div></div></div>').join('');
+document.getElementById('cr-log').innerHTML=[['var(--am)','Trending','14:35:03','25 repos analyzed'],['var(--tl)','GitHub','14:32:01','Scanning anthropic/claude-skills'],['var(--ac)','ClawHub','14:31:48','Page 42/56 — 12 skills'],['var(--co)','Upload','14:31:12','react-optimizer validated']].map(r=>'<div><span style="color:'+r[0]+'">['+r[1]+']</span> <span style="color:var(--t4)">'+r[2]+'</span> '+r[3]+'</div>').join('');
+
+/* Projects list */
+renderProjs();
+
+setTimeout(()=>{const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight},100);
+</script>
+</body>
+</html>
