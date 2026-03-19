@@ -202,6 +202,14 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}.pulse{animation:pulse 2s ease-in-out infinite}
 @keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin 1s linear infinite;display:inline-block}
 .fi>*{animation:fadeUp .3s ease both}.fi>*:nth-child(2){animation-delay:.05s}.fi>*:nth-child(3){animation-delay:.1s}
+.claw-status{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;font-size:11px;font-family:var(--fm);cursor:pointer;transition:all .15s}
+.claw-status .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.claw-status.live .dot{background:var(--gn);box-shadow:0 0 6px rgba(90,224,138,.4)}
+.claw-status.live{color:var(--gn);background:var(--gnb)}
+.claw-status.off .dot{background:var(--t4)}
+.claw-status.off{color:var(--t4);background:var(--bg3)}
+.claw-status.connecting .dot{background:var(--am);animation:pulse 1.5s ease-in-out infinite}
+.claw-status.connecting{color:var(--am);background:var(--amb)}
 </style>
 </head>
 <body>
@@ -232,7 +240,8 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 <div class="tb">
   <div class="sb-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input id="gs" placeholder="Search skills, agents, projects... (Ctrl+K)" oninput="globalSearch(this.value)"></div>
   <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
-    <button class="btn" onclick="toast('Syncing all sources...')">⟳ Sync</button>
+    <div class="claw-status off" id="claw-status" onclick="claw.reconnect()"><div class="dot"></div><span id="claw-label">Demo Mode</span></div>
+    <button class="btn" onclick="syncAll()">⟳ Sync</button>
     <button class="btn btn-p" onclick="openMo()">+ New project</button>
     <div class="av" onclick="go('settings')">Y</div>
   </div>
@@ -397,6 +406,21 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
       </div>
     </div>
 
+    <!-- ── OpenClaw Connection ── -->
+    <div class="set-card full" style="border-color:var(--tl)">
+      <h3 style="display:flex;align-items:center;gap:8px">OpenClaw Gateway <span id="oc-ver" style="font-size:10px;font-family:var(--fm);color:var(--t4)"></span></h3>
+      <div class="set-desc">Connect to your local OpenClaw gateway for real AI agent capabilities. <a href="https://docs.openclaw.ai" target="_blank" style="color:var(--tl)">Docs</a></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="ff"><label>Gateway URL</label><input id="oc-url" value="ws://127.0.0.1:18789" placeholder="ws://127.0.0.1:18789"></div>
+        <div class="ff"><label>Auth Token</label><input id="oc-token" type="password" placeholder="OPENCLAW_GATEWAY_TOKEN (leave empty for no-auth)"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+        <button class="btn btn-sm" style="border-color:var(--tl);color:var(--tl)" onclick="testClawConnection()">Test connection</button>
+        <button class="btn btn-sm btn-p" onclick="saveClawConfig()">Save & connect</button>
+        <span id="oc-status" style="font-size:11px;font-family:var(--fm);color:var(--t4);margin-left:8px"></span>
+      </div>
+    </div>
+
     <!-- ── Built-in Tools ── -->
     <div class="set-card">
       <h3>Built-in tools</h3>
@@ -541,6 +565,307 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 <div class="toast" id="toast-el"></div>
 
 <script>
+/* ══ OpenClaw Integration Layer ══ */
+const CLAW_CONFIG_KEY = 'agenthub_openclaw_config';
+
+class OpenClawClient {
+  constructor() {
+    this.ws = null;
+    this.connected = false;
+    this.connecting = false;
+    this.reqId = 0;
+    this.pending = new Map();
+    this.listeners = {};
+    this.reconnectDelay = 3000;
+    this.maxReconnectDelay = 30000;
+    this.reconnectTimer = null;
+    this.serverVersion = '';
+    const saved = localStorage.getItem(CLAW_CONFIG_KEY);
+    if (saved) {
+      try { const c = JSON.parse(saved); this.url = c.url || 'ws://127.0.0.1:18789'; this.token = c.token || ''; } catch(e) { this.url = 'ws://127.0.0.1:18789'; this.token = ''; }
+    } else { this.url = 'ws://127.0.0.1:18789'; this.token = ''; }
+  }
+
+  updateUI(state) {
+    const el = document.getElementById('claw-status');
+    const lb = document.getElementById('claw-label');
+    if (!el || !lb) return;
+    el.className = 'claw-status ' + state;
+    if (state === 'live') lb.textContent = 'OpenClaw' + (this.serverVersion ? ' ' + this.serverVersion : '');
+    else if (state === 'connecting') lb.textContent = 'Connecting...';
+    else lb.textContent = 'Demo Mode';
+  }
+
+  connect() {
+    if (this.connected || this.connecting) return;
+    this.connecting = true;
+    this.updateUI('connecting');
+    try {
+      this.ws = new WebSocket(this.url);
+    } catch(e) { this.connecting = false; this.updateUI('off'); return; }
+
+    this.ws.onopen = () => {};
+
+    this.ws.onmessage = (evt) => {
+      let frame;
+      try { frame = JSON.parse(evt.data); } catch(e) { return; }
+
+      // Handle challenge
+      if (frame.type === 'event' && frame.event === 'connect.challenge') {
+        const params = {
+          minProtocol: 3, maxProtocol: 3,
+          client: { id: 'agenthub-ui', version: '5.0.0', platform: navigator.platform.includes('Win') ? 'windows' : navigator.platform.includes('Mac') ? 'macos' : 'linux', mode: 'ui' },
+          role: 'operator',
+          scopes: ['operator.read', 'operator.write']
+        };
+        if (this.token) params.auth = { token: this.token };
+        this.ws.send(JSON.stringify({ type: 'req', id: 'connect-' + Date.now(), method: 'connect', params }));
+        return;
+      }
+
+      // Handle connect response
+      if (frame.type === 'res' && frame.ok && frame.payload && frame.payload.type === 'hello-ok') {
+        this.connected = true;
+        this.connecting = false;
+        this.reconnectDelay = 3000;
+        this.serverVersion = frame.payload.server?.version || '';
+        this.updateUI('live');
+        this.emit('connected', frame.payload);
+        return;
+      }
+
+      // Handle RPC responses
+      if (frame.type === 'res' && frame.id && this.pending.has(frame.id)) {
+        const { resolve, reject } = this.pending.get(frame.id);
+        this.pending.delete(frame.id);
+        if (frame.ok) resolve(frame.payload);
+        else reject(frame.error || { message: 'Unknown error' });
+        return;
+      }
+
+      // Handle events
+      if (frame.type === 'event') {
+        this.emit(frame.event, frame.payload);
+        return;
+      }
+
+      // Handle connect failure
+      if (frame.type === 'res' && !frame.ok) {
+        this.connecting = false;
+        this.updateUI('off');
+      }
+    };
+
+    this.ws.onclose = () => {
+      const wasConnected = this.connected;
+      this.connected = false;
+      this.connecting = false;
+      this.updateUI('off');
+      this.pending.forEach(({ reject }) => reject({ message: 'Connection closed' }));
+      this.pending.clear();
+      if (wasConnected) this.emit('disconnected');
+      this.scheduleReconnect();
+    };
+
+    this.ws.onerror = () => {
+      this.connecting = false;
+      this.updateUI('off');
+    };
+  }
+
+  scheduleReconnect() {
+    clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = setTimeout(() => {
+      this.connect();
+      this.reconnectDelay = Math.min(this.reconnectDelay * 1.5, this.maxReconnectDelay);
+    }, this.reconnectDelay);
+  }
+
+  reconnect() {
+    clearTimeout(this.reconnectTimer);
+    this.reconnectDelay = 3000;
+    if (this.ws) { try { this.ws.close(); } catch(e) {} }
+    this.connected = false;
+    this.connecting = false;
+    this.url = document.getElementById('oc-url')?.value || this.url;
+    this.token = document.getElementById('oc-token')?.value || this.token;
+    this.connect();
+  }
+
+  send(method, params = {}) {
+    return new Promise((resolve, reject) => {
+      if (!this.connected || !this.ws) { reject({ message: 'Not connected' }); return; }
+      const id = 'req-' + (++this.reqId);
+      this.pending.set(id, { resolve, reject });
+      this.ws.send(JSON.stringify({ type: 'req', id, method, params }));
+      setTimeout(() => { if (this.pending.has(id)) { this.pending.delete(id); reject({ message: 'Timeout' }); } }, 15000);
+    });
+  }
+
+  async invoke(tool, args = {}) {
+    const httpUrl = this.url.replace('ws://', 'http://').replace('wss://', 'https://');
+    const headers = { 'Content-Type': 'application/json' };
+    if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
+    const res = await fetch(httpUrl + '/tools/invoke', { method: 'POST', headers, body: JSON.stringify({ tool, args }) });
+    const data = await res.json();
+    if (!data.ok) throw data.error || { message: 'Invoke failed' };
+    return data.result;
+  }
+
+  on(event, fn) { (this.listeners[event] = this.listeners[event] || []).push(fn); }
+  off(event, fn) { if (this.listeners[event]) this.listeners[event] = this.listeners[event].filter(f => f !== fn); }
+  emit(event, data) { (this.listeners[event] || []).forEach(fn => { try { fn(data); } catch(e) {} }); }
+
+  destroy() { clearTimeout(this.reconnectTimer); if (this.ws) this.ws.close(); }
+}
+
+const claw = new OpenClawClient();
+
+/* ── OpenClaw Settings helpers ── */
+function testClawConnection() {
+  const st = document.getElementById('oc-status');
+  st.textContent = 'Testing...'; st.style.color = 'var(--am)';
+  claw.url = document.getElementById('oc-url').value || 'ws://127.0.0.1:18789';
+  claw.token = document.getElementById('oc-token').value || '';
+  if (claw.ws) { try { claw.ws.close(); } catch(e) {} }
+  claw.connected = false; claw.connecting = false;
+  const onOk = () => { st.textContent = '\u25cf Connected to OpenClaw ' + claw.serverVersion; st.style.color = 'var(--gn)'; claw.off('connected', onOk); };
+  claw.on('connected', onOk);
+  claw.connect();
+  setTimeout(() => { if (!claw.connected) { st.textContent = '\u2717 Connection failed \u2014 is OpenClaw gateway running?'; st.style.color = 'var(--co)'; claw.off('connected', onOk); } }, 5000);
+}
+function saveClawConfig() {
+  const url = document.getElementById('oc-url').value || 'ws://127.0.0.1:18789';
+  const token = document.getElementById('oc-token').value || '';
+  localStorage.setItem(CLAW_CONFIG_KEY, JSON.stringify({ url, token }));
+  claw.url = url; claw.token = token;
+  toast('OpenClaw config saved');
+  claw.reconnect();
+}
+
+async function syncAll() {
+  if (claw.connected) {
+    toast('Syncing from OpenClaw gateway...');
+    try { await loadRealSkills(); } catch(e) {}
+    try { await loadRealStatus(); } catch(e) {}
+    try { await loadRealSessions(); } catch(e) {}
+    toast('Sync complete');
+  } else {
+    toast('Demo mode \u2014 connect OpenClaw to sync real data');
+  }
+}
+
+/* ── On connect: load real data ── */
+claw.on('connected', async (payload) => {
+  const ver = document.getElementById('oc-ver');
+  if (ver) ver.textContent = 'v' + (payload.server?.version || '');
+  toast('OpenClaw connected \u2014 loading real data...');
+  try { await loadRealSkills(); } catch(e) {}
+  try { await loadRealStatus(); } catch(e) {}
+  try { await loadRealSessions(); } catch(e) {}
+});
+
+claw.on('disconnected', () => {
+  toast('OpenClaw disconnected \u2014 switching to demo mode');
+});
+
+/* ── Load real skills from OpenClaw ── */
+async function loadRealSkills() {
+  if (!claw.connected) return;
+  let result;
+  try { result = await claw.invoke('sessions_send', { message: '/skills --json', sessionKey: 'main' }); } catch(e) {}
+  // If tools/invoke works for skills, parse. Otherwise use status info.
+  try {
+    const statusData = await claw.send('status');
+    if (statusData && statusData.skills) {
+      const realSkills = [];
+      const catMap = { 'coding-agent': 'code', 'browser': 'ui', 'canvas': 'ui', 'cron': 'infra', 'webhooks': 'infra', 'email': 'doc', 'calendar': 'doc', 'github-issues': 'code', 'gemini': 'ai', 'discord': 'infra', 'telegram': 'infra', 'slack': 'infra', 'whatsapp': 'infra' };
+      const iconMap = { ready: '\u25c9', missing: '\u25c7', disabled: '\u25cc' };
+      const colorMap = { ready: { b: 'var(--gnb)', c: 'var(--gn)' }, missing: { b: 'var(--cob)', c: 'var(--co)' }, disabled: { b: 'var(--bg5)', c: 'var(--t4)' } };
+      (statusData.skills || []).forEach(sk => {
+        const status = sk.ready ? 'ready' : 'missing';
+        const cm = colorMap[status] || colorMap.missing;
+        realSkills.push({
+          n: sk.name || sk.skill || 'unknown',
+          s: 'openclaw/' + (sk.source || 'bundled'),
+          d: sk.description || sk.desc || '',
+          t: [status, 'openclaw'],
+          i: sk.icon || iconMap[status] || '\u25c7',
+          b: cm.b, c: cm.c,
+          r: sk.ready ? '5.0' : '\u2014',
+          src: 'clawhub',
+          cat: catMap[sk.name] || catMap[sk.skill] || 'infra',
+          real: true
+        });
+      });
+      if (realSkills.length > 0) {
+        // Merge: real skills first, then demo skills tagged
+        const demoTagged = SKS.filter(s => !s.real).map(s => ({ ...s, t: [...s.t, 'demo'] }));
+        SKS.length = 0;
+        SKS.push(...realSkills, ...demoTagged);
+        renderSk();
+        document.getElementById('stat-sk').textContent = SKS.length;
+        const skBadge = document.querySelector('.ni[data-p="lib-sk"] .bd');
+        if (skBadge) skBadge.textContent = realSkills.length + '+';
+        toast(realSkills.length + ' real OpenClaw skills loaded');
+      }
+    }
+  } catch(e) {}
+}
+
+/* ── Load real gateway status ── */
+async function loadRealStatus() {
+  if (!claw.connected) return;
+  try {
+    const health = await claw.send('health');
+    if (health) {
+      // Update dashboard stats
+      const statCards = document.querySelectorAll('.sc');
+      if (health.uptime && statCards[3]) {
+        statCards[3].querySelector('.sc-c').textContent = '\u2191 uptime: ' + Math.floor(health.uptime / 60) + 'm';
+      }
+    }
+  } catch(e) {}
+}
+
+/* ── Load real sessions as projects ── */
+async function loadRealSessions() {
+  if (!claw.connected) return;
+  try {
+    const result = await claw.invoke('sessions_list', {});
+    if (result && Array.isArray(result.sessions) && result.sessions.length > 0) {
+      const sessionColors = ['var(--tl)', 'var(--bl)', 'var(--pk)', 'var(--am)', 'var(--gn)'];
+      result.sessions.forEach((sess, i) => {
+        const exists = PROJS.some(p => p.sessionKey === sess.key);
+        if (!exists) {
+          PROJS.push({
+            n: sess.name || sess.key || 'Session ' + (i + 1),
+            d: 'OpenClaw session' + (sess.channel ? ' via ' + sess.channel : ''),
+            p: 0, c: sessionColors[i % sessionColors.length], ph: 'Active',
+            sessionKey: sess.key, real: true
+          });
+        }
+      });
+      renderProjs(); renderDashProjs();
+    }
+  } catch(e) {}
+}
+
+/* ── Real chat via OpenClaw ── */
+async function sendToOpenClaw(text) {
+  if (!claw.connected) return null;
+  try {
+    const result = await claw.send('agent', {
+      message: text,
+      sessionKey: currentSessionKey || 'main',
+      deliver: false
+    });
+    return result;
+  } catch(e) { return null; }
+}
+
+let currentSessionKey = 'main';
+
 /* ══ Nav ══ */
 document.querySelectorAll('.ni[data-p]').forEach(n=>n.onclick=()=>go(n.dataset.p));
 function go(p){
@@ -575,7 +900,14 @@ function createProj(){
   const nm=document.getElementById('mo-name').value||'New Project';
   const ds=document.getElementById('mo-desc').value||'Custom project';
   const pri=document.getElementById('mo-pri').value;
-  PROJS.push({n:nm,d:ds,p:0,c:projColors[PROJS.length%projColors.length],ph:'Analyze'});
+  const newProj = {n:nm,d:ds,p:0,c:projColors[PROJS.length%projColors.length],ph:'Analyze'};
+  if (claw.connected) {
+    const sk = 'project-' + Date.now();
+    newProj.sessionKey = sk;
+    newProj.real = true;
+    claw.send('sessions.spawn', { name: nm, sessionKey: sk }).catch(() => {});
+  }
+  PROJS.push(newProj);
   closeMo();toast('"'+nm+'" created — PM-Agent deploying...');
   document.getElementById('mo-name').value='';
   document.getElementById('mo-desc').value='';
@@ -610,13 +942,37 @@ function sendMsg(){
   const inp=document.getElementById('ci'),txt=inp.value.trim();if(!txt)return;
   const log=document.getElementById('build-phase');
   const d=document.createElement('div');d.className='ai usr';d.style.animation='fadeUp .25s ease both';
-  d.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--co),var(--am));color:#090a0e">Y</div><div class="ab"><div class="an" style="color:var(--t1)">You → PM-Agent</div><div class="am">'+esc(txt)+'</div><div class="at">'+now()+'</div></div>';
+  d.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--co),var(--am));color:#090a0e">Y</div><div class="ab"><div class="an" style="color:var(--t1)">You \u2192 PM-Agent</div><div class="am">'+esc(txt)+'</div><div class="at">'+now()+'</div></div>';
   log.appendChild(d);inp.value='';scrollLog();
-  setTimeout(()=>{
-    const r=document.createElement('div');r.className='ai';r.style.animation='fadeUp .25s ease both';
-    r.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">'+getReply(txt)+'</div><div class="at">'+now()+'</div></div>';
-    log.appendChild(r);scrollLog();
-  },600+Math.random()*600);
+
+  if (claw.connected) {
+    // Real OpenClaw agent call
+    const thinking = document.createElement('div');
+    thinking.className='ai';thinking.style.animation='fadeUp .25s ease both';
+    thinking.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am"><span class="pulse" style="color:var(--t3)">Thinking...</span></div></div>';
+    log.appendChild(thinking);scrollLog();
+    sendToOpenClaw(txt).then(result => {
+      if (result && (result.text || result.message || result.content)) {
+        const reply = result.text || result.message || (Array.isArray(result.content) ? result.content.map(c=>c.text||'').join('') : String(result.content));
+        thinking.querySelector('.am').innerHTML = reply.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+      } else {
+        thinking.querySelector('.am').innerHTML = getReply(txt) + ' <span style="font-size:9px;color:var(--t4)">(fallback)</span>';
+      }
+      thinking.querySelector('.ab').insertAdjacentHTML('beforeend','<div class="at">'+now()+'</div>');
+      scrollLog();
+    }).catch(() => {
+      thinking.querySelector('.am').innerHTML = getReply(txt) + ' <span style="font-size:9px;color:var(--t4)">(fallback)</span>';
+      thinking.querySelector('.ab').insertAdjacentHTML('beforeend','<div class="at">'+now()+'</div>');
+      scrollLog();
+    });
+  } else {
+    // Demo mode fallback
+    setTimeout(()=>{
+      const r=document.createElement('div');r.className='ai';r.style.animation='fadeUp .25s ease both';
+      r.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">'+getReply(txt)+'</div><div class="at">'+now()+'</div></div>';
+      log.appendChild(r);scrollLog();
+    },600+Math.random()*600);
+  }
 }
 function now(){return new Date().toLocaleTimeString('en',{hour12:false})}
 function scrollLog(){const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight}
@@ -832,6 +1188,8 @@ function switchProject(idx){
   const offset=251.3*(1-p.p/100);
   document.getElementById('ring-fill').setAttribute('stroke-dashoffset',offset);
   document.getElementById('ring-pct').textContent=p.p+'%';
+  if (p.sessionKey) currentSessionKey = p.sessionKey;
+  else currentSessionKey = 'main';
 }
 function renderDashProjs(){
   document.getElementById('d-proj').innerHTML=PROJS.map((p,i)=>'<div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;cursor:pointer;margin-bottom:8px;transition:border-color .15s" onclick="switchProject('+i+');go(\'ws\')" onmouseover="this.style.borderColor=\'var(--b2)\'" onmouseout="this.style.borderColor=\'var(--b0)\'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:13.5px;font-weight:500">'+esc(p.n)+'</span><span style="font-size:10px;padding:2px 7px;border-radius:5px;background:'+p.c+'12;color:'+p.c+';font-family:var(--fm)">'+p.p+'%</span></div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div style="font-size:10.5px;color:var(--t4)">'+esc(p.ph)+'</div></div>').join('');
@@ -878,6 +1236,15 @@ document.getElementById('cr-log').innerHTML=[['var(--am)','Trending','14:35:03',
 renderProjs();
 
 setTimeout(()=>{const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight},100);
+
+/* ══ OpenClaw auto-connect ══ */
+setTimeout(() => {
+  const urlInput = document.getElementById('oc-url');
+  const tokenInput = document.getElementById('oc-token');
+  if (urlInput) urlInput.value = claw.url;
+  if (tokenInput) tokenInput.value = claw.token;
+  claw.connect();
+}, 200);
 </script>
 </body>
 </html>
