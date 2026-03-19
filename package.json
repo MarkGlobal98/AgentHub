@@ -4,8 +4,8 @@
   "description": "AgentHub - Intelligent Agent Orchestration Platform / AI智能体编排平台",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve . -l 3000 --no-clipboard",
-    "dev": "npx serve . -l 3000 --no-clipboard",
+    "start": "node server.js",
+    "dev": "node server.js",
     "preview": "npx serve . -l 3000 -o"
   },
   "keywords": [

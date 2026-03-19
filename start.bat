@@ -30,4 +30,4 @@ echo  Starting AgentHub server on http://localhost:3000 ...
 echo  Press Ctrl+C to stop.
 echo.
 
-npx serve . -l 3000
+node server.js

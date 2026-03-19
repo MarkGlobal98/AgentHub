@@ -4,9 +4,9 @@
 
 ### Intelligent Agent Orchestration Platform / AI 智能体编排平台
 
-**One prompt, multiple agents, fully automated software delivery.**
+**Visual dashboard for OpenClaw — manage skills, agents, and projects through a modern web UI.**
 
-**一句话需求，多智能体协作，全自动软件交付。**
+**OpenClaw 可视化控制面板 — 通过 Web 界面管理技能、智能体和项目。**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
@@ -22,102 +22,79 @@
 
 ## What is AgentHub?
 
-AgentHub is an AI agent orchestration platform that decomposes your project requirements into tasks, assigns them to specialized AI agents (Architect, Backend, Frontend, Test, DevOps), and delivers working code — all managed by a PM-Agent.
+AgentHub is a web-based dashboard that connects to your local [OpenClaw](https://openclaw.dev) gateway. It provides a visual interface to browse skills, manage agents, create projects, and chat with AI agents — all through your browser.
 
 **Key features:**
 
-- **Multi-model support** — Claude, GPT, Gemini, Deepseek, and more. API key or OAuth login.
-- **Smart routing** — Auto-fallback between models on rate limit or error.
-- **Agent library** — 180+ pre-built agents with 2,800+ skills.
-- **Skill crawler** — Auto-discovers skills from GitHub, ClawHub, and trending repos.
-- **Workspace** — Real-time project tracking with agent activity log, issue detection, and chat.
-- **Zero config** — Built-in tools (Scrapling, ChromaDB, Redis, PostgreSQL, Nginx) require no setup.
+- **OpenClaw integration** — Real-time WebSocket connection + HTTP API proxy to your local gateway
+- **Skills library** — Browse all OpenClaw skills with status (ready / missing dependencies)
+- **Agent management** — View and create agents, assign to projects
+- **Project workspace** — Pipeline view (Analyze → Plan → Assign → Build → Review → Deliver) with real-time AI chat
+- **AI chat** — Talk to PM-Agent powered by your OpenClaw models (e.g., GPT-5.4)
+- **GitHub trending** — Discover trending AI agent repos and add skills to your library
+- **Channel monitoring** — View configured channels (Feishu, Slack, Telegram, etc.)
+- **Smart routing** — Auto-fallback toggles for rate limits, errors, and cost optimization
 
 ## Quick Start
 
-### Option 1: One-click (Beginners)
+### Prerequisites
 
-**Windows:**
-```
-Double-click start.bat
-```
+| Requirement | Version | Note |
+|-------------|---------|------|
+| Node.js     | 18+     | Required |
+| OpenClaw    | 2026.3+ | `npm install -g openclaw` then `openclaw setup` |
 
-**macOS / Linux:**
-```bash
-chmod +x start.sh
-./start.sh
-```
-
-### Option 2: npm
+### Install & Run
 
 ```bash
-# 1. Clone the repo
+# 1. Clone
 git clone https://github.com/MarkGlobal98/AgentHub.git
-
-# 2. Enter the directory
 cd AgentHub
 
-# 3. Start the server
+# 2. Start (includes API proxy server)
 npm start
 ```
 
-### Option 3: Direct open
+Open **http://localhost:3000** in your browser.
 
-Just open `index.html` in your browser. No server needed for basic preview.
+### One-click (Beginners)
 
-> After starting, open **http://localhost:3000** in your browser.
+**Windows:** Double-click `start.bat`
 
-## Prerequisites
+**macOS / Linux:**
+```bash
+chmod +x start.sh && ./start.sh
+```
 
-| Requirement | Version | Required? |
-|-------------|---------|-----------|
-| Node.js     | 18+     | For `npm start` and one-click scripts |
-| Browser     | Modern (Chrome, Edge, Firefox, Safari) | Yes |
+### Configure OpenClaw
 
-> **Note:** If you just want to preview, you can open `index.html` directly — no Node.js needed.
+1. Make sure OpenClaw is running: `openclaw start`
+2. In AgentHub Settings, enter your Gateway URL (`ws://127.0.0.1:18789`) and Auth Token
+3. Click "Save & connect"
 
-## Features
+> Your OpenClaw token can be found with: `openclaw config get gateway.auth.token`
 
-### Dashboard
-Overview of all skills, agents, projects, and activity feed.
+## Architecture
 
-### Multi-Model Settings
-- Add models via **API key** or **OAuth account login**
-- Supported: Claude (Sonnet/Opus), GPT-4o, Gemini 2.5 Pro, Deepseek V3, Groq, Ollama (local), Azure OpenAI, Mistral, and custom endpoints
-- **Smart routing**: auto-fallback on rate limit, error, or cost optimization
-
-### Skill Library
-- 2,800+ skills across 8 categories: Code Gen, Testing, DevOps, Data/DB, Security, Docs, AI/ML, Frontend
-- Filter by source (GitHub, ClawHub, Trending) and category
-- Click any skill for detail view
-
-### Agent Library
-- 180+ agents organized by type (Development, DevOps, QA, Security, Data, Docs)
-- Create custom agents with skill composition
-- Real-time status tracking (Active / Idle)
-
-### Workspace
-- **Pipeline view**: Analyze → Plan → Assign → Build → Review → Deliver
-- **Agent activity log**: Real-time messages between agents
-- **Issue detection**: Auto-detected bugs with one-click fix
-- **Chat**: Talk to PM-Agent to reprioritize, add features, or ask for status
-- **Modes**: "Plan first" (review before execution) or "Auto execute"
-
-### Skill Crawler
-- GitHub repo scanner for SKILL.md files
-- GitHub trending daily sync
-- ClawHub marketplace integration
-- Upload review queue
-
-### Trending
-- GitHub daily trending repos with star counts
-- One-click "Extract skills" and "Add to library"
+```
+Browser (localhost:3000)
+  ├── WebSocket → OpenClaw Gateway (ws://127.0.0.1:18789)
+  │   └── Connection status, health events, channel data
+  └── HTTP → server.js proxy
+      ├── /api/skills   → openclaw skills list --json (cached 5min)
+      ├── /api/agents   → openclaw agents list --json (cached 5min)
+      ├── /api/config   → openclaw config get agents/channels
+      ├── /api/agent    → openclaw agent --message "..." --agent main
+      ├── /api/trending → GitHub Search API (AI agent repos)
+      └── /api/*        → proxy to OpenClaw gateway /tools/invoke
+```
 
 ## Project Structure
 
 ```
 AgentHub/
 ├── index.html      # Main application (single-file SPA)
+├── server.js       # Node.js server with API proxy + CLI bridge
 ├── package.json    # npm scripts and metadata
 ├── start.bat       # Windows one-click launcher
 ├── start.sh        # macOS/Linux one-click launcher
@@ -128,17 +105,9 @@ AgentHub/
 ## Tech Stack
 
 - **Frontend**: Vanilla HTML/CSS/JS (zero dependencies, zero build step)
-- **Fonts**: DM Sans + JetBrains Mono (Google Fonts)
-- **Architecture**: Single-page application with client-side routing
-- **Design**: Dark theme with purple accent, fully responsive
-
-## Contributing
-
-1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- **Server**: Node.js (stdlib only — no npm dependencies)
+- **Fonts**: DM Sans + JetBrains Mono (Google Fonts CDN)
+- **Design**: Dark theme, purple accent, responsive layout
 
 ---
 
@@ -146,126 +115,61 @@ AgentHub/
 
 ## 什么是 AgentHub？
 
-AgentHub 是一个 AI 智能体编排平台。你只需要用一句话描述项目需求，AgentHub 会自动将需求分解为任务，分配给专业的 AI 智能体（架构师、后端、前端、测试、运维），最终交付可运行的代码 —— 全程由 PM-Agent 统一管理。
+AgentHub 是一个连接本地 [OpenClaw](https://openclaw.dev) 网关的 Web 控制面板。通过浏览器可视化管理技能、智能体、项目，并与 AI 智能体实时对话。
 
 **核心功能：**
 
-- **多模型支持** — Claude、GPT、Gemini、Deepseek 等，支持 API Key 和 OAuth 账号登录
-- **智能路由** — 遇到限流或错误自动切换备用模型
-- **智能体库** — 180+ 预制智能体，2800+ 技能
-- **技能爬虫** — 自动从 GitHub、ClawHub、热门仓库发现新技能
-- **工作台** — 实时项目追踪、智能体活动日志、问题检测、对话交互
-- **零配置** — 内置工具（Scrapling、ChromaDB、Redis、PostgreSQL、Nginx）开箱即用
+- **OpenClaw 集成** — WebSocket 实时连接 + HTTP API 代理
+- **技能库** — 浏览所有 OpenClaw 技能，显示状态（就绪 / 缺少依赖）
+- **智能体管理** — 查看、创建智能体，分配到项目
+- **项目工作台** — 流水线视图（分析 → 规划 → 分配 → 构建 → 审查 → 交付）+ AI 实时对话
+- **AI 对话** — 与 PM-Agent 对话，由 OpenClaw 模型（如 GPT-5.4）驱动
+- **GitHub 热门** — 发现热门 AI 智能体仓库，一键添加技能
+- **频道监控** — 查看已配置的消息频道（飞书、Slack、Telegram 等）
 
 ## 快速开始
 
-### 方式一：一键启动（推荐新手）
+### 环境要求
 
-**Windows 用户：**
-```
-双击 start.bat 即可
-```
+| 依赖 | 版本 | 说明 |
+|------|------|------|
+| Node.js | 18+ | 必须 |
+| OpenClaw | 2026.3+ | `npm install -g openclaw` 然后 `openclaw setup` |
 
-**macOS / Linux 用户：**
-```bash
-chmod +x start.sh
-./start.sh
-```
-
-### 方式二：npm 启动
+### 安装和运行
 
 ```bash
 # 1. 克隆仓库
 git clone https://github.com/MarkGlobal98/AgentHub.git
-
-# 2. 进入目录
 cd AgentHub
 
-# 3. 启动服务
+# 2. 启动（包含 API 代理服务器）
 npm start
 ```
 
-### 方式三：直接打开
+访问 **http://localhost:3000** 即可使用。
 
-双击 `index.html` 用浏览器打开即可预览，无需任何安装。
+### 一键启动
 
-> 启动后访问 **http://localhost:3000** 即可使用。
+**Windows 用户：** 双击 `start.bat`
 
-## 环境要求
-
-| 依赖 | 版本 | 是否必须 |
-|------|------|----------|
-| Node.js | 18+ | 使用 `npm start` 或一键脚本时需要 |
-| 浏览器 | 现代浏览器（Chrome、Edge、Firefox、Safari） | 是 |
-
-> **提示：** 如果只是预览，直接打开 `index.html` 即可，不需要安装 Node.js。
-
-## 功能一览
-
-### 仪表盘
-总览所有技能、智能体、项目和活动动态。
-
-### 多模型配置
-- 支持 **API Key** 和 **OAuth 账号登录** 两种方式添加模型
-- 已支持：Claude (Sonnet/Opus)、GPT-4o、Gemini 2.5 Pro、Deepseek V3、Groq、Ollama（本地）、Azure OpenAI、Mistral、自定义端点
-- **智能路由**：限流自动切换、错误自动切换、成本优化
-
-### 技能库
-- 2800+ 技能，覆盖 8 大分类：代码生成、测试、运维、数据/数据库、安全、文档、AI/ML、前端
-- 按来源（GitHub、ClawHub、热门）和分类筛选
-- 点击技能卡片查看详情
-
-### 智能体库
-- 180+ 智能体，按类型（开发、运维、QA、安全、数据、文档）分类
-- 支持创建自定义智能体并组合技能
-- 实时状态追踪（活跃 / 空闲）
-
-### 工作台
-- **流水线视图**：分析 → 规划 → 分配 → 构建 → 审查 → 交付
-- **活动日志**：实时查看智能体之间的协作消息
-- **问题检测**：自动发现 Bug，一键修复
-- **对话**：与 PM-Agent 对话，调整优先级、添加功能、查询进度
-- **模式切换**：「先规划」（执行前审查）或「自动执行」
-
-### 技能爬虫
-- GitHub 仓库扫描（查找 SKILL.md 文件）
-- GitHub 每日热门仓库同步
-- ClawHub 市场对接
-- 上传审核队列
-
-### 热门趋势
-- GitHub 每日热门仓库，含 Star 数和增长趋势
-- 一键「提取技能」和「添加到库」
-
-## 项目结构
-
-```
-AgentHub/
-├── index.html      # 主应用（单文件 SPA）
-├── package.json    # npm 脚本和项目信息
-├── start.bat       # Windows 一键启动脚本
-├── start.sh        # macOS/Linux 一键启动脚本
-├── LICENSE         # MIT 开源协议
-└── README.md       # 本文件
+**macOS / Linux 用户：**
+```bash
+chmod +x start.sh && ./start.sh
 ```
 
-## 技术栈
+### 配置 OpenClaw
 
-- **前端**：原生 HTML/CSS/JS（零依赖，零构建步骤）
-- **字体**：DM Sans + JetBrains Mono（Google Fonts）
-- **架构**：单页应用，客户端路由
-- **设计**：暗色主题 + 紫色强调色，完全响应式
+1. 确保 OpenClaw 正在运行：`openclaw start`
+2. 在 AgentHub 设置页面输入网关地址（`ws://127.0.0.1:18789`）和 Auth Token
+3. 点击「Save & connect」
 
-## 参与贡献
-
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add amazing feature'`)
-4. 推送分支 (`git push origin feature/amazing-feature`)
-5. 发起 Pull Request
+> Token 可通过命令获取：`openclaw config get gateway.auth.token`
 
 ## 开源协议
 
 [MIT](LICENSE) - 自由使用、修改和分发。
+
 作者：Mark Tang
+
 贡献：杭州维舟科技有限公司（WayJoy.Tec.Global@gmail.com）

@@ -220,7 +220,7 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
     <div class="ns"><div class="ns-l">Overview</div>
       <div class="ni on" data-p="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Dashboard</div>
       <div class="ni" data-p="trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Trending<span class="bd lv">NEW</span></div>
-      <div class="ni" data-p="crawl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 014 9 15 15 0 01-4 9"/><path d="M3 12h18"/></svg>Crawler<span class="bd lv">LIVE</span></div>
+      <div class="ni" data-p="crawl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 014 9 15 15 0 01-4 9"/><path d="M3 12h18"/></svg>Channels<span class="bd lv">LIVE</span></div>
     </div>
     <div class="ns"><div class="ns-l">Library</div>
       <div class="ni" data-p="lib-sk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Skills<span class="bd">0</span></div>
@@ -240,7 +240,7 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 <div class="tb">
   <div class="sb-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input id="gs" placeholder="Search skills, agents, projects... (Ctrl+K)" oninput="globalSearch(this.value)"></div>
   <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
-    <div class="claw-status off" id="claw-status" onclick="claw.reconnect()"><div class="dot"></div><span id="claw-label">Demo Mode</span></div>
+    <div class="claw-status off" id="claw-status" onclick="claw.reconnect()"><div class="dot"></div><span id="claw-label">Offline</span></div>
     <button class="btn" onclick="syncAll()">⟳ Sync</button>
     <button class="btn btn-p" onclick="openMo()">+ New project</button>
     <div class="av" onclick="go('settings')">Y</div>
@@ -257,14 +257,14 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
         <div class="ob-step done">1. Installed</div>
         <div class="ob-step" onclick="go('settings')">2. Connect OpenClaw</div>
         <div class="ob-step" onclick="openMo()">3. Create project</div>
-        <div class="ob-step" onclick="loadDemoData()">4. Load examples</div>
+        <div class="ob-step" onclick="go('lib-sk')">4. Skills synced</div>
       </div>
     </div>
     <button class="btn-sm btn" style="color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2)" onclick="this.closest('.onboard').style.display='none'">Dismiss</button>
   </div>
   <div class="stats">
-    <div class="sc"><div class="sc-l">Total skills</div><div class="sc-v" id="stat-sk">0</div><div class="sc-c">Connect OpenClaw or load demo</div></div>
-    <div class="sc"><div class="sc-l">Active agents</div><div class="sc-v">0</div><div class="sc-c">Create or load demo</div></div>
+    <div class="sc"><div class="sc-l">Total skills</div><div class="sc-v" id="stat-sk">0</div><div class="sc-c">from OpenClaw</div></div>
+    <div class="sc"><div class="sc-l">Active agents</div><div class="sc-v">0</div><div class="sc-c">from OpenClaw</div></div>
     <div class="sc"><div class="sc-l">Projects</div><div class="sc-v">0</div><div class="sc-c">Create your first project</div></div>
     <div class="sc"><div class="sc-l">Success rate</div><div class="sc-v">—</div><div class="sc-c">No data yet</div></div>
   </div>
@@ -275,10 +275,10 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 </div></div>
 
 <!-- ═══ Trending ═══ -->
-<div class="page" id="p-trend"><div class="psc fi"><div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><h2 style="font-size:18px;font-weight:500;flex:1">GitHub daily trending</h2><button class="btn btn-sm" onclick="toast('Syncing...')">⟳</button></div><div class="tg" id="tr-list"></div></div></div>
+<div class="page" id="p-trend"><div class="psc fi"><div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><h2 style="font-size:18px;font-weight:500;flex:1">GitHub daily trending</h2><button class="btn btn-sm" onclick="loadTrending()">⟳</button></div><div class="tg" id="tr-list"></div></div></div>
 
-<!-- ═══ Crawler ═══ -->
-<div class="page" id="p-crawl"><div class="psc fi"><h2 style="font-size:18px;font-weight:500;margin-bottom:16px">Crawler status</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:22px" id="cr-cards"></div><h3 style="font-size:14px;font-weight:500;margin-bottom:10px">Crawl log</h3><div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;font-family:var(--fm);font-size:11px;line-height:2.1;color:var(--t2);max-height:220px;overflow-y:auto" id="cr-log"></div></div></div>
+<!-- ═══ Channel Status ═══ -->
+<div class="page" id="p-crawl"><div class="psc fi"><h2 style="font-size:18px;font-weight:500;margin-bottom:16px">Channel status</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:22px" id="cr-cards"></div><h3 style="font-size:14px;font-weight:500;margin-bottom:10px">Event log</h3><div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;font-family:var(--fm);font-size:11px;line-height:2.1;color:var(--t2);max-height:220px;overflow-y:auto" id="cr-log"></div></div></div>
 
 <!-- ═══ Skills Library ═══ -->
 <div class="page" id="p-lib-sk"><div class="ll">
@@ -335,7 +335,7 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
     <!-- ── AI Models: API Key OR OAuth ── -->
     <div class="set-card full">
       <h3>AI models</h3>
-      <div class="set-desc">Add models via API key or log in with your subscription account (OAuth). Auto-switches between models on rate limit / error. You can mix both methods.</div>
+      <div class="set-desc">Models managed by OpenClaw. Run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw configure</code> to change.</div>
 
       <!-- Auth method tabs -->
       <div style="display:flex;gap:2px;background:var(--bg4);border-radius:9px;padding:3px;margin-bottom:16px;width:fit-content">
@@ -345,49 +345,13 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
       </div>
 
       <div id="model-list">
-        <!-- API key models -->
-        <div class="model-row" data-id="m1" data-auth="key">
-          <div class="mr-left"><div class="mr-icon" style="background:var(--acb2);color:var(--ac)">C</div><div><div class="mr-name">Claude Sonnet 4</div><div class="mr-provider">Anthropic <span class="auth-badge key">API key</span></div></div></div>
-          <div class="mr-mid"><input type="password" value="sk-ant-***configured***" placeholder="sk-ant-..." class="mr-key" oninput="validateKey(this)"><div class="mr-status ok">Connected</div></div>
-          <div class="mr-right"><select class="mr-priority"><option>Primary</option><option>Fallback</option><option>Disabled</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div>
-        </div>
-
-        <div class="model-row" data-id="m2" data-auth="key">
-          <div class="mr-left"><div class="mr-icon" style="background:var(--acb2);color:var(--ac)">C</div><div><div class="mr-name">Claude Opus 4</div><div class="mr-provider">Anthropic <span class="auth-badge key">API key</span></div></div></div>
-          <div class="mr-mid"><input type="password" value="sk-ant-***configured***" placeholder="sk-ant-..." class="mr-key" oninput="validateKey(this)"><div class="mr-status ok">Connected</div></div>
-          <div class="mr-right"><select class="mr-priority"><option>Fallback</option><option>Primary</option><option>Disabled</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div>
-        </div>
-
-        <!-- OAuth model examples -->
-        <div class="model-row" data-id="m3" data-auth="oauth">
-          <div class="mr-left"><div class="mr-icon" style="background:var(--blb);color:var(--bl)">G</div><div><div class="mr-name">Gemini 2.5 Pro</div><div class="mr-provider">Google <span class="auth-badge oauth">Google account</span></div></div></div>
-          <div class="mr-mid">
-            <div class="oauth-status logged-in"><div class="oauth-avatar">Y</div><div class="oauth-info"><div class="oauth-email">you@gmail.com</div><div class="oauth-plan">Gemini Advanced subscriber</div></div></div>
-            <div class="mr-status ok">Logged in</div>
-          </div>
-          <div class="mr-right"><select class="mr-priority"><option>Fallback</option><option>Primary</option><option>Disabled</option></select><button class="btn btn-sm" onclick="toast('Refreshing session...')">Refresh</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Logout</button></div>
-        </div>
-
-        <div class="model-row" data-id="m4" data-auth="oauth">
-          <div class="mr-left"><div class="mr-icon" style="background:var(--gnb);color:var(--gn)">O</div><div><div class="mr-name">ChatGPT (GPT-4o)</div><div class="mr-provider">OpenAI <span class="auth-badge oauth">OpenAI account</span></div></div></div>
-          <div class="mr-mid">
-            <button class="btn btn-sm btn-p oauth-login-btn" onclick="simulateOAuth(this,'OpenAI')">Log in with OpenAI</button>
-            <div class="mr-status miss">Not logged in</div>
-          </div>
-          <div class="mr-right"><select class="mr-priority"><option>Disabled</option><option>Fallback</option><option>Primary</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div>
-        </div>
-
-        <div class="model-row" data-id="m5" data-auth="key">
-          <div class="mr-left"><div class="mr-icon" style="background:var(--tlb);color:var(--tl)">D</div><div><div class="mr-name">Deepseek V3</div><div class="mr-provider">Deepseek <span class="auth-badge key">API key</span></div></div></div>
-          <div class="mr-mid"><input type="password" placeholder="sk-..." class="mr-key" oninput="validateKey(this)"><div class="mr-status miss">Not configured</div></div>
-          <div class="mr-right"><select class="mr-priority"><option>Disabled</option><option>Fallback</option><option>Primary</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div>
-        </div>
+        <!-- Models loaded dynamically -->
       </div>
 
       <!-- Add model -->
       <div style="margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <button class="btn btn-sm btn-p" onclick="showAddModel()">+ Add model</button>
-        <span style="font-size:11px;color:var(--t4)">API key or account login — whatever you have</span>
+        <button class="btn btn-sm btn-p" onclick="syncModels(this)">⟳ Sync models</button>
+        <span style="font-size:11px;color:var(--t4)">Models synced from OpenClaw config</span>
       </div>
 
       <!-- Add model panel (hidden by default) -->
@@ -399,10 +363,10 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
       <!-- Smart routing -->
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--b0)">
         <div style="font-size:12.5px;font-weight:500;margin-bottom:8px">Smart routing</div>
-        <div class="toggle-row"><div><div class="tl">Auto-fallback on rate limit</div><div class="td">Switch to next model when rate limited</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row"><div><div class="tl">Auto-fallback on error</div><div class="td">Switch if API returns error or timeout</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row"><div><div class="tl">Cost optimization</div><div class="td">Cheap models for simple tasks, powerful for complex</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row"><div><div class="tl">Session persistence</div><div class="td">Keep OAuth sessions alive, auto-refresh tokens</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row"><div><div class="tl">Auto-fallback on rate limit</div><div class="td">Switch to next model when rate limited</div></div><div class="toggle on" onclick="this.classList.toggle('on');autoSave()"></div></div>
+        <div class="toggle-row"><div><div class="tl">Auto-fallback on error</div><div class="td">Switch if API returns error or timeout</div></div><div class="toggle on" onclick="this.classList.toggle('on');autoSave()"></div></div>
+        <div class="toggle-row"><div><div class="tl">Cost optimization</div><div class="td">Cheap models for simple tasks, powerful for complex</div></div><div class="toggle on" onclick="this.classList.toggle('on');autoSave()"></div></div>
+        <div class="toggle-row"><div><div class="tl">Session persistence</div><div class="td">Keep OAuth sessions alive, auto-refresh tokens</div></div><div class="toggle on" onclick="this.classList.toggle('on');autoSave()"></div></div>
       </div>
     </div>
 
@@ -421,29 +385,24 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
       </div>
     </div>
 
-    <!-- ── Built-in Tools ── -->
+    <!-- ── OpenClaw Skills Status ── -->
     <div class="set-card">
-      <h3>Built-in tools</h3>
-      <div class="set-desc">Pre-installed, zero configuration. Everything works out of the box.</div>
-      <div class="builtin-item"><div class="bi-icon" style="background:var(--tlb);color:var(--tl)">S</div><div class="bi-info"><div class="bi-name">Scrapling</div><div class="bi-desc">Web scraper — GitHub, ClawHub, any site</div></div><div class="bi-status on">Active</div></div>
-      <div class="builtin-item"><div class="bi-icon" style="background:var(--acb2);color:var(--ac)">C</div><div class="bi-info"><div class="bi-name">ChromaDB</div><div class="bi-desc">Vector DB for semantic skill search</div></div><div class="bi-status on">Active</div></div>
-      <div class="builtin-item"><div class="bi-icon" style="background:var(--amb);color:var(--am)">R</div><div class="bi-info"><div class="bi-name">Redis + Celery</div><div class="bi-desc">Task queue and scheduler</div></div><div class="bi-status on">Active</div></div>
-      <div class="builtin-item"><div class="bi-icon" style="background:var(--blb);color:var(--bl)">P</div><div class="bi-info"><div class="bi-name">PostgreSQL</div><div class="bi-desc">Main database</div></div><div class="bi-status on">Active</div></div>
-      <div class="builtin-item"><div class="bi-icon" style="background:var(--gnb);color:var(--gn)">N</div><div class="bi-info"><div class="bi-name">Nginx + SSL</div><div class="bi-desc">Auto HTTPS</div></div><div class="bi-status on">Active</div></div>
-      <div class="builtin-item"><div class="bi-icon" style="background:var(--cob);color:var(--co)">G</div><div class="bi-info"><div class="bi-name">Git integration</div><div class="bi-desc">Repo clone and analysis</div></div><div class="bi-status on">Active</div></div>
-      <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px;font-size:11.5px;color:var(--t3)">All pre-installed. No setup needed.</div>
+      <h3>Skills status</h3>
+      <div class="set-desc">Skills loaded from OpenClaw. Status reflects real availability.</div>
+      <div id="settings-skills-status">
+        <div style="text-align:center;padding:20px;color:var(--t4);font-size:12px">Loading skills status...</div>
+      </div>
+      <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px;font-size:11.5px;color:var(--t3)">Skills managed by OpenClaw. Run <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw skills list</code> for details.</div>
     </div>
 
-    <!-- ── Crawlers ── -->
+    <!-- ── Channels ── -->
     <div class="set-card">
-      <h3>Crawlers</h3>
-      <div class="set-desc">Scrapling handles all scraping automatically. Just toggle on/off.</div>
-      <div class="toggle-row"><div><div class="tl">GitHub repos</div><div class="td">Scan for SKILL.md files</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="toggle-row"><div><div class="tl">GitHub trending</div><div class="td">Daily trending analysis</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="toggle-row"><div><div class="tl">ClawHub</div><div class="td">Agent marketplace</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="toggle-row"><div><div class="tl">Auto-index uploads</div><div class="td">Auto-approve user skills</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-      <div class="ff" style="margin-top:10px"><label>Scan interval</label><select><option>Every 15 min</option><option>Every 30 min</option><option>Every hour</option></select></div>
-      <div class="ff"><label>GitHub token (optional)</label><input type="password" placeholder="ghp_... (increases rate limit)"><div class="hint">Without: 60 req/hr. With: 5,000 req/hr</div></div>
+      <h3>Channels</h3>
+      <div class="set-desc">Message channels configured in OpenClaw gateway.</div>
+      <div id="settings-channels-status">
+        <div style="text-align:center;padding:20px;color:var(--t4);font-size:12px">Loading channel status...</div>
+      </div>
+      <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px;font-size:11.5px;color:var(--t3)">Channels managed by OpenClaw. Run <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw setup</code> to configure.</div>
     </div>
 
     <!-- ── System ── -->
@@ -451,9 +410,9 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
         <div><div class="ff"><label>Max concurrent tasks</label><input type="number" value="8" min="1" max="32"></div></div>
         <div><div class="ff"><label>Task timeout (seconds)</label><input type="number" value="300"></div></div>
-        <div><div class="ff"><label>Language</label><select><option>English</option><option>中文</option><option>日本語</option></select></div></div>
+        <div><div class="ff"><label>Language</label><select id="lang-select" onchange="switchLang(this.value);autoSave()"><option value="en">English</option><option value="zh">中文</option></select></div></div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-sm btn-p" onclick="toast('All settings saved')">Save all</button><button class="btn btn-sm btn-d" onclick="toast('Cache cleared')">Clear cache</button></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-sm btn-p" onclick="saveWithFeedback(this)">Save all</button><button class="btn btn-sm btn-d" onclick="localStorage.clear();location.reload()">Clear cache</button></div>
     </div>
   </div>
 </div></div>
@@ -461,44 +420,28 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 <!-- ═══ Workspace ═══ -->
 <div class="page" id="p-ws">
   <div class="ppb">
-    <span style="font-size:13px;font-weight:500;margin-right:16px" id="ws-proj-name">E-Commerce Platform</span>
+    <span style="font-size:13px;font-weight:500;margin-right:16px" id="ws-proj-name">No project selected</span>
     <div class="pps dn"><div class="ddd"></div>Analyze</div><div class="ppc dn"></div>
     <div class="pps dn"><div class="ddd"></div>Plan</div><div class="ppc dn"></div>
     <div class="pps dn"><div class="ddd"></div>Assign</div><div class="ppc dn"></div>
     <div class="pps ac"><div class="ddd"></div>Build</div><div class="ppc"></div>
     <div class="pps"><div class="ddd"></div>Review</div><div class="ppc"></div>
     <div class="pps"><div class="ddd"></div>Deliver</div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:6px"><span style="font-size:11px;color:var(--gn);font-family:var(--fm);font-weight:500" id="ws-pct">72%</span><div style="width:70px;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden"><div style="width:72%;height:100%;background:var(--gn);border-radius:2px" id="ws-bar"></div></div></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:6px"><span style="font-size:11px;color:var(--gn);font-family:var(--fm);font-weight:500" id="ws-pct">0%</span><div style="width:70px;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden"><div style="width:0%;height:100%;background:var(--gn);border-radius:2px" id="ws-bar"></div></div></div>
   </div>
   <div class="ws">
     <div class="wsl">
       <div class="wsc"><div class="al" id="alog">
-        <div class="ag"><div class="agh"><span class="pt" style="background:var(--acb2);color:var(--ac)">Analyze</span><div class="ln"></div><span class="st" style="color:var(--gn)">Done</span></div>
-          <div class="ai sy"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">Analyzed your requirements: <strong>E-Commerce Platform</strong> with user auth, product catalog, shopping cart, Stripe payments, order management, admin panel.</div><div class="at">14:20:01</div></div></div></div>
-        <div class="ag"><div class="agh"><span class="pt" style="background:var(--tlb);color:var(--tl)">Plan</span><div class="ln"></div><span class="st" style="color:var(--gn)">Done</span></div>
-          <div class="ai sy"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am"><strong>23 tasks, 5 agents</strong>:</div>
-            <div class="plb"><div class="plt">Execution plan</div>
-              <div class="pli"><span class="pln">1</span>System architecture<span class="pla" style="background:var(--acb2);color:var(--ac)">Architect</span></div>
-              <div class="pli"><span class="pln">2</span>Database ERD<span class="pla" style="background:var(--acb2);color:var(--ac)">Architect</span></div>
-              <div class="pli"><span class="pln">3</span>API contracts (18 endpoints)<span class="pla" style="background:var(--acb2);color:var(--ac)">Architect</span></div>
-              <div class="pli"><span class="pln">4</span>User auth + OAuth<span class="pla" style="background:var(--tlb);color:var(--tl)">Backend</span></div>
-              <div class="pli"><span class="pln">5</span>Product CRUD API<span class="pla" style="background:var(--tlb);color:var(--tl)">Backend</span></div>
-              <div class="pli"><span class="pln">6</span>Stripe payment<span class="pla" style="background:var(--tlb);color:var(--tl)">Backend</span></div>
-              <div class="pli"><span class="pln">7</span>Design system<span class="pla" style="background:var(--cob);color:var(--co)">Frontend</span></div>
-              <div class="pli" style="color:var(--t4)"><span class="pln">..</span>+16 more tasks<span class="pla" style="background:var(--bg5)">Various</span></div>
-              <div class="plx" id="plx"><button class="btn btn-p btn-sm" onclick="approve()">Approve & execute</button><button class="btn btn-sm" onclick="toast('Edit mode coming soon')">Edit plan</button><button class="btn btn-w btn-sm" style="margin-left:auto" onclick="approve()">Auto</button></div>
-            </div><div class="at">14:20:28</div></div></div></div>
-        <div class="ag"><div class="agh"><span class="pt" style="background:var(--amb);color:var(--am)">Assign</span><div class="ln"></div><span class="st" style="color:var(--gn)">Done</span></div>
-          <div class="ai sy"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">Deployed: <strong>Architect</strong> (4) / <strong>Backend</strong> (6) / <strong>Frontend</strong> (6) / <strong>Test</strong> (4) / <strong>DevOps</strong> (3)</div><div class="at">14:21:03</div></div></div></div>
-        <div class="ag" id="build-phase"><div class="agh"><span class="pt" style="background:var(--gnb);color:var(--gn)">Build</span><div class="ln"></div><span class="st pulse" style="color:var(--gn)">In progress</span></div>
-          <div class="ai"><div class="aa" style="background:var(--acb2);color:var(--ac)">A</div><div class="ab"><div class="an" style="color:var(--ac)">Architect-Agent</div><div class="am">System design complete. Docs pushed to shared context.</div><div class="at">14:28:12</div></div></div>
-          <div class="ai"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">Architect complete. Unblocking Backend and Frontend for parallel work.</div><div class="at">14:28:15</div></div></div>
-          <div class="ai"><div class="aa" style="background:var(--tlb);color:var(--tl)">B</div><div class="ab"><div class="an" style="color:var(--tl)">Backend-Agent</div><div class="am">Auth module: <strong>POST /auth/login</strong>, <strong>POST /auth/register</strong>, <strong>GET /auth/me</strong>.</div><div class="at">14:29:01</div></div></div>
-          <div class="ai"><div class="aa" style="background:var(--tlb);color:var(--tl)">B</div><div class="ab"><div class="an" style="color:var(--tl)">Backend → <span style="color:var(--co)">Frontend</span></div><div class="am">Product API ready: <strong>GET /api/products</strong>, <strong>POST /api/cart</strong>. Schema pushed.</div><div class="at">14:35:22</div></div></div>
-          <div class="ai"><div class="aa" style="background:var(--amb);color:var(--am)">T</div><div class="ab"><div class="an" style="color:var(--am)">Test-Agent → PM</div><div class="am">Auth: <strong>24/24</strong>. Products: <strong>18/18</strong>. Coverage: 92%.</div><div class="at">14:42:08</div></div></div>
-          <div class="ai sy" id="issue-log" style="border-color:rgba(248,113,133,.2);background:var(--cob)"><div class="aa" style="background:var(--co);color:#fff">!</div><div class="ab"><div class="an" style="color:var(--co)">PM-Agent — Issue</div><div class="am"><strong>payment-service.ts:142</strong> — Stripe webhook timeout.</div><div class="ax"><button class="btn btn-d btn-sm" onclick="fixLog(this)">Fix</button><button class="btn btn-sm" onclick="toast('Code viewer coming soon')">View code</button></div><div class="at">14:44:30</div></div></div>
-          <div class="ai usr"><div class="aa" style="background:linear-gradient(135deg,var(--co),var(--am));color:#090a0e">Y</div><div class="ab"><div class="an" style="color:var(--t1)">You → PM-Agent</div><div class="am">Prioritize payment. Need Stripe by Friday.</div><div class="at">14:45:12</div></div></div>
-          <div class="ai"><div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">Re-prioritized: Backend → payment first, Frontend → checkout moved up, Test → payment E2E queued. ETA: <strong>~2 hours</strong>.</div><div class="at">14:45:18</div></div></div>
+        <div id="ws-empty" style="text-align:center;padding:80px 20px">
+          <div style="font-size:40px;margin-bottom:16px;opacity:.25">🚀</div>
+          <div style="font-size:16px;color:var(--t2);margin-bottom:6px">No active project</div>
+          <div style="font-size:12px;color:var(--t4);margin-bottom:20px;max-width:300px;margin-left:auto;margin-right:auto">Create a project or select one from My Projects to start building with AI agents</div>
+          <button class="btn btn-p" onclick="openMo()">+ Create project</button>
+          <button class="btn" style="margin-left:8px" onclick="go('projs')">My projects</button>
+        </div>
+        <div id="demo-activity" style="display:none">
+        <div class="ag" id="build-phase"><div class="agh"><span class="pt" style="background:var(--gnb);color:var(--gn)">Chat</span><div class="ln"></div><span class="st" style="color:var(--tl)">Ready</span></div>
+        </div>
         </div>
       </div></div>
       <div class="cha">
@@ -508,28 +451,16 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
     </div>
     <div class="wsr">
       <div class="wp" style="text-align:center">
-        <div class="rng"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="var(--b0)" stroke-width="6"/><circle id="ring-fill" cx="48" cy="48" r="40" fill="none" stroke="var(--gn)" stroke-width="6" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="70.4"/></svg><div class="rng-c"><div class="rv" style="color:var(--gn)" id="ring-pct">72%</div><div class="rl">Complete</div></div></div>
-        <div style="display:flex;justify-content:center;gap:16px;font-size:10px;font-family:var(--fm)"><span style="color:var(--gn)">17 done</span><span style="color:var(--ac)">4 active</span><span style="color:var(--t4)">2 queued</span></div>
+        <div class="rng"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="var(--b0)" stroke-width="6"/><circle id="ring-fill" cx="48" cy="48" r="40" fill="none" stroke="var(--gn)" stroke-width="6" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3"/></svg><div class="rng-c"><div class="rv" style="color:var(--gn)" id="ring-pct">0%</div><div class="rl">Complete</div></div></div>
       </div>
       <div class="wp"><h4>Agent team</h4>
-        <div class="agc"><div class="ah"><div class="aav" style="background:var(--acb2);color:var(--ac)">A</div><div class="anm">Architect</div><span class="ast" style="background:var(--gnb);color:var(--gn)">Done</span></div><div class="atx">4/4 complete</div><div class="abr"><div class="fl" style="width:100%;background:var(--gn)"></div></div></div>
-        <div class="agc"><div class="ah"><div class="aav" style="background:var(--tlb);color:var(--tl)">B</div><div class="anm">Backend</div><span class="ast" style="background:var(--acb2);color:var(--ac)">Working</span></div><div class="atx">3/6 — payment</div><div class="abr"><div class="fl" style="width:50%;background:var(--tl)"></div></div></div>
-        <div class="agc"><div class="ah"><div class="aav" style="background:var(--cob);color:var(--co)">F</div><div class="anm">Frontend</div><span class="ast" style="background:var(--acb2);color:var(--ac)">Working</span></div><div class="atx">3/6 — cart</div><div class="abr"><div class="fl" style="width:50%;background:var(--co)"></div></div></div>
-        <div class="agc"><div class="ah"><div class="aav" style="background:var(--amb);color:var(--am)">T</div><div class="anm">Test</div><span class="ast" style="background:var(--acb2);color:var(--ac)">Working</span></div><div class="atx">2/4 — integration</div><div class="abr"><div class="fl" style="width:50%;background:var(--am)"></div></div></div>
-        <div class="agc"><div class="ah"><div class="aav" style="background:var(--blb);color:var(--bl)">D</div><div class="anm">DevOps</div><span class="ast" style="background:var(--bg5);color:var(--t4)">Queued</span></div><div class="atx">1/3</div><div class="abr"><div class="fl" style="width:33%;background:var(--bl)"></div></div></div>
+        <div id="ws-agent-team" style="font-size:12px;color:var(--t4);padding:8px 0">Select a project to see assigned agents</div>
       </div>
-      <div class="wp"><h4 id="issue-count"><span style="color:var(--co)">!</span> Issues (2)</h4>
-        <div class="ial" id="wi1"><div class="it"><div class="itx">Stripe webhook timeout</div><div class="ifl">payment-service.ts:142</div></div><button class="btn btn-d btn-sm" onclick="fixP(1,this)">Fix</button></div>
-        <div class="ial" id="wi2"><div class="it"><div class="itx">Cart re-render perf</div><div class="ifl">CartView.tsx:78</div></div><button class="btn btn-d btn-sm" onclick="fixP(2,this)">Fix</button></div>
+      <div class="wp"><h4 id="issue-count">Issues</h4>
+        <div id="ws-issues" style="font-size:12px;color:var(--t4);padding:8px 0">No issues</div>
       </div>
       <div class="wp"><h4>Deliverables</h4>
-        <div class="dli"><span>📋</span><span class="dlnm">system-architecture.md</span><span class="dlag">Architect</span></div>
-        <div class="dli"><span>🔌</span><span class="dlnm">api-contracts.yaml</span><span class="dlag">Architect</span></div>
-        <div class="dli"><span>🗄</span><span class="dlnm">database-schema.sql</span><span class="dlag">Backend</span></div>
-        <div class="dli"><span>⚙</span><span class="dlnm">backend/src/ (42 files)</span><span class="dlag">Backend</span></div>
-        <div class="dli"><span>🎨</span><span class="dlnm">frontend/src/ (38 files)</span><span class="dlag">Frontend</span></div>
-        <div class="dli"><span>✅</span><span class="dlnm">test-reports/</span><span class="dlag">Test</span></div>
-        <div class="dli" style="opacity:.35"><span>📦</span><span class="dlnm">production-build/</span><span class="dlag">Pending</span></div>
+        <div id="ws-deliverables" style="font-size:12px;color:var(--t4);padding:8px 0">No deliverables yet</div>
       </div>
     </div>
   </div>
@@ -568,6 +499,167 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 /* ══ OpenClaw Integration Layer ══ */
 const CLAW_CONFIG_KEY = 'agenthub_openclaw_config';
 
+const STORAGE_KEY = 'agenthub_state';
+
+function saveState() {
+  const state = {
+    projects: PROJS,
+    skills: SKS.filter(s => !s.real), // don't save OpenClaw skills
+    agents: AGS.filter(a => !a.real), // don't save OpenClaw agents
+    models: getModelConfigs(),
+    settings: getSettingsState()
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    if (state.projects && state.projects.length) { PROJS.length = 0; PROJS.push(...state.projects); }
+    if (state.skills && state.skills.length) { SKS.length = 0; SKS.push(...state.skills); }
+    if (state.agents && state.agents.length) { AGS.length = 0; AGS.push(...state.agents); }
+    if (state.settings) applySettings(state.settings);
+    if (state.models) restoreModels(state.models);
+    return true;
+  } catch(e) { return false; }
+}
+
+function getModelConfigs() {
+  const models = [];
+  document.querySelectorAll('.model-row').forEach(row => {
+    const name = row.querySelector('.mr-name')?.textContent || '';
+    const provider = row.querySelector('.mr-provider')?.textContent || '';
+    const key = row.querySelector('.mr-key')?.value || '';
+    const priority = row.querySelector('.mr-priority')?.value || 'Disabled';
+    const status = row.querySelector('.mr-status')?.textContent || '';
+    const auth = row.dataset.auth || 'key';
+    const icon = row.querySelector('.mr-icon')?.textContent || '';
+    const iconBg = row.querySelector('.mr-icon')?.style.background || '';
+    const iconColor = row.querySelector('.mr-icon')?.style.color || '';
+    models.push({ name, provider, key, priority, status, auth, icon, iconBg, iconColor, id: row.dataset.id });
+  });
+  return models;
+}
+
+function restoreModels(models) {
+  // Models are now managed by OpenClaw config - no local restore needed
+}
+
+function autoSave() {
+  clearTimeout(autoSave._t);
+  autoSave._t = setTimeout(saveState, 500);
+}
+autoSave._t = null;
+
+function saveWithFeedback(btn) {
+  saveState();
+  btn.style.pointerEvents = 'none';
+  const orig = btn.textContent;
+  btn.textContent = '\u2713 Saved!';
+  btn.style.background = 'var(--gn)'; btn.style.color = '#090a0e';
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; btn.style.pointerEvents = ''; }, 1500);
+}
+
+function getSettingsState() {
+  const toggles = {};
+  document.querySelectorAll('#p-settings .toggle').forEach((t, i) => { toggles['t' + i] = t.classList.contains('on'); });
+  return {
+    toggles,
+    lang: document.querySelector('#p-settings select')?.value || 'English',
+    maxTasks: document.querySelector('#p-settings input[type="number"]')?.value || '8',
+    timeout: document.querySelectorAll('#p-settings input[type="number"]')[1]?.value || '300',
+    scanInterval: document.querySelectorAll('#p-settings select')[0]?.value || 'Every 15 min'
+  };
+}
+
+function applySettings(s) {
+  if (!s) return;
+  if (s.toggles) {
+    document.querySelectorAll('#p-settings .toggle').forEach((t, i) => {
+      if (s.toggles['t' + i] !== undefined) t.classList.toggle('on', s.toggles['t' + i]);
+    });
+  }
+}
+
+/* ══ Language switching ══ */
+const LANG = {
+  en: {
+    dashboard: 'Dashboard', trending: 'Trending', crawler: 'Channels', skills: 'Skills', agents: 'Agents',
+    myProjects: 'My projects', activeProject: 'Active project', settings: 'Settings',
+    overview: 'OVERVIEW', library: 'LIBRARY', workspace: 'WORKSPACE', system: 'SYSTEM',
+    newProject: '+ New project', sync: '\u27f3 Sync', search: 'Search skills, agents, projects... (Ctrl+K)',
+    totalSkills: 'TOTAL SKILLS', activeAgents: 'ACTIVE AGENTS', projects: 'PROJECTS', successRate: 'SUCCESS RATE',
+    activity: 'Activity', welcomeTitle: 'Welcome to AgentHub', welcomeDesc: 'Complete setup to start building with AI agents',
+    createProject: 'Create new project', projectName: 'Project name', whatBuild: 'What do you want to build?',
+    priority: 'Priority', cancel: 'Cancel', createDeploy: 'Create & deploy agents',
+    noSkills: 'No skills loaded', noAgents: 'No agents yet', noProjects: 'No projects yet', noActivity: 'No activity yet',
+    connectOC: 'Connect OpenClaw', createAgent: '+ Create agent',
+    offline: 'Offline', save: 'Save all', clearCache: 'Clear cache',
+    installed: '1. Installed', connectStep: '2. Connect OpenClaw', createStep: '3. Create project', skillsSynced: '4. Skills synced'
+  },
+  zh: {
+    dashboard: '\u4eea\u8868\u76d8', trending: '\u70ed\u95e8\u8d8b\u52bf', crawler: '\u6e20\u9053', skills: '\u6280\u80fd', agents: '\u667a\u80fd\u4f53',
+    myProjects: '\u6211\u7684\u9879\u76ee', activeProject: '\u6d3b\u8dc3\u9879\u76ee', settings: '\u8bbe\u7f6e',
+    overview: '\u6982\u89c8', library: '\u8d44\u6e90\u5e93', workspace: '\u5de5\u4f5c\u533a', system: '\u7cfb\u7edf',
+    newProject: '+ \u65b0\u5efa\u9879\u76ee', sync: '\u27f3 \u540c\u6b65', search: '\u641c\u7d22\u6280\u80fd\u3001\u667a\u80fd\u4f53\u3001\u9879\u76ee... (Ctrl+K)',
+    totalSkills: '\u6280\u80fd\u603b\u6570', activeAgents: '\u6d3b\u8dc3\u667a\u80fd\u4f53', projects: '\u9879\u76ee\u6570', successRate: '\u6210\u529f\u7387',
+    activity: '\u52a8\u6001', welcomeTitle: '\u6b22\u8fce\u4f7f\u7528 AgentHub', welcomeDesc: '\u5b8c\u6210\u8bbe\u7f6e\uff0c\u5f00\u59cb\u4f7f\u7528 AI \u667a\u80fd\u4f53',
+    createProject: '\u521b\u5efa\u65b0\u9879\u76ee', projectName: '\u9879\u76ee\u540d\u79f0', whatBuild: '\u4f60\u60f3\u6784\u5efa\u4ec0\u4e48\uff1f',
+    priority: '\u4f18\u5148\u7ea7', cancel: '\u53d6\u6d88', createDeploy: '\u521b\u5efa\u5e76\u90e8\u7f72\u667a\u80fd\u4f53',
+    noSkills: '\u6682\u65e0\u6280\u80fd', noAgents: '\u6682\u65e0\u667a\u80fd\u4f53', noProjects: '\u6682\u65e0\u9879\u76ee', noActivity: '\u6682\u65e0\u52a8\u6001',
+    connectOC: '\u8fde\u63a5 OpenClaw', createAgent: '+ \u521b\u5efa\u667a\u80fd\u4f53',
+    offline: '\u79bb\u7ebf', save: '\u4fdd\u5b58\u6240\u6709', clearCache: '\u6e05\u9664\u7f13\u5b58',
+    installed: '1. \u5df2\u5b89\u88c5', connectStep: '2. \u8fde\u63a5 OpenClaw', createStep: '3. \u521b\u5efa\u9879\u76ee', skillsSynced: '4. \u6280\u80fd\u5df2\u540c\u6b65'
+  }
+};
+let currentLang = 'en';
+
+function switchLang(lang) {
+  currentLang = lang;
+  const L = LANG[lang] || LANG.en;
+  // Section labels
+  document.querySelectorAll('.ns-l').forEach((el,i) => {
+    const keys = ['overview','library','workspace','system'];
+    if (keys[i] && L[keys[i]]) el.textContent = L[keys[i]];
+  });
+  // Top bar
+  const searchInput = document.getElementById('gs');
+  if (searchInput) searchInput.placeholder = L.search;
+  // Stat labels
+  document.querySelectorAll('.sc-l').forEach((el,i) => {
+    const keys = ['totalSkills','activeAgents','projects','successRate'];
+    if (keys[i] && L[keys[i]]) el.textContent = L[keys[i]];
+  });
+  // Dashboard headers
+  document.querySelectorAll('#p-dash h3').forEach((el,i) => {
+    if (i===0 && L.activity) el.textContent = L.activity;
+    if (i===1 && L.projects) el.textContent = L.projects;
+  });
+  // Onboarding
+  const obSteps = document.querySelectorAll('.ob-step');
+  if(obSteps[0]) obSteps[0].textContent = L.installed;
+  if(obSteps[1]) obSteps[1].textContent = L.connectStep;
+  if(obSteps[2]) obSteps[2].textContent = L.createStep;
+  if(obSteps[3]) obSteps[3].textContent = L.skillsSynced;
+  const obTitle = document.querySelector('.onboard h2');
+  if(obTitle) obTitle.textContent = L.welcomeTitle;
+  const obDesc = document.querySelector('.onboard p');
+  if(obDesc) obDesc.textContent = L.welcomeDesc;
+  // Buttons in top bar
+  document.querySelectorAll('.tb .btn').forEach(b => {
+    if(b.textContent.includes('Sync') || b.textContent.includes('\u540c\u6b65')) b.textContent = L.sync;
+    if(b.textContent.includes('New project') || b.textContent.includes('\u65b0\u5efa')) b.textContent = L.newProject;
+  });
+  // Demo mode label
+  const clawLabel = document.getElementById('claw-label');
+  if(clawLabel && clawLabel.textContent.includes('Offline')) clawLabel.textContent = L.offline;
+
+  // Re-render to update empty states
+  renderAll();
+}
+
 class OpenClawClient {
   constructor() {
     this.ws = null;
@@ -593,7 +685,7 @@ class OpenClawClient {
     el.className = 'claw-status ' + state;
     if (state === 'live') lb.textContent = 'OpenClaw' + (this.serverVersion ? ' ' + this.serverVersion : '');
     else if (state === 'connecting') lb.textContent = 'Connecting...';
-    else lb.textContent = 'Demo Mode';
+    else lb.textContent = 'Offline';
   }
 
   connect() {
@@ -614,9 +706,9 @@ class OpenClawClient {
       if (frame.type === 'event' && frame.event === 'connect.challenge') {
         const params = {
           minProtocol: 3, maxProtocol: 3,
-          client: { id: 'agenthub-ui', version: '5.0.0', platform: navigator.platform.includes('Win') ? 'windows' : navigator.platform.includes('Mac') ? 'macos' : 'linux', mode: 'ui' },
+          client: { id: 'gateway-client', version: '2026.3.13', platform: navigator.platform.includes('Win') ? 'windows' : navigator.platform.includes('Mac') ? 'macos' : 'linux', mode: 'backend' },
           role: 'operator',
-          scopes: ['operator.read', 'operator.write']
+          scopes: ['operator.read', 'operator.write', 'operator.admin']
         };
         if (this.token) params.auth = { token: this.token };
         this.ws.send(JSON.stringify({ type: 'req', id: 'connect-' + Date.now(), method: 'connect', params }));
@@ -703,10 +795,15 @@ class OpenClawClient {
   }
 
   async invoke(tool, args = {}) {
-    const httpUrl = this.url.replace('ws://', 'http://').replace('wss://', 'https://');
+    // Use local proxy /api/ to avoid CORS, fallback to direct URL
+    const proxyUrl = '/api/tools/invoke';
+    const directUrl = this.url.replace('ws://', 'http://').replace('wss://', 'https://') + '/tools/invoke';
     const headers = { 'Content-Type': 'application/json' };
     if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
-    const res = await fetch(httpUrl + '/tools/invoke', { method: 'POST', headers, body: JSON.stringify({ tool, args }) });
+    const body = JSON.stringify({ tool, args });
+    let res;
+    try { res = await fetch(proxyUrl, { method: 'POST', headers, body }); }
+    catch(e) { res = await fetch(directUrl, { method: 'POST', headers, body }); }
     const data = await res.json();
     if (!data.ok) throw data.error || { message: 'Invoke failed' };
     return data.result;
@@ -735,24 +832,68 @@ function testClawConnection() {
   setTimeout(() => { if (!claw.connected) { st.textContent = '\u2717 Connection failed \u2014 is OpenClaw gateway running?'; st.style.color = 'var(--co)'; claw.off('connected', onOk); } }, 5000);
 }
 function saveClawConfig() {
+  const btn = document.querySelector('button[onclick="saveClawConfig()"]');
+  if (btn) { btn.style.pointerEvents='none'; btn.textContent='Connecting...'; }
   const url = document.getElementById('oc-url').value || 'ws://127.0.0.1:18789';
   const token = document.getElementById('oc-token').value || '';
   localStorage.setItem(CLAW_CONFIG_KEY, JSON.stringify({ url, token }));
   claw.url = url; claw.token = token;
   toast('OpenClaw config saved');
   claw.reconnect();
+  setTimeout(() => { if(btn){btn.textContent='Save & connect';btn.style.pointerEvents=''} }, 3000);
 }
 
 async function syncAll() {
-  if (claw.connected) {
-    toast('Syncing from OpenClaw gateway...');
-    try { await loadRealSkills(); } catch(e) {}
-    try { await loadRealStatus(); } catch(e) {}
-    try { await loadRealSessions(); } catch(e) {}
-    toast('Sync complete');
-  } else {
-    toast('Demo mode \u2014 connect OpenClaw to sync real data');
+  const L = LANG[currentLang] || LANG.en;
+  toast(L.syncing || 'Syncing from OpenClaw...');
+  try {
+    await Promise.all([loadRealSkills(), loadRealAgents(), loadRealConfig()]);
+    if (claw.connected) {
+      await loadRealSessions();
+      await loadRealStatus();
+    }
+    renderAll(); updateStats(); updateWizard();
+    toast(L.syncDone || 'Sync complete');
+  } catch(e) { toast('Sync error: ' + e.message); }
+}
+
+/* ══ Trending actions (with button feedback) ══ */
+function extractSkills(btn, repoName, lang) {
+  btn.style.pointerEvents = 'none';
+  btn.innerHTML = '<span class="spin">\u27f3</span> Extracting...';
+  setTimeout(() => {
+    const langCat = {Python:'ai',TypeScript:'code',JavaScript:'ui',Go:'infra',Rust:'infra'}[lang] || 'code';
+    const parts = repoName.split('/');
+    const name = parts[parts.length - 1].toLowerCase();
+    const skillName = name + '-skill';
+    if (SKS.some(s => s.n === skillName)) {
+      btn.textContent = '\u2713 Already added'; btn.className = 'btn btn-sm'; btn.style.background = 'var(--bg5)'; btn.style.color = 'var(--t4)';
+      return;
+    }
+    SKS.push({ n: skillName, s: 'github/' + repoName, d: 'Auto-extracted skill from ' + repoName, t: [lang.toLowerCase(), 'extracted'], i: '\u26a1', b: 'var(--amb)', c: 'var(--am)', r: '\u2014', src: 'github', cat: langCat });
+    renderSk(); updateStats();
+    const skB = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skB) skB.textContent = SKS.length;
+    autoSave();
+    btn.textContent = '\u2713 Extracted'; btn.className = 'btn btn-sm'; btn.style.background = 'var(--gnb)'; btn.style.color = 'var(--gn)';
+    toast('Extracted 1 skill from ' + repoName);
+  }, 1200);
+}
+
+function addToLibrary(btn, repoName, desc, lang) {
+  const langCat = {Python:'ai',TypeScript:'code',JavaScript:'ui',Go:'infra',Rust:'infra'}[lang] || 'code';
+  const parts = repoName.split('/');
+  const name = parts[parts.length - 1].toLowerCase();
+  if (SKS.some(s => s.n === name)) {
+    btn.textContent = '\u2713 In library'; btn.style.background = 'var(--bg5)'; btn.style.color = 'var(--t4)'; btn.style.pointerEvents = 'none';
+    toast(name + ' already in library'); return;
   }
+  btn.style.pointerEvents = 'none';
+  SKS.push({ n: name, s: 'github/' + repoName, d: desc, t: [lang.toLowerCase(), 'trending'], i: '\u2605', b: 'var(--tlb)', c: 'var(--tl)', r: '\u2014', src: 'trending', cat: langCat });
+  renderSk(); updateStats();
+  const skB = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skB) skB.textContent = SKS.length;
+  autoSave();
+  btn.textContent = '\u2713 Added'; btn.style.background = 'var(--gnb)'; btn.style.color = 'var(--gn)';
+  toast(name + ' added to skill library');
 }
 
 /* ── On connect: load real data ── */
@@ -761,56 +902,170 @@ claw.on('connected', async (payload) => {
   if (ver) ver.textContent = 'v' + (payload.server?.version || '');
   toast('OpenClaw connected \u2014 loading real data...');
   try { await loadRealSkills(); } catch(e) {}
+  try { await loadRealAgents(); } catch(e) {}
+  try { await loadRealConfig(); } catch(e) {}
   try { await loadRealStatus(); } catch(e) {}
   try { await loadRealSessions(); } catch(e) {}
+  updateStats(); updateWizard();
 });
 
 claw.on('disconnected', () => {
-  toast('OpenClaw disconnected \u2014 switching to demo mode');
+  toast('OpenClaw disconnected');
+  updateWizard();
 });
 
-/* ── Load real skills from OpenClaw ── */
+/* ── Load real skills from OpenClaw (via server /api/skills) ── */
 async function loadRealSkills() {
-  if (!claw.connected) return;
-  let result;
-  try { result = await claw.invoke('sessions_send', { message: '/skills --json', sessionKey: 'main' }); } catch(e) {}
-  // If tools/invoke works for skills, parse. Otherwise use status info.
   try {
-    const statusData = await claw.send('status');
-    if (statusData && statusData.skills) {
-      const realSkills = [];
-      const catMap = { 'coding-agent': 'code', 'browser': 'ui', 'canvas': 'ui', 'cron': 'infra', 'webhooks': 'infra', 'email': 'doc', 'calendar': 'doc', 'github-issues': 'code', 'gemini': 'ai', 'discord': 'infra', 'telegram': 'infra', 'slack': 'infra', 'whatsapp': 'infra' };
-      const iconMap = { ready: '\u25c9', missing: '\u25c7', disabled: '\u25cc' };
-      const colorMap = { ready: { b: 'var(--gnb)', c: 'var(--gn)' }, missing: { b: 'var(--cob)', c: 'var(--co)' }, disabled: { b: 'var(--bg5)', c: 'var(--t4)' } };
-      (statusData.skills || []).forEach(sk => {
-        const status = sk.ready ? 'ready' : 'missing';
-        const cm = colorMap[status] || colorMap.missing;
-        realSkills.push({
-          n: sk.name || sk.skill || 'unknown',
-          s: 'openclaw/' + (sk.source || 'bundled'),
-          d: sk.description || sk.desc || '',
-          t: [status, 'openclaw'],
-          i: sk.icon || iconMap[status] || '\u25c7',
-          b: cm.b, c: cm.c,
-          r: sk.ready ? '5.0' : '\u2014',
-          src: 'clawhub',
-          cat: catMap[sk.name] || catMap[sk.skill] || 'infra',
-          real: true
-        });
+    const res = await fetch('/api/skills');
+    const data = await res.json();
+    const skillsData = data.skills || [];
+    if (!skillsData.length) return;
+    const realSkills = [];
+    const catMap = { 'coding-agent': 'code', 'browser': 'ui', 'canvas': 'ui', 'cron': 'infra', 'webhooks': 'infra', 'email': 'doc', 'calendar': 'doc', 'github-issues': 'code', 'gemini': 'ai', 'discord': 'infra', 'telegram': 'infra', 'slack': 'infra', 'whatsapp': 'infra' };
+    const colorMap = { ready: { b: 'var(--gnb)', c: 'var(--gn)' }, missing: { b: 'var(--cob)', c: 'var(--co)' } };
+    skillsData.forEach(sk => {
+      const ready = sk.eligible && !sk.disabled;
+      const status = ready ? 'ready' : 'missing';
+      const cm = colorMap[status] || colorMap.missing;
+      const name = sk.name || 'unknown';
+      realSkills.push({
+        n: name, s: 'openclaw/' + (sk.source || 'bundled'),
+        d: sk.description || name + ' skill',
+        t: [status, 'openclaw', sk.source || 'bundled'],
+        i: sk.emoji || (ready ? '\u25c9' : '\u25c7'), b: cm.b, c: cm.c,
+        r: ready ? '5.0' : '\u2014', src: 'clawhub',
+        cat: catMap[name] || 'infra', real: true
       });
-      if (realSkills.length > 0) {
-        // Merge: real skills first, then demo skills tagged
-        const demoTagged = SKS.filter(s => !s.real).map(s => ({ ...s, t: [...s.t, 'demo'] }));
-        SKS.length = 0;
-        SKS.push(...realSkills, ...demoTagged);
-        renderSk();
-        document.getElementById('stat-sk').textContent = SKS.length;
-        const skBadge = document.querySelector('.ni[data-p="lib-sk"] .bd');
-        if (skBadge) skBadge.textContent = realSkills.length + '+';
-        toast(realSkills.length + ' real OpenClaw skills loaded');
-      }
+    });
+    if (realSkills.length > 0) {
+      const demoTagged = SKS.filter(s => !s.real).map(s => ({ ...s, t: [...s.t, 'demo'] }));
+      SKS.length = 0; SKS.push(...realSkills, ...demoTagged);
+      renderSk(); updateStats();
+      const skBadge = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skBadge) skBadge.textContent = SKS.length;
+      toast(realSkills.length + ' OpenClaw skills loaded');
+      addActivity('\u26a1', '<strong>Skills</strong> \u2014 ' + realSkills.length + ' loaded from OpenClaw');
+      // Update settings skills status if visible
+      renderSettingsConfig(window._lastAgentDefaults || {});
     }
   } catch(e) {}
+}
+
+/* ── Load real agents from OpenClaw ── */
+async function loadRealAgents() {
+  try {
+    const res = await fetch('/api/agents');
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) return;
+    const realAgents = data.map(a => ({
+      n: a.id || a.name || 'Agent',
+      d: 'Model: ' + (a.model || 'default'),
+      sk: [], c: a.isDefault ? 'var(--ac)' : 'var(--tl)',
+      st: 'active', tp: 'dev', real: true
+    }));
+    const userAgents = AGS.filter(a => !a.real);
+    AGS.length = 0;
+    AGS.push(...realAgents, ...userAgents);
+    renderAg(); updateStats();
+    const agB = document.querySelector('.ni[data-p="lib-ag"] .bd');
+    if (agB) agB.textContent = AGS.length;
+  } catch(e) {}
+}
+
+/* ── Load real config from OpenClaw ── */
+async function loadRealConfig() {
+  try {
+    const res = await fetch('/api/config');
+    const data = await res.json();
+    if (data.agents) renderModelsFromConfig(data.agents);
+    if (data.channels) {
+      renderChannelStatus(data.channels);
+      renderSettingsChannels(data.channels);
+    }
+    if (data.agents?.defaults) { window._lastAgentDefaults = data.agents.defaults; renderSettingsConfig(data.agents.defaults); }
+  } catch(e) {}
+}
+
+function renderSettingsConfig(defaults) {
+  const el = document.getElementById('settings-skills-status');
+  if (!el) return;
+  const ready = SKS.filter(s => s.real && s.t && s.t.includes('ready')).length;
+  const total = SKS.filter(s => s.real).length;
+  if (!defaults || (!defaults.maxConcurrent && !defaults.compaction)) defaults = defaults || {};
+  const concurrent = defaults?.maxConcurrent || '?';
+  const subagents = defaults?.subagents?.maxConcurrent || '?';
+  el.innerHTML =
+    '<div class="builtin-item"><div class="bi-icon" style="background:var(--gnb);color:var(--gn)">\u2713</div><div class="bi-info"><div class="bi-name">' + total + ' skills loaded</div><div class="bi-desc">' + ready + ' ready, ' + (total - ready) + ' missing dependencies</div></div><div class="bi-status on">Synced</div></div>' +
+    '<div class="builtin-item"><div class="bi-icon" style="background:var(--acb2);color:var(--ac)">\u2699</div><div class="bi-info"><div class="bi-name">Max concurrent tasks</div><div class="bi-desc">' + concurrent + ' agents, ' + subagents + ' subagents</div></div><div class="bi-status on">' + concurrent + '</div></div>' +
+    '<div class="builtin-item"><div class="bi-icon" style="background:var(--amb);color:var(--am)">\u2696</div><div class="bi-info"><div class="bi-name">Compaction mode</div><div class="bi-desc">' + (defaults?.compaction?.mode || 'default') + '</div></div><div class="bi-status on">Active</div></div>';
+}
+
+function renderSettingsChannels(channels) {
+  const el = document.getElementById('settings-channels-status');
+  if (!el) return;
+  let chArr = channels;
+  if (chArr && !Array.isArray(chArr)) chArr = Object.entries(chArr).map(([k, v]) => ({ name: k, ...v }));
+  if (!chArr || !chArr.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t4);font-size:12px">No channels configured</div>';
+    return;
+  }
+  const colors = {feishu:'var(--bl)',slack:'var(--ac)',discord:'var(--pk)',telegram:'var(--tl)',whatsapp:'var(--gn)',web:'var(--am)'};
+  el.innerHTML = chArr.map(ch => {
+    const name = ch.name || 'Channel';
+    const enabled = ch.enabled !== false;
+    const color = colors[name.toLowerCase()] || 'var(--t2)';
+    return '<div class="builtin-item"><div class="bi-icon" style="background:' + color + '22;color:' + color + '">' + name[0].toUpperCase() + '</div><div class="bi-info"><div class="bi-name">' + name + '</div><div class="bi-desc">' + (ch.appId ? 'App: ' + ch.appId : 'Channel endpoint') + '</div></div><div class="bi-status ' + (enabled ? 'on' : '') + '">' + (enabled ? 'Enabled' : 'Disabled') + '</div></div>';
+  }).join('');
+}
+
+function renderModelsFromConfig(agentsConfig) {
+  const list = document.getElementById('model-list');
+  if (!list) return;
+  list.innerHTML = '';
+  // Parse the config structure: { defaults: { model: { primary: "..." }, models: { "model/id": {} } } }
+  const defaults = agentsConfig?.defaults || agentsConfig || {};
+  const primary = defaults?.model?.primary || '';
+  const modelsObj = defaults?.models || {};
+  const modelEntries = Object.keys(modelsObj);
+  if (!primary && !modelEntries.length) {
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--t3);font-size:13px">No models configured in OpenClaw.<br><span style="font-size:11px;color:var(--t4)">Run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw configure</code> to add models.</span></div>';
+    return;
+  }
+  const allModels = modelEntries.length ? modelEntries : [primary];
+  allModels.forEach(modelId => {
+    const isPrimary = modelId === primary;
+    const provider = modelId.split('/')[0] || 'unknown';
+    const name = modelId.split('/').pop() || modelId;
+    const html = '<div class="model-row" data-id="' + name + '" style="pointer-events:auto"><div class="mr-left"><div class="mr-icon" style="background:var(--acb2);color:var(--ac)">' + name[0].toUpperCase() + '</div><div><div class="mr-name">' + name + '</div><div class="mr-provider">' + provider + ' <span class="auth-badge key">' + modelId + '</span></div></div></div><div class="mr-mid"><div class="mr-status ok">' + (isPrimary ? 'Primary' : 'Configured') + '</div></div><div class="mr-right"><span style="font-size:11px;color:var(--t3);font-family:var(--fm)">read-only</span></div></div>';
+    list.insertAdjacentHTML('beforeend', html);
+  });
+  // Add config hint
+  list.insertAdjacentHTML('beforeend', '<div style="text-align:center;padding:16px 0 8px;color:var(--t4);font-size:11px">Models managed by OpenClaw \u2014 Run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw configure</code> to change.</div>');
+}
+
+function renderChannelStatus(channels) {
+  const cards = document.getElementById('cr-cards');
+  const log = document.getElementById('cr-log');
+  if (!cards) return;
+  // Convert object { feishu: {...}, slack: {...} } to array [{name:'feishu',...}, ...]
+  if (channels && !Array.isArray(channels)) {
+    channels = Object.entries(channels).map(([k, v]) => ({ name: k, ...v }));
+  }
+  if (!channels || !channels.length) {
+    cards.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--t3);font-size:13px">No channels configured<br><span style="font-size:11px;color:var(--t4)">Run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw setup</code> to add channels.</span></div>';
+    if (log) log.innerHTML = '<div style="color:var(--t4)">No channel events yet</div>';
+    return;
+  }
+  const channelColors = {feishu:'var(--bl)',slack:'var(--ac)',discord:'var(--pk)',telegram:'var(--tl)',whatsapp:'var(--gn)',web:'var(--am)'};
+  cards.innerHTML = channels.map(ch => {
+    const name = ch.name || ch.type || 'Channel';
+    const color = channelColors[name.toLowerCase()] || 'var(--t2)';
+    const isActive = ch.status === 'Active' || ch.status === 'running' || ch.running || ch.configured || ch.enabled;
+    const status = isActive ? 'Active' : (ch.configured ? 'Configured' : 'Disabled');
+    const statusColor = isActive ? 'var(--gn)' : ch.configured ? 'var(--am)' : 'var(--t4)';
+    const detail = ch.appId ? 'App: ' + ch.appId : ch.probe?.appId ? 'App: ' + ch.probe.appId : ch.description || 'Channel endpoint';
+    return '<div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:28px;height:28px;border-radius:8px;background:' + color + '15;color:' + color + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">' + name[0].toUpperCase() + '</div><span style="font-size:13px;font-weight:500">' + name + '</span><span style="margin-left:auto;font-size:10px;padding:2px 7px;border-radius:5px;background:' + statusColor + '15;color:' + statusColor + ';font-family:var(--fm)">' + status + '</span></div><div style="font-size:12px;color:var(--t3)">' + detail + '</div></div>';
+  }).join('');
 }
 
 /* ── Load real gateway status ── */
@@ -833,9 +1088,10 @@ async function loadRealSessions() {
   if (!claw.connected) return;
   try {
     const result = await claw.invoke('sessions_list', {});
-    if (result && Array.isArray(result.sessions) && result.sessions.length > 0) {
+    const sessions = result?.details?.sessions || result?.sessions || [];
+    if (sessions.length > 0) {
       const sessionColors = ['var(--tl)', 'var(--bl)', 'var(--pk)', 'var(--am)', 'var(--gn)'];
-      result.sessions.forEach((sess, i) => {
+      sessions.forEach((sess, i) => {
         const exists = PROJS.some(p => p.sessionKey === sess.key);
         if (!exists) {
           PROJS.push({
@@ -851,16 +1107,17 @@ async function loadRealSessions() {
   } catch(e) {}
 }
 
-/* ── Real chat via OpenClaw ── */
+/* ── Real chat via OpenClaw (server-side agent CLI) ── */
 async function sendToOpenClaw(text) {
   if (!claw.connected) return null;
   try {
-    const result = await claw.send('agent', {
-      message: text,
-      sessionKey: currentSessionKey || 'main',
-      deliver: false
+    const r = await fetch('/api/agent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, agent: 'main' })
     });
-    return result;
+    const data = await r.json();
+    return data;
   } catch(e) { return null; }
 }
 
@@ -873,7 +1130,14 @@ function go(p){
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
   const e=document.getElementById('p-'+p);if(e)e.classList.add('on');
   document.querySelectorAll('.ni').forEach(n=>{if(n.dataset.p===p)n.classList.add('on')});
-  if(p==='ws')setTimeout(()=>{const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight},50);
+  if(p==='trend'){ loadTrending(); }
+  if(p==='ws'){
+    if(activeProjectIdx < 0 || PROJS.length===0){
+      const demoAct=document.getElementById('demo-activity');const wsEmpty=document.getElementById('ws-empty');
+      if(demoAct)demoAct.style.display='none';if(wsEmpty)wsEmpty.style.display='';
+    }
+    setTimeout(()=>{const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight},50);
+  }
 }
 /* FIX M-07: Ctrl+K shortcut */
 document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.getElementById('gs').focus()}});
@@ -890,14 +1154,11 @@ function toast(msg){
 /* ══ Modal — FIX M-05: clear fields ══ */
 function openMo(){document.getElementById('modal').classList.add('open')}
 function closeMo(){document.getElementById('modal').classList.remove('open')}
-const DEMO_PROJS=[
-  {n:'E-Commerce Platform',d:'Full-stack with Stripe, auth, admin panel',p:72,c:'var(--gn)',ph:'Build'},
-  {n:'SaaS Dashboard',d:'Analytics, funnels, reports, billing',p:25,c:'var(--ac)',ph:'Plan'},
-  {n:'Blog Platform',d:'Markdown blog with SSR, CMS, RSS',p:91,c:'var(--am)',ph:'Deliver'},
-];
 const PROJS=[];
 const projColors=['var(--bl)','var(--pk)','var(--tl)','var(--co)','var(--am)','var(--gn)','var(--ac)'];
 function createProj(){
+  const btn = document.querySelector('#modal .btn-p');
+  if (btn) { btn.style.pointerEvents='none'; btn.textContent='Creating...'; }
   const nm=document.getElementById('mo-name').value||'New Project';
   const ds=document.getElementById('mo-desc').value||'Custom project';
   const pri=document.getElementById('mo-pri').value;
@@ -909,35 +1170,38 @@ function createProj(){
     claw.send('sessions.spawn', { name: nm, sessionKey: sk }).catch(() => {});
   }
   PROJS.push(newProj);
-  closeMo();toast('"'+nm+'" created — PM-Agent deploying...');
+  setTimeout(()=>{ if(btn){btn.style.pointerEvents='';btn.textContent='Create & deploy agents'} },500);
+  closeMo();toast('"'+nm+'" created \u2014 PM-Agent deploying...');
   document.getElementById('mo-name').value='';
   document.getElementById('mo-desc').value='';
   renderProjs();renderDashProjs();
   document.querySelector('.sc:nth-child(3) .sc-v').textContent=PROJS.length;
   document.querySelector('.ni[data-p="projs"] .bd').textContent=PROJS.length;
   setTimeout(()=>{switchProject(PROJS.length-1);go('ws')},600);
+  autoSave();
 }
 
 /* ══ Mode ══ */
 let mode='plan';
 function setM(m){mode=m;document.getElementById('m-plan').classList.toggle('on',m==='plan');document.getElementById('m-auto').classList.toggle('on',m==='auto');toast(m==='auto'?'Auto mode — agents execute immediately':'Plan mode — review before execution')}
 
-/* ══ Chat — FIX C-01 XSS, FIX M-06 animation fill ══ */
+/* ══ Chat fallback replies ══ */
 const replies=[
-  {k:['prioritize','priority','urgent','asap','friday'],r:'Re-prioritizing now. Bumping to top of queue and notifying agents.'},
-  {k:['fix','bug','error','issue','broken'],r:'Flagged for immediate fix. Dispatching the responsible agent now.'},
-  {k:['status','progress','how','update','where'],r:'17/23 tasks done (72%). Backend on payment, Frontend on cart, Test at 92% coverage. 2 issues pending.'},
-  {k:['add','feature','also','include','want','need'],r:'Added to backlog. Re-evaluating assignments — if it\'s a dependency, I\'ll slot it in immediately.'},
-  {k:['deploy','ship','launch','production','release'],r:'Deploy is Phase 6. Blockers: payment + 2 issues. Once cleared, DevOps-Agent runs CI/CD. ETA ~4 hours.'},
-  {k:['test','coverage','qa'],r:'Test-Agent: 42/42 unit, 18/18 integration passing. E2E queued. Coverage at 92%.'},
-  {k:['hello','hi','hey'],r:'Hey! I\'m your PM-Agent. Tell me what you need — I\'ll coordinate the team.'},
-  {k:['help','what can','how do'],r:'You can: ask for status, prioritize tasks, add features, request fixes, or ask me to deploy. I coordinate all agents for you.'},
+  {k:['status','progress','how','update'],r:'Checking project status...'},
+  {k:['fix','bug','error','issue'],r:'Looking into the issue...'},
+  {k:['add','feature','include','want','need'],r:'Added to the backlog. Will plan in the next cycle.'},
+  {k:['deploy','ship','launch','release'],r:'Deploy requires review first. Run through the pipeline.'},
+  {k:['test','coverage','qa'],r:'Running test suite...'},
+  {k:['hello','hi','hey'],r:'Hey! I\'m PM-Agent. Connect OpenClaw for real AI responses.'},
+  {k:['help','what can','how do'],r:'Connect OpenClaw to get real AI agent responses. Without it, I can only give placeholder replies.'}
 ];
 function getReply(txt){
   const low=txt.toLowerCase();
-  for(const r of replies)if(r.k.some(k=>low.includes(k)))return r.r;
-  return mode==='auto'?'Executing now — dispatching agents. Updates will appear in the log.':'Got it. Drafting an execution plan for your review.';
+  for(const r of replies){if(r.k.some(k=>low.includes(k)))return r.r}
+  return 'Message received. Connect OpenClaw for real AI responses.';
 }
+
+/* ══ Chat — FIX C-01 XSS, FIX M-06 animation fill ══ */
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function sendMsg(){
   const inp=document.getElementById('ci'),txt=inp.value.trim();if(!txt)return;
@@ -960,23 +1224,29 @@ function sendMsg(){
         thinking.querySelector('.am').innerHTML = getReply(txt) + ' <span style="font-size:9px;color:var(--t4)">(fallback)</span>';
       }
       thinking.querySelector('.ab').insertAdjacentHTML('beforeend','<div class="at">'+now()+'</div>');
-      scrollLog();
+      scrollLog(); saveChatToProject();
     }).catch(() => {
       thinking.querySelector('.am').innerHTML = getReply(txt) + ' <span style="font-size:9px;color:var(--t4)">(fallback)</span>';
       thinking.querySelector('.ab').insertAdjacentHTML('beforeend','<div class="at">'+now()+'</div>');
-      scrollLog();
+      scrollLog(); saveChatToProject();
     });
   } else {
     // Demo mode fallback
     setTimeout(()=>{
       const r=document.createElement('div');r.className='ai';r.style.animation='fadeUp .25s ease both';
       r.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">'+getReply(txt)+'</div><div class="at">'+now()+'</div></div>';
-      log.appendChild(r);scrollLog();
+      log.appendChild(r);scrollLog();saveChatToProject();
     },600+Math.random()*600);
   }
 }
 function now(){return new Date().toLocaleTimeString('en',{hour12:false})}
 function scrollLog(){const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight}
+function saveChatToProject(){
+  if(activeProjectIdx>=0&&PROJS[activeProjectIdx]){
+    const bp=document.getElementById('build-phase');
+    if(bp)PROJS[activeProjectIdx]._chatHtml=bp.innerHTML;
+  }
+}
 
 /* ══ Fix — FIX C-04: immediate disable + FIX L-03: update count ══ */
 let issuesFixed=0;
@@ -987,20 +1257,6 @@ let approved=false;
 function approve(){if(approved)return;approved=true;document.getElementById('plx').innerHTML='<span style="font-size:11px;color:var(--gn);font-family:var(--fm)">✓ Plan approved — agents executing</span>';toast('Plan approved — 5 agents deploying')}
 
 /* ══ Library — FIX M-01: separate source/category groups, FIX L-06: real counts ══ */
-const DEMO_SKS=[
-  {n:'code-reviewer',s:'github/anthropic',d:'Automated code review with security, style, and performance analysis',t:['python','review'],i:'λ',b:'var(--acb2)',c:'var(--ac)',r:'4.8',src:'github',cat:'code'},
-  {n:'api-generator',s:'clawhub/devtools',d:'Generate REST and GraphQL APIs from natural language schema',t:['api','codegen'],i:'⚡',b:'var(--tlb)',c:'var(--tl)',r:'4.6',src:'clawhub',cat:'code'},
-  {n:'test-writer',s:'github/testing-ai',d:'Auto-generate unit, integration and E2E tests',t:['testing','jest'],i:'⬡',b:'var(--cob)',c:'var(--co)',r:'4.5',src:'github',cat:'test'},
-  {n:'doc-writer',s:'clawhub/docs',d:'Generate technical documentation from codebase',t:['docs','openapi'],i:'◈',b:'var(--amb)',c:'var(--am)',r:'4.7',src:'clawhub',cat:'doc'},
-  {n:'db-designer',s:'github/data-ai',d:'Database schema design and query optimization',t:['sql','postgres'],i:'◇',b:'var(--blb)',c:'var(--bl)',r:'4.4',src:'github',cat:'data'},
-  {n:'deploy-manager',s:'clawhub/infra',d:'Automated CI/CD pipeline and infrastructure provisioning',t:['docker','k8s'],i:'△',b:'var(--tlb)',c:'var(--tl)',r:'4.3',src:'clawhub',cat:'infra'},
-  {n:'security-scanner',s:'github/sec-tools',d:'Vulnerability scanning and OWASP compliance',t:['security','audit'],i:'⬢',b:'var(--cob)',c:'var(--co)',r:'4.6',src:'github',cat:'sec'},
-  {n:'react-builder',s:'github/frontend-ai',d:'React scaffolding with Tailwind and state management',t:['react','tailwind'],i:'⬡',b:'var(--acb2)',c:'var(--ac)',r:'4.7',src:'github',cat:'ui'},
-  {n:'agent-router',s:'trending/swarm',d:'Agent routing from trending multi-agent framework',t:['agent','routing'],i:'⚡',b:'var(--blb)',c:'var(--bl)',r:'4.5',src:'trending',cat:'ai'},
-  {n:'perf-optimizer',s:'trending/perf',d:'Performance profiling and bottleneck detection',t:['perf','cache'],i:'◉',b:'var(--amb)',c:'var(--am)',r:'4.2',src:'trending',cat:'code'},
-  {n:'nlp-processor',s:'clawhub/ml',d:'NER, sentiment analysis and summarization',t:['nlp','ml'],i:'◎',b:'var(--acb2)',c:'var(--pk)',r:'4.4',src:'clawhub',cat:'ai'},
-  {n:'vue-scaffold',s:'github/frontend-ai',d:'Vue 3 + Nuxt with Pinia and TypeScript',t:['vue','nuxt'],i:'⬡',b:'var(--gnb)',c:'var(--gn)',r:'4.3',src:'github',cat:'ui'},
-];
 const SKS=[];
 let skSrc='all',skCat='all';
 function fltSk(el){
@@ -1017,7 +1273,7 @@ function renderSk(){
   const parts=[];if(skSrc!=='all')parts.push(skSrc.charAt(0).toUpperCase()+skSrc.slice(1));if(skCat!=='all')parts.push(skCat);
   document.getElementById('sk-title').textContent=parts.length?parts.join(' ')+' skills':'All skills';
   document.getElementById('sk-count').textContent=f.length+' results';
-  document.getElementById('sk-grid').innerHTML=f.length?f.map(s=>skCard(s)).join(''):SKS.length===0?'<div style="text-align:center;padding:60px 20px"><div style="font-size:32px;margin-bottom:12px;opacity:.3">⚡</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">No skills loaded</div><div style="font-size:12px;color:var(--t4);margin-bottom:16px">Connect OpenClaw to load real skills, or explore with demo data</div><button class="btn btn-p btn-sm" onclick="loadDemoData()">Load demo data</button> <button class="btn btn-sm" style="margin-left:6px" onclick="go(\'settings\')">Connect OpenClaw</button></div>':'<div style="text-align:center;padding:40px;color:var(--t4)">No skills match this filter</div>';
+  document.getElementById('sk-grid').innerHTML=f.length?f.map(s=>skCard(s)).join(''):SKS.length===0?'<div style="text-align:center;padding:60px 20px"><div style="font-size:32px;margin-bottom:12px;opacity:.3">⚡</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">No skills loaded</div><div style="font-size:12px;color:var(--t4);margin-bottom:16px">Connect OpenClaw to load real skills</div><button class="btn btn-p btn-sm" onclick="go(\'settings\')">Connect OpenClaw</button></div>':'<div style="text-align:center;padding:40px;color:var(--t4)">No skills match this filter</div>';
   const cnt=(k,v)=>SKS.filter(s=>s[k]===v).length;
   ['github','clawhub','trending'].forEach(v=>{const el=document.getElementById('sk-cnt-'+v);if(el)el.textContent=cnt('src',v)});
   ['code','test','infra','data','sec','doc','ai','ui'].forEach(v=>{const el=document.getElementById('sk-cnt-'+v);if(el)el.textContent=cnt('cat',v)});
@@ -1025,15 +1281,6 @@ function renderSk(){
   const cae=document.getElementById('sk-cnt-cat-all');if(cae)cae.textContent=SKS.length;
 }
 
-const DEMO_AGS=[
-  {n:'FullStack-Dev',d:'Code gen, testing, deploy',sk:['code-reviewer','api-gen','test-writer'],c:'var(--ac)',st:'Active',tp:'dev'},
-  {n:'Security-Auditor',d:'Scanning, vulnerability assessment',sk:['security-scanner','code-reviewer'],c:'var(--co)',st:'Active',tp:'sec'},
-  {n:'Data-Engineer',d:'Database, ETL, data quality',sk:['db-designer','perf-optimizer'],c:'var(--tl)',st:'Active',tp:'data'},
-  {n:'Frontend-Pro',d:'React UI, design system',sk:['react-builder','test-writer'],c:'var(--bl)',st:'Idle',tp:'dev'},
-  {n:'DevOps-Master',d:'Infra, CI/CD, monitoring',sk:['deploy-manager'],c:'var(--am)',st:'Active',tp:'ops'},
-  {n:'Doc-Writer',d:'Auto-generate documentation',sk:['doc-writer'],c:'var(--gn)',st:'Idle',tp:'doc'},
-  {n:'QA-Lead',d:'Test strategy, coverage analysis',sk:['test-writer'],c:'var(--tl)',st:'Active',tp:'qa'},
-];
 const AGS=[];
 let agTp='all',agSt='all';
 function fltAg(el){
@@ -1050,7 +1297,7 @@ function renderAg(){
   const parts=[];if(agTp!=='all')parts.push(agTp.charAt(0).toUpperCase()+agTp.slice(1));if(agSt!=='all')parts.push(agSt);
   document.getElementById('ag-title').textContent=parts.length?parts.join(' ')+' agents':'All agents';
   document.getElementById('ag-count').textContent=f.length+' agents';
-  document.getElementById('ag-grid').innerHTML=f.length?f.map(a=>agCard(a)).join(''):AGS.length===0?'<div style="text-align:center;padding:60px 20px"><div style="font-size:32px;margin-bottom:12px;opacity:.3">🤖</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">No agents yet</div><div style="font-size:12px;color:var(--t4);margin-bottom:16px">Create a custom agent or load demo data to explore</div><button class="btn btn-p btn-sm" onclick="openCreateAgent()">+ Create agent</button> <button class="btn btn-sm" style="margin-left:6px" onclick="loadDemoData()">Load demo data</button></div>':'<div style="text-align:center;padding:40px;color:var(--t4)">No agents match</div>';
+  document.getElementById('ag-grid').innerHTML=f.length?f.map(a=>agCard(a)).join(''):AGS.length===0?'<div style="text-align:center;padding:60px 20px"><div style="font-size:32px;margin-bottom:12px;opacity:.3">🤖</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">No agents yet</div><div style="font-size:12px;color:var(--t4);margin-bottom:16px">Create a custom agent or connect OpenClaw to sync</div><button class="btn btn-p btn-sm" onclick="openCreateAgent()">+ Create agent</button> <button class="btn btn-sm" style="margin-left:6px" onclick="go(\'settings\')">Connect OpenClaw</button></div>':'<div style="text-align:center;padding:40px;color:var(--t4)">No agents match</div>';
   const cnt=(k,v)=>AGS.filter(a=>a[k]===v||(k==='st'&&a.st.toLowerCase()===v)).length;
   ['dev','ops','qa','sec','data','doc'].forEach(v=>{const el=document.getElementById('ag-cnt-'+v);if(el)el.textContent=cnt('tp',v)});
   ['active','idle'].forEach(v=>{const el=document.getElementById('ag-cnt-'+v);if(el)el.textContent=cnt('st',v)});
@@ -1072,47 +1319,9 @@ function globalSearch(q){
   else{toast('No results for "'+q+'"')}
 }
 
-/* ══ Settings: model management with OAuth support ══ */
-let modelCounter=6;
-const MODELS=[
-  {name:'Claude Haiku 3.5',prov:'Anthropic',icon:'C',ib:'var(--acb2)',ic:'var(--ac)',auth:'key',ph:'sk-ant-...'},
-  {name:'GPT-4o Mini',prov:'OpenAI',icon:'O',ib:'var(--gnb)',ic:'var(--gn)',auth:'both',ph:'sk-... or login',login:'OpenAI'},
-  {name:'Gemini 2.0 Flash',prov:'Google',icon:'G',ib:'var(--blb)',ic:'var(--bl)',auth:'both',ph:'AIza... or login',login:'Google'},
-  {name:'Deepseek V3',prov:'Deepseek',icon:'D',ib:'var(--tlb)',ic:'var(--tl)',auth:'key',ph:'sk-...'},
-  {name:'Groq Llama 3.3',prov:'Groq',icon:'Q',ib:'var(--amb)',ic:'var(--am)',auth:'key',ph:'gsk_...'},
-  {name:'Ollama (Local)',prov:'localhost:11434',icon:'L',ib:'var(--bg5)',ic:'var(--t2)',auth:'none',ph:'No key needed'},
-  {name:'Azure OpenAI',prov:'Microsoft',icon:'A',ib:'var(--blb)',ic:'var(--bl)',auth:'both',ph:'endpoint key or login',login:'Microsoft'},
-  {name:'Claude via subscription',prov:'Anthropic',icon:'C',ib:'var(--acb2)',ic:'var(--ac)',auth:'oauth',login:'Anthropic'},
-  {name:'Mistral Large',prov:'Mistral',icon:'M',ib:'var(--cob)',ic:'var(--co)',auth:'key',ph:'...'},
-  {name:'Custom OpenAI-compatible',prov:'Any endpoint',icon:'*',ib:'var(--bg5)',ic:'var(--t2)',auth:'key',ph:'base_url + key'},
-];
+/* ══ Settings: model management — read-only from OpenClaw config ══ */
+let modelCounter=0;
 
-function validateKey(inp){
-  const st=inp.closest('.model-row').querySelector('.mr-status');
-  if(inp.value.length>8){st.textContent='Connected';st.className='mr-status ok'}
-  else if(inp.value.length>0){st.textContent='Invalid';st.className='mr-status miss'}
-  else{st.textContent='Not configured';st.className='mr-status miss'}
-}
-function testModel(btn){
-  const row=btn.closest('.model-row'),st=row.querySelector('.mr-status');
-  const key=row.querySelector('.mr-key');
-  if(key&&(!key.value||key.value.length<5)){toast('Enter a key first');return}
-  btn.style.pointerEvents='none';st.textContent='Testing...';st.className='mr-status testing';
-  setTimeout(()=>{st.textContent='Connected';st.className='mr-status ok';toast('Model responded OK');btn.style.pointerEvents=''},1500);
-}
-function removeModel(btn){
-  const row=btn.closest('.model-row');
-  row.style.opacity='.3';row.style.pointerEvents='none';
-  setTimeout(()=>{row.remove();toast('Model removed')},300);
-}
-function simulateOAuth(btn,provider){
-  btn.style.pointerEvents='none';btn.textContent='Connecting...';
-  setTimeout(()=>{
-    const mid=btn.closest('.mr-mid');
-    mid.innerHTML='<div class="oauth-status logged-in"><div class="oauth-avatar">Y</div><div class="oauth-info"><div class="oauth-email">you@'+provider.toLowerCase()+'.com</div><div class="oauth-plan">'+provider+' subscriber</div></div></div><div class="mr-status ok">Logged in</div>';
-    toast('Logged in to '+provider+' successfully');
-  },1800);
-}
 function filterModels(type){
   document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on'));
   document.getElementById('tab-'+type).classList.add('on');
@@ -1121,35 +1330,16 @@ function filterModels(type){
     else r.style.display=r.dataset.auth===type?'':'none';
   });
 }
-function showAddModel(){
-  const panel=document.getElementById('add-model-panel');
-  if(panel.style.display==='none'){
-    panel.style.display='block';
-    const picker=document.getElementById('model-picker');
-    picker.innerHTML=MODELS.map((m,i)=>{
-      const authLabel=m.auth==='key'?'API key':m.auth==='oauth'?'Account login':m.auth==='both'?'Key or login':'No key';
-      return '<div class="model-pick" onclick="addModel('+i+')"><div class="mp-icon" style="background:'+m.ib+';color:'+m.ic+'">'+m.icon+'</div><div><div class="mp-name">'+m.name+'</div><div class="mp-type">'+m.prov+' — '+authLabel+'</div></div></div>';
-    }).join('');
-  }else{panel.style.display='none'}
+async function syncModels(btn){
+  if(btn){btn.style.pointerEvents='none';btn.innerHTML='<span class="spin">\u27f3</span> Syncing...';}
+  try{
+    await loadRealConfig();
+    toast('\u2713 Models synced from OpenClaw');
+  }catch(e){toast('Sync failed');}
+  if(btn){setTimeout(()=>{btn.innerHTML='\u27f3 Sync models';btn.style.pointerEvents='';},1500);}
 }
-function addModel(idx){
-  const m=MODELS[idx];modelCounter++;
-  document.getElementById('add-model-panel').style.display='none';
-  const authType=m.auth==='oauth'||m.auth==='both'?'oauth':'key';
-  const badge=authType==='oauth'?'<span class="auth-badge oauth">'+m.login+' account</span>':'<span class="auth-badge key">API key</span>';
-  let midHTML;
-  if(m.auth==='none'){
-    midHTML='<div style="font-size:12px;color:var(--t3);flex:1">No API key needed — runs locally</div><div class="mr-status ok">Ready</div>';
-  }else if(m.auth==='oauth'){
-    midHTML='<button class="btn btn-sm btn-p oauth-login-btn" onclick="simulateOAuth(this,\''+m.login+'\')">Log in with '+m.login+'</button><div class="mr-status miss">Not logged in</div>';
-  }else if(m.auth==='both'){
-    midHTML='<input type="password" placeholder="'+m.ph+'" class="mr-key" oninput="validateKey(this)" style="flex:1"><span style="font-size:11px;color:var(--t4);padding:0 4px">or</span><button class="btn btn-sm" onclick="simulateOAuth(this,\''+m.login+'\')">'+m.login+' login</button><div class="mr-status miss">Not configured</div>';
-  }else{
-    midHTML='<input type="password" placeholder="'+(m.ph||'API key...')+'" class="mr-key" oninput="validateKey(this)"><div class="mr-status miss">Not configured</div>';
-  }
-  const html='<div class="model-row" data-id="m'+modelCounter+'" data-auth="'+authType+'" style="animation:fadeUp .25s ease both"><div class="mr-left"><div class="mr-icon" style="background:'+m.ib+';color:'+m.ic+'">'+m.icon+'</div><div><div class="mr-name">'+m.name+'</div><div class="mr-provider">'+m.prov+' '+badge+'</div></div></div><div class="mr-mid">'+midHTML+'</div><div class="mr-right"><select class="mr-priority"><option>Fallback</option><option>Primary</option><option>Disabled</option></select><button class="btn btn-sm" onclick="testModel(this)">Test</button><button class="btn btn-sm btn-d" onclick="removeModel(this)">Remove</button></div></div>';
-  document.getElementById('model-list').insertAdjacentHTML('beforeend',html);
-  toast(m.name+' added');
+function removeModel(btn){
+  toast('Models are managed by OpenClaw. Run: openclaw configure');
 }
 
 /* ══ View detail modals ══ */
@@ -1170,58 +1360,124 @@ function viewAgent(idx){
 /* ══ Create agent ══ */
 function openCreateAgent(){document.getElementById('agent-create-modal').classList.add('open')}
 function createAgent(){
+  const btn = document.querySelector('#agent-create-modal .btn-p');
+  if (btn) { btn.style.pointerEvents='none'; btn.textContent='Creating...'; }
   const nm=document.getElementById('ca-name').value||'New-Agent';
   const ds=document.getElementById('ca-desc').value||'Custom agent';
   const tp=document.getElementById('ca-type').value;
   const sks=(document.getElementById('ca-skills').value||'').split(',').map(s=>s.trim()).filter(Boolean);
   const colors={dev:'var(--ac)',ops:'var(--bl)',qa:'var(--tl)',sec:'var(--co)',data:'var(--am)',doc:'var(--gn)'};
   AGS.push({n:nm,d:ds,sk:sks.length?sks:['general'],c:colors[tp]||'var(--ac)',st:'Idle',tp:tp});
+  setTimeout(()=>{ if(btn){btn.style.pointerEvents='';btn.textContent='Create agent'} },500);
   document.getElementById('agent-create-modal').classList.remove('open');
   document.getElementById('ca-name').value='';document.getElementById('ca-desc').value='';document.getElementById('ca-skills').value='';
-  renderAg();toast('"'+nm+'" created');
+  renderAg();toast('\u2713 "'+nm+'" created');
+  autoSave();
   document.querySelector('.ni[data-p="lib-ag"] .bd').textContent=AGS.length;
 }
 
 /* ══ Projects ══ */
+let activeProjectIdx = -1;
+
 function switchProject(idx){
   const p=PROJS[idx];if(!p)return;
+  activeProjectIdx = idx;
+
+  // Update header
   document.getElementById('ws-proj-name').textContent=p.n;
   document.getElementById('ws-pct').textContent=p.p+'%';
   document.getElementById('ws-bar').style.width=p.p+'%';
   const offset=251.3*(1-p.p/100);
   document.getElementById('ring-fill').setAttribute('stroke-dashoffset',offset);
   document.getElementById('ring-pct').textContent=p.p+'%';
+
+  // Session key for chat
   if (p.sessionKey) currentSessionKey = p.sessionKey;
   else currentSessionKey = 'main';
+
+  // Show workspace, hide empty state
+  const demoAct = document.getElementById('demo-activity');
+  const wsEmpty = document.getElementById('ws-empty');
+  if (demoAct) demoAct.style.display = '';
+  if (wsEmpty) wsEmpty.style.display = 'none';
+
+  // Update pipeline stages
+  const phases = ['Analyze','Plan','Assign','Build','Review','Deliver'];
+  const phaseMap = {'Active':'Analyze','active':'Analyze','Analyze':'Analyze','Plan':'Plan','Assign':'Assign','Build':'Build','Review':'Review','Deliver':'Deliver','Done':'Deliver'};
+  const currentPhase = phaseMap[p.ph] || 'Analyze';
+  const phaseIdx = phases.indexOf(currentPhase);
+  const allStages = document.querySelectorAll('.pps');
+  const allConns = document.querySelectorAll('.ppc');
+  allStages.forEach((s, i) => {
+    s.classList.remove('dn','ac');
+    if (i < phaseIdx) { s.classList.add('dn'); }
+    else if (i === phaseIdx) { s.classList.add('ac'); }
+  });
+  allConns.forEach((c, i) => {
+    c.classList.remove('dn');
+    if (i < phaseIdx) c.classList.add('dn');
+  });
+
+  // Update agent team panel
+  const teamEl = document.getElementById('ws-agent-team');
+  if (teamEl) {
+    if (AGS.length > 0) {
+      teamEl.innerHTML = AGS.map(a => '<div class="agc"><div class="ah"><div class="aav" style="background:'+a.c+'15;color:'+a.c+'">'+a.n[0]+'</div><div class="anm">'+esc(a.n)+'</div><div class="ast" style="background:var(--gnb);color:var(--gn)">'+a.st+'</div></div><div class="atx">'+esc(a.d)+'</div></div>').join('');
+    } else {
+      teamEl.innerHTML = '<div style="font-size:12px;color:var(--t4);padding:8px 0">No agents assigned. <a href="#" onclick="go(\'lib-ag\');return false" style="color:var(--ac)">Create agents</a> to assign them.</div>';
+    }
+  }
+
+  // Update issues/deliverables
+  document.getElementById('ws-issues').innerHTML = '<div style="font-size:12px;color:var(--t4);padding:4px 0">No issues for this project</div>';
+  document.getElementById('ws-deliverables').innerHTML = '<div style="font-size:12px;color:var(--t4);padding:4px 0">Send messages to PM-Agent to generate deliverables</div>';
+
+  // Clear previous chat if switching projects, keep build-phase container
+  const bp = document.getElementById('build-phase');
+  if (bp) {
+    // Only clear if there's leftover from a different project
+    if (p._chatHtml) { bp.innerHTML = p._chatHtml; }
+    else { bp.innerHTML = '<div class="agh"><span class="pt" style="background:var(--gnb);color:var(--gn)">Chat</span><div class="ln"></div><span class="st" style="color:var(--tl)">Ready</span></div>'; }
+  }
 }
 function renderDashProjs(){
   if(PROJS.length===0){document.getElementById('d-proj').innerHTML='<div style="text-align:center;padding:30px 14px"><div style="font-size:13px;color:var(--t3);margin-bottom:12px">No projects yet</div><button class="btn btn-p btn-sm" onclick="openMo()">+ Create project</button></div>';return}
-  document.getElementById('d-proj').innerHTML=PROJS.map((p,i)=>'<div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;cursor:pointer;margin-bottom:8px;transition:border-color .15s" onclick="switchProject('+i+');go(\'ws\')" onmouseover="this.style.borderColor=\'var(--b2)\'" onmouseout="this.style.borderColor=\'var(--b0)\'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:13.5px;font-weight:500">'+esc(p.n)+'</span><span style="font-size:10px;padding:2px 7px;border-radius:5px;background:'+p.c+'12;color:'+p.c+';font-family:var(--fm)">'+p.p+'%</span></div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div style="font-size:10.5px;color:var(--t4)">'+esc(p.ph)+'</div></div>').join('');
+  document.getElementById('d-proj').innerHTML=PROJS.map((p,i)=>'<div style="position:relative;background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;cursor:pointer;margin-bottom:8px;transition:border-color .15s" onclick="switchProject('+i+');go(\'ws\')" onmouseover="this.style.borderColor=\'var(--b2)\'" onmouseout="this.style.borderColor=\'var(--b0)\'"><span style="position:absolute;top:6px;right:8px;cursor:pointer;color:var(--t4);font-size:14px;z-index:1" onclick="event.stopPropagation();deleteProj('+i+')">\u00d7</span><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:13.5px;font-weight:500">'+esc(p.n)+'</span><span style="font-size:10px;padding:2px 7px;border-radius:5px;background:'+p.c+'12;color:'+p.c+';font-family:var(--fm)">'+p.p+'%</span></div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div style="font-size:10.5px;color:var(--t4)">'+esc(p.ph)+'</div></div>').join('');
 }
 function renderProjs(){
-  if(PROJS.length===0){document.getElementById('pj-list').innerHTML='<div style="text-align:center;padding:60px 20px;grid-column:1/-1"><div style="font-size:32px;margin-bottom:12px;opacity:.3">📁</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">No projects yet</div><div style="font-size:12px;color:var(--t4);margin-bottom:16px">Create your first project to start building with AI agents</div><button class="btn btn-p" onclick="openMo()">+ Create project</button> <button class="btn" style="margin-left:6px" onclick="loadDemoData()">Load demo data</button></div>';return}
-  document.getElementById('pj-list').innerHTML=PROJS.map((p,i)=>'<div class="lcd" onclick="switchProject('+i+');go(\'ws\')"><div class="lh"><div class="li" style="background:'+p.c+'15;color:'+p.c+';font-size:16px;font-weight:600">'+p.n[0]+'</div><div><div class="ln">'+esc(p.n)+'</div><div class="ls">'+esc(p.ph)+'</div></div></div><div class="ld">'+esc(p.d)+'</div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin:8px 0"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div class="lf"><span>'+p.p+'% complete</span></div></div>').join('');
+  if(PROJS.length===0){document.getElementById('pj-list').innerHTML='<div style="text-align:center;padding:60px 20px;grid-column:1/-1"><div style="font-size:32px;margin-bottom:12px;opacity:.3">📁</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">No projects yet</div><div style="font-size:12px;color:var(--t4);margin-bottom:16px">Create your first project to start building with AI agents</div><button class="btn btn-p" onclick="openMo()">+ Create project</button></div>';return}
+  document.getElementById('pj-list').innerHTML=PROJS.map((p,i)=>'<div class="lcd" style="position:relative" onclick="switchProject('+i+');go(\'ws\')"><span style="position:absolute;top:6px;right:8px;cursor:pointer;color:var(--t4);font-size:14px;z-index:1" onclick="event.stopPropagation();deleteProj('+i+')">\u00d7</span><div class="lh"><div class="li" style="background:'+p.c+'15;color:'+p.c+';font-size:16px;font-weight:600">'+p.n[0]+'</div><div><div class="ln">'+esc(p.n)+'</div><div class="ls">'+esc(p.ph)+'</div></div></div><div class="ld">'+esc(p.d)+'</div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin:8px 0"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div class="lf"><span>'+p.p+'% complete</span></div></div>').join('');
 }
 
-/* ══ Demo data management ══ */
-let demoLoaded = false;
-function loadDemoData() {
-  if (demoLoaded) return;
-  demoLoaded = true;
-  SKS.push(...DEMO_SKS);
-  AGS.push(...DEMO_AGS);
-  PROJS.push(...DEMO_PROJS);
-  renderAll();
-  toast('Demo data loaded — explore the platform!');
+function deleteProj(i) {
+  if (!confirm('Delete "' + PROJS[i].n + '"?')) return;
+  PROJS.splice(i, 1);
+  // Reset workspace if we deleted the active project
+  if (activeProjectIdx === i) {
+    activeProjectIdx = -1;
+    document.getElementById('ws-proj-name').textContent = 'No project selected';
+    document.getElementById('ws-pct').textContent = '0%';
+    document.getElementById('ws-bar').style.width = '0%';
+    document.getElementById('ring-fill').setAttribute('stroke-dashoffset', '251.3');
+    document.getElementById('ring-pct').textContent = '0%';
+    const demoAct = document.getElementById('demo-activity');
+    const wsEmpty = document.getElementById('ws-empty');
+    if (demoAct) demoAct.style.display = 'none';
+    if (wsEmpty) wsEmpty.style.display = '';
+    document.getElementById('ws-agent-team').innerHTML = '<div style="font-size:12px;color:var(--t4);padding:8px 0">Select a project to see assigned agents</div>';
+    // Reset pipeline stages
+    document.querySelectorAll('.pps').forEach(s => { s.classList.remove('dn','ac'); });
+    document.querySelectorAll('.ppc').forEach(c => { c.classList.remove('dn'); });
+  } else if (activeProjectIdx > i) {
+    activeProjectIdx--;
+  }
+  renderProjs(); renderDashProjs(); updateStats(); autoSave();
+  toast('Project deleted');
+  go('projs');
 }
-function clearDemoData() {
-  SKS.length = 0; AGS.length = 0; PROJS.length = 0;
-  demoLoaded = false;
-  renderAll();
-  toast('Demo data cleared');
-}
+
 function renderAll() {
-  renderSk(); renderAg(); renderProjs(); renderDashProjs(); renderDashActivity(); updateStats();
+  renderSk(); renderAg(); renderProjs(); renderDashProjs(); renderDashActivity(); updateStats(); updateWizard();
   const skB = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skB) skB.textContent = SKS.length || '0';
   const agB = document.querySelector('.ni[data-p="lib-ag"] .bd'); if(agB) agB.textContent = AGS.length || '0';
   const pjB = document.querySelector('.ni[data-p="projs"] .bd'); if(pjB) pjB.textContent = PROJS.length || '0';
@@ -1231,59 +1487,154 @@ function updateStats() {
   if(cards[0]) cards[0].querySelector('.sc-v').textContent = SKS.length ? SKS.length.toLocaleString() : '0';
   if(cards[1]) cards[1].querySelector('.sc-v').textContent = AGS.length || '0';
   if(cards[2]) cards[2].querySelector('.sc-v').textContent = PROJS.length || '0';
-  if(cards[3]) cards[3].querySelector('.sc-v').textContent = PROJS.length ? '94.2%' : '—';
-  // Update sub-text
-  if(cards[0]) cards[0].querySelector('.sc-c').textContent = SKS.length ? '↑ 124 this week' : 'Connect OpenClaw or load demo';
-  if(cards[1]) cards[1].querySelector('.sc-c').textContent = AGS.length ? '↑ 12 this week' : 'Create or load demo';
-  if(cards[2]) cards[2].querySelector('.sc-c').textContent = PROJS.length ? '↑ 1 today' : 'Create your first project';
-  if(cards[3]) cards[3].querySelector('.sc-c').textContent = PROJS.length ? '↑ 1.8%' : 'No data yet';
+  if(cards[3]) cards[3].querySelector('.sc-v').textContent = '\u2014';
+  // Update sub-text with real descriptions
+  const readyCount = SKS.filter(s => s.t && s.t.includes('ready')).length;
+  if(cards[0]) cards[0].querySelector('.sc-c').textContent = SKS.length ? readyCount + ' ready' : 'from OpenClaw';
+  if(cards[1]) cards[1].querySelector('.sc-c').textContent = AGS.length ? AGS.length + ' configured' : 'from OpenClaw';
+  if(cards[2]) cards[2].querySelector('.sc-c').textContent = PROJS.length ? '' : 'Create your first project';
+  if(cards[3]) cards[3].querySelector('.sc-c').textContent = 'No data yet';
+}
+
+function updateWizard() {
+  const steps = document.querySelectorAll('.ob-step');
+  if (!steps.length) return;
+  // Step 1: always done
+  steps[0].classList.add('done');
+  // Step 2: OpenClaw connected
+  if (claw.connected) steps[1].classList.add('done'); else steps[1].classList.remove('done');
+  // Step 3: has projects
+  if (PROJS.length > 0) steps[2].classList.add('done'); else steps[2].classList.remove('done');
+  // Step 4: skills loaded
+  if (SKS.length > 0) steps[3].classList.add('done'); else steps[3].classList.remove('done');
+  // Auto-dismiss when all done
+  if ([...steps].every(s => s.classList.contains('done'))) {
+    const ob = document.querySelector('.onboard');
+    if (ob) setTimeout(() => ob.style.display = 'none', 2000);
+  }
 }
 
 /* ══ Render all ══ */
 renderSk();renderAg();updateStats();
 
-/* Dashboard */
+/* Dashboard — Activity log from real events */
+const activityLog = [];
+function addActivity(icon, text) {
+  const time = new Date().toLocaleTimeString('en', {hour12:false});
+  activityLog.unshift({icon, text, time});
+  if (activityLog.length > 30) activityLog.length = 30;
+  renderDashActivity();
+}
 function renderDashActivity(){
-  if(PROJS.length===0 && SKS.length===0){
-    document.getElementById('d-act').innerHTML='<div style="text-align:center;padding:30px 14px;color:var(--t4)"><div style="font-size:13px;margin-bottom:8px">No activity yet</div><div style="font-size:11px">Create a project or connect OpenClaw to get started</div></div>';
+  const el = document.getElementById('d-act');
+  if (!el) return;
+  if(activityLog.length === 0){
+    el.innerHTML='<div style="text-align:center;padding:30px 14px;color:var(--t4)"><div style="font-size:13px;margin-bottom:8px">No activity yet</div><div style="font-size:11px">Create a project or connect OpenClaw to get started</div></div>';
     return;
   }
-  document.getElementById('d-act').innerHTML=[
-    {c:'var(--am)',t:'<strong>GitHub trending</strong> synced — 25 repos',d:'3m ago'},
-    {c:'var(--tl)',t:'<strong>Crawler</strong> indexed 47 new skills',d:'12m ago'},
-    {c:'var(--gn)',t:'<strong>E-Commerce</strong> — auth module done',d:'28m ago'},
-    {c:'var(--ac)',t:'<strong>PM-Agent</strong> assigned agents to SaaS project',d:'42m ago'},
-    {c:'var(--co)',t:'<strong>Fix</strong> resolved 2 test failures',d:'1h ago'},
-  ].map(a=>'<div style="display:flex;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .12s" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'transparent\'"><div style="width:7px;height:7px;border-radius:50%;background:'+a.c+';margin-top:7px;flex-shrink:0"></div><div><div style="font-size:12.5px;color:var(--t2);line-height:1.5">'+a.t+'</div><div style="font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:2px">'+a.d+'</div></div></div>').join('');
+  el.innerHTML=activityLog.slice(0,10).map(a=>'<div style="display:flex;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .12s" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'transparent\'"><div style="width:7px;height:7px;border-radius:50%;background:var(--tl);margin-top:7px;flex-shrink:0"></div><div><div style="font-size:12.5px;color:var(--t2);line-height:1.5">' + a.icon + ' ' + a.text+'</div><div style="font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:2px">'+a.time+'</div></div></div>').join('');
 }
 renderDashActivity();
+
+/* Hook into WebSocket events for activity */
+claw.on('health.tick', () => {
+  // Don't spam activity with ticks
+});
+claw.on('connected', () => {
+  addActivity('\u26a1', '<strong>OpenClaw</strong> connected');
+});
 
 /* FIX M-04: dynamic project rendering */
 renderDashProjs();
 
-/* Trending — FIX L-01: escape repo names properly */
-document.getElementById('tr-list').innerHTML=[
-  {r:1,n:'openai/swarm',l:'Python',lc:'#3572A5',d:'Lightweight multi-agent orchestration with handoffs',s:'24.2k',t:'+1,847'},
-  {r:2,n:'anthropic/claude-code',l:'TypeScript',lc:'#3178c6',d:'Agentic coding tool for your terminal',s:'31.8k',t:'+1,203'},
-  {r:3,n:'browser-use/browser-use',l:'Python',lc:'#3572A5',d:'Make websites accessible for AI agents',s:'18.5k',t:'+982'},
-  {r:4,n:'crewAI/crewAI',l:'Python',lc:'#3572A5',d:'Role-playing autonomous AI agents for complex tasks',s:'22.1k',t:'+876'},
-  {r:5,n:'langchain-ai/langgraph',l:'Python',lc:'#3572A5',d:'Build resilient language agents as graphs',s:'8.4k',t:'+654'},
-  {r:6,n:'vercel/ai',l:'TypeScript',lc:'#3178c6',d:'AI-powered applications with React, streaming-first',s:'15.7k',t:'+521'},
-].map(t=>'<div class="tc"><div style="font-size:10.5px;font-family:var(--fm);color:var(--am);margin-bottom:6px">★ #'+t.r+' trending</div><div style="font-size:14px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+t.lc+'"></span>'+t.n+'</div><div style="font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:10px">'+t.d+'</div><div style="display:flex;gap:12px;font-size:10.5px;color:var(--t4);font-family:var(--fm);margin-bottom:10px"><span>★ '+t.s+'</span><span style="color:var(--gn)">▲ '+t.t+'</span><span>'+t.l+'</span></div><div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--b0)"><button class="btn btn-sm" onclick="toast(\'Extracting skills from '+esc(t.n)+'...\')">Extract skills</button><button class="btn btn-p btn-sm" onclick="toast(\''+esc(t.n)+' added to library\')">+ Library</button></div></div>').join('');
+/* Trending — loaded from real API */
+async function loadTrending() {
+  const el = document.getElementById('tr-list');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)"><span class="pulse">Loading trending repos...</span></div>';
+  try {
+    const res = await fetch('/api/trending');
+    const data = await res.json();
+    const repos = Array.isArray(data) ? data : (data.repos || data.items || []);
+    if (!repos.length) {
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">No trending data available.<br><span style="font-size:11px;color:var(--t4)">Connect OpenClaw or check back later.</span></div>';
+      return;
+    }
+    renderTrending(repos);
+  } catch(e) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">Could not load trending data.<br><span style="font-size:11px;color:var(--t4)">Connect OpenClaw to fetch GitHub trending repos.</span></div>';
+  }
+}
+function formatStars(n) {
+  if (typeof n === 'string') return n;
+  if (n >= 1000) return (n/1000).toFixed(1) + 'k';
+  return String(n);
+}
+function renderTrending(repos) {
+  const el = document.getElementById('tr-list');
+  if (!el) return;
+  const langColors = {Python:'#3572A5',TypeScript:'#3178c6',JavaScript:'#f1e05a',Go:'#00ADD8',Rust:'#dea584',Java:'#b07219',C:'#555555','C++':'#f34b7d',Ruby:'#701516',Swift:'#ffac45'};
+  el.innerHTML = repos.map((t,i) => {
+    const name = t.name || t.full_name || t.repo || '';
+    const lang = t.language || t.lang || '';
+    const lc = langColors[lang] || '#888';
+    const desc = t.description || t.desc || '';
+    const stars = formatStars(t.stars || t.stargazers_count || 0);
+    const trend = t.todayStars || t.trending || '';
+    const shortName = name.split('/').pop().toLowerCase();
+    const alreadyInLib = SKS.some(s => s.n === shortName);
+    const libBtn = alreadyInLib
+      ? '<button class="btn btn-sm" style="background:var(--bg5);color:var(--t4);pointer-events:none">\u2713 In library</button>'
+      : '<button class="btn btn-p btn-sm" onclick="addToLibrary(this,\'' + esc(name) + '\',\'' + esc(desc).replace(/'/g, "\\'") + '\',\'' + esc(lang) + '\')">+ Library</button>';
+    return '<div class="tc"><div style="font-size:10.5px;font-family:var(--fm);color:var(--am);margin-bottom:6px">★ #' + (i+1) + ' trending</div><div style="font-size:14px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:' + lc + '"></span>' + esc(name) + '</div><div style="font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:10px">' + esc(desc) + '</div><div style="display:flex;gap:12px;font-size:10.5px;color:var(--t4);font-family:var(--fm);margin-bottom:10px"><span>★ ' + stars + '</span>' + (trend ? '<span style="color:var(--gn)">▲ ' + trend + '</span>' : '') + '<span>' + esc(lang) + '</span></div><div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--b0)"><button class="btn btn-sm" onclick="extractSkills(this,\'' + esc(name) + '\',\'' + esc(lang) + '\')">Extract skills</button>' + libBtn + '</div></div>';
+  }).join('');
+}
+// Show empty state initially
+document.getElementById('tr-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">Trending repos load from OpenClaw.<br><span style="font-size:11px;color:var(--t4)">Click ⟳ to sync, or connect OpenClaw for auto-sync.</span></div>';
 
-/* Crawler */
-document.getElementById('cr-cards').innerHTML=[
-  {n:'GitHub crawler',ic:'⬡',b:'var(--tlb)',c:'var(--tl)',rows:[['Repos','342'],['Skills','2,104'],['Sync','2m ago']],pw:78},
-  {n:'Trending sync',ic:'★',b:'var(--amb)',c:'var(--am)',rows:[['Today','25 repos'],['Extracted','67'],['Schedule','6h']],pw:100},
-  {n:'ClawHub',ic:'◆',b:'var(--acb2)',c:'var(--ac)',rows:[['Endpoints','28'],['Skills','743'],['Sync','8m ago']],pw:52},
-  {n:'Uploads',ic:'↑',b:'var(--cob)',c:'var(--co)',rows:[['Pending','7'],['Approved','89'],['Review','~4m']],pw:92},
-].map(c=>'<div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:28px;height:28px;border-radius:8px;background:'+c.b+';color:'+c.c+';display:flex;align-items:center;justify-content:center;font-size:13px">'+c.ic+'</div><span style="font-size:13px;font-weight:500">'+c.n+'</span><span style="margin-left:auto;font-size:10px;padding:2px 7px;border-radius:5px;background:var(--gnb);color:var(--gn);font-family:var(--fm)">Running</span></div>'+c.rows.map(r=>'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--t3)">'+r[0]+'</span><span style="font-family:var(--fm)">'+r[1]+'</span></div>').join('')+'<div style="height:3px;background:var(--bg5);border-radius:2px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+c.pw+'%;background:'+c.c+';border-radius:2px"></div></div></div>').join('');
-document.getElementById('cr-log').innerHTML=[['var(--am)','Trending','14:35:03','25 repos analyzed'],['var(--tl)','GitHub','14:32:01','Scanning anthropic/claude-skills'],['var(--ac)','ClawHub','14:31:48','Page 42/56 — 12 skills'],['var(--co)','Upload','14:31:12','react-optimizer validated']].map(r=>'<div><span style="color:'+r[0]+'">['+r[1]+']</span> <span style="color:var(--t4)">'+r[2]+'</span> '+r[3]+'</div>').join('');
+/* Channel Status — populated from real data */
+document.getElementById('cr-cards').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--t3);font-size:13px">No channels configured<br><span style="font-size:11px;color:var(--t4)">Connect OpenClaw to see channel status, or run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw setup</code> to add channels.</span></div>';
+document.getElementById('cr-log').innerHTML='<div style="color:var(--t4)">No events yet \u2014 connect OpenClaw to see real-time events</div>';
+
+/* WebSocket event log for channels */
+const wsEventLog = [];
+function addWsEvent(source, message) {
+  const time = new Date().toLocaleTimeString('en', {hour12:false});
+  wsEventLog.unshift({source, message, time});
+  if (wsEventLog.length > 50) wsEventLog.length = 50;
+  renderWsEventLog();
+}
+function renderWsEventLog() {
+  const el = document.getElementById('cr-log');
+  if (!el) return;
+  if (!wsEventLog.length) { el.innerHTML = '<div style="color:var(--t4)">No events yet</div>'; return; }
+  el.innerHTML = wsEventLog.slice(0, 20).map(e => '<div><span style="color:var(--tl)">[' + e.source + ']</span> <span style="color:var(--t4)">' + e.time + '</span> ' + e.message + '</div>').join('');
+}
+
+claw.on('health', (payload) => {
+  if (payload && payload.channels) {
+    renderChannelStatus(payload.channels);
+    renderSettingsChannels(payload.channels);
+  }
+});
+claw.on('health.tick', (payload) => {
+  addWsEvent('health', 'tick \u2014 uptime: ' + (payload && payload.uptime ? Math.floor(payload.uptime/60) + 'm' : 'unknown'));
+});
+claw.on('session.message', (payload) => {
+  addWsEvent('session', (payload && payload.sessionKey ? payload.sessionKey : 'unknown') + ' \u2014 new message');
+});
 
 /* Projects list */
 renderProjs();
 
 setTimeout(()=>{const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight},100);
+
+/* ══ Load saved state ══ */
+const hadState = loadState();
+if (hadState) { renderAll(); }
+
+/* ══ Initial data load ══ */
+updateWizard();
 
 /* ══ OpenClaw auto-connect ══ */
 setTimeout(() => {
@@ -1292,6 +1643,18 @@ setTimeout(() => {
   if (urlInput) urlInput.value = claw.url;
   if (tokenInput) tokenInput.value = claw.token;
   claw.connect();
+  // Load real data via HTTP — retry with backoff until CLI cache is ready
+  async function loadAllData(attempt) {
+    attempt = attempt || 1;
+    await Promise.allSettled([loadRealSkills(), loadRealAgents(), loadRealConfig()]);
+    renderAll(); updateStats(); updateWizard();
+    // Retry up to 3 times with increasing delay if real skills didn't load
+    if (SKS.filter(s => s.real).length === 0 && attempt <= 3) {
+      const delay = attempt * 3000; // 3s, 6s, 9s
+      setTimeout(() => loadAllData(attempt + 1), delay);
+    }
+  }
+  setTimeout(loadAllData, 500);
 }, 200);
 </script>
 </body>
