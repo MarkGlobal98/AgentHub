@@ -8,8 +8,13 @@ const { exec, spawn } = require('child_process');
 const PORT = 3000;
 const GATEWAY = 'http://127.0.0.1:18789';
 const NUL = process.platform === 'win32' ? '2>NUL' : '2>/dev/null';
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGINS || `http://localhost:${PORT}`;
-const JSON_H = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': ALLOWED_ORIGIN, 'Cache-Control': 'no-store' };
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || `http://localhost:${PORT}`).split(',').map(s => s.trim());
+function getCorsOrigin(req) {
+  const origin = req.headers.origin;
+  if (!origin) return ALLOWED_ORIGINS[0]; // same-origin requests (no Origin header)
+  return ALLOWED_ORIGINS.includes(origin) ? origin : 'null'; // 'null' = deny
+}
+const JSON_H_BASE = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
 const MAX_BODY = 64 * 1024; // 64 KB max request body
 
 const MIME = {
@@ -58,26 +63,26 @@ function cleanJson(raw) {
 }
 
 /* Helper: run openclaw CLI with caching */
-function clawExec(cmd, res, timeout = 60000, retries = 1) {
+function clawExec(cmd, res, headers, timeout = 60000, retries = 1) {
   // Check cache
   const cached = cache[cmd];
   if (cached && (Date.now() - cached.ts < CACHE_TTL)) {
-    res.writeHead(200, JSON_H);
+    res.writeHead(200, headers);
     res.end(cached.data);
     return;
   }
   exec(`openclaw ${cmd} ${NUL}`, { timeout, maxBuffer: 1024 * 1024 }, (err, stdout) => {
     const json = cleanJson(stdout);
     if (!json && retries > 0) {
-      setTimeout(() => clawExec(cmd, res, timeout, retries - 1), 3000);
+      setTimeout(() => clawExec(cmd, res, headers, timeout, retries - 1), 3000);
       return;
     }
     if (json) {
       if (Object.keys(cache).length < CACHE_MAX) cache[cmd] = { data: json, ts: Date.now() };
-      res.writeHead(200, JSON_H);
+      res.writeHead(200, headers);
       res.end(json);
     } else {
-      res.writeHead(500, JSON_H);
+      res.writeHead(500, headers);
       res.end(JSON.stringify({ ok: false, error: err?.message || 'No output' }));
     }
   });
@@ -97,16 +102,17 @@ warmCache();
 
 const server = http.createServer((req, res) => {
   const urlPath = req.url.split('?')[0]; // Strip query strings for matching
+  const JSON_H = { ...JSON_H_BASE, 'Access-Control-Allow-Origin': getCorsOrigin(req) };
 
   // ── CLI-backed endpoints ──
 
   if (urlPath === '/api/skills') {
-    clawExec('skills list --json', res);
+    clawExec('skills list --json', res, JSON_H);
     return;
   }
 
   if (urlPath === '/api/agents') {
-    clawExec('agents list --json', res);
+    clawExec('agents list --json', res, JSON_H);
     return;
   }
 
@@ -289,7 +295,7 @@ const server = http.createServer((req, res) => {
       if (req.headers.authorization) headers['Authorization'] = req.headers.authorization;
       const proxy = http.request({ hostname: u.hostname, port: u.port, path: u.pathname, method: req.method, headers }, (pRes) => {
         // FIX: only forward safe response headers
-        const safeHeaders = { 'Access-Control-Allow-Origin': ALLOWED_ORIGIN };
+        const safeHeaders = { 'Access-Control-Allow-Origin': getCorsOrigin(req) };
         if (pRes.headers['content-type']) safeHeaders['Content-Type'] = pRes.headers['content-type'];
         if (pRes.headers['content-length']) safeHeaders['Content-Length'] = pRes.headers['content-length'];
         res.writeHead(pRes.statusCode, safeHeaders);
@@ -307,7 +313,7 @@ const server = http.createServer((req, res) => {
   // ── CORS preflight ──
 
   if (req.method === 'OPTIONS') {
-    res.writeHead(204, { 'Access-Control-Allow-Origin': ALLOWED_ORIGIN, 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,Authorization' });
+    res.writeHead(204, { 'Access-Control-Allow-Origin': getCorsOrigin(req), 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,Authorization' });
     res.end();
     return;
   }

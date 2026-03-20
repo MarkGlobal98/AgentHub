@@ -286,15 +286,19 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
   .mo-box{width:calc(100vw - 32px);max-width:540px;padding:20px}
 }
 @media(max-width:600px){
+  .app{height:100dvh} /* dynamic viewport height — accounts for mobile address bar */
   .sb{display:none}
   .stats{grid-template-columns:1fr}
   .lgr{grid-template-columns:1fr}
   .tg{grid-template-columns:1fr}
+  .tb{padding:0 10px;gap:6px;height:48px}
   .tb .sb-in{max-width:none;flex:1}
+  .tb .sb-in input{font-size:14px} /* prevent iOS zoom on focus */
   .tb .btn:not(.btn-p){display:none}
   .onboard{flex-direction:column;padding:16px}.onboard .ob-steps{flex-wrap:wrap}
-  .psc{padding:14px}
-  .chi input{font-size:14px}
+  .psc{padding:14px;-webkit-overflow-scrolling:touch}
+  .chi input{font-size:16px} /* prevent iOS zoom on focus */
+  .mo-box{width:calc(100vw - 24px);max-width:none;max-height:85dvh;overflow-y:auto;padding:16px}
   #p-crawl div[style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr!important}
   #p-settings div[style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important}
   #p-settings div[style*="grid-template-columns:1fr 1fr;gap:12px"]{grid-template-columns:1fr!important}
@@ -1124,6 +1128,15 @@ class OpenClawClient {
 const claw = new OpenClawClient();
 // FIX: clean shutdown on page unload — prevents WebSocket/timer leaks
 window.addEventListener('beforeunload', () => claw.destroy());
+// Global error handlers — catch uncaught exceptions and unhandled rejections
+window.addEventListener('error', (e) => {
+  console.error('Runtime error:', e.message, e.filename, e.lineno);
+  if (typeof toast === 'function') toast('Runtime error — check console');
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('Unhandled rejection:', e.reason);
+  if (typeof toast === 'function') toast('Async error — check console');
+});
 // Also handle visibilitychange for mobile browsers that skip beforeunload
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
