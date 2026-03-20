@@ -3,21 +3,30 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 
 const PORT = 3000;
 const GATEWAY = 'http://127.0.0.1:18789';
 const NUL = process.platform === 'win32' ? '2>NUL' : '2>/dev/null';
-const JSON_H = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' };
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGINS || `http://localhost:${PORT}`;
+const JSON_H = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': ALLOWED_ORIGIN, 'Cache-Control': 'no-store' };
+const MAX_BODY = 64 * 1024; // 64 KB max request body
 
 const MIME = {
   '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
   '.json': 'application/json', '.png': 'image/png', '.ico': 'image/x-icon'
 };
 
-/* Cache for CLI results (5-min TTL) */
+/* Cache for CLI results (5-min TTL, auto-sweep) */
 const cache = {};
 const CACHE_TTL = 5 * 60 * 1000;
+const CACHE_MAX = 50; // max entries — hard cap against unbounded growth
+setInterval(() => {
+  const now = Date.now();
+  for (const key in cache) {
+    if (now - cache[key].ts >= CACHE_TTL) delete cache[key];
+  }
+}, CACHE_TTL);
 
 function cleanJson(raw) {
   if (!raw) return null;
@@ -64,7 +73,7 @@ function clawExec(cmd, res, timeout = 60000, retries = 1) {
       return;
     }
     if (json) {
-      cache[cmd] = { data: json, ts: Date.now() };
+      if (Object.keys(cache).length < CACHE_MAX) cache[cmd] = { data: json, ts: Date.now() };
       res.writeHead(200, JSON_H);
       res.end(json);
     } else {
@@ -131,25 +140,87 @@ const server = http.createServer((req, res) => {
 
   if (urlPath === '/api/agent' && req.method === 'POST') {
     let body = '';
-    req.on('data', c => body += c);
+    let bodySize = 0;
+    req.on('data', c => {
+      bodySize += c.length;
+      if (bodySize > MAX_BODY) { req.destroy(); return; }
+      body += c;
+    });
     req.on('end', () => {
+      if (bodySize > MAX_BODY) {
+        res.writeHead(413, JSON_H);
+        res.end(JSON.stringify({ ok: false, error: 'Request body too large' }));
+        return;
+      }
       try {
-        const { message, agent } = JSON.parse(body);
-        const escaped = message.replace(/"/g, '\\"').replace(/\n/g, ' ');
-        const agentFlag = agent ? ` --agent ${agent}` : ' --agent main';
-        exec(`openclaw agent --message "${escaped}"${agentFlag} --json ${NUL}`, { timeout: 120000, maxBuffer: 1024 * 1024 }, (err, stdout) => {
-          res.writeHead(200, JSON_H);
-          // Parse JSON response — extract text from result.payloads
+        const parsed = JSON.parse(body);
+        const message = parsed.message;
+        const agent = parsed.agent;
+        // Input validation
+        if (typeof message !== 'string' || !message.trim()) {
+          res.writeHead(400, JSON_H);
+          res.end(JSON.stringify({ ok: false, error: 'message must be a non-empty string' }));
+          return;
+        }
+        if (message.length > 10000) {
+          res.writeHead(400, JSON_H);
+          res.end(JSON.stringify({ ok: false, error: 'message too long (max 10000 chars)' }));
+          return;
+        }
+        // Validate agent name — alphanumeric, hyphens, underscores only
+        const agentName = (typeof agent === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(agent)) ? agent : 'main';
+        // FIX: use spawn with args array — no shell, no injection, streaming output
+        const child = spawn('openclaw', ['agent', '--message', message.trim(), '--agent', agentName, '--json']);
+        let stdout = '', stderr = '';
+        let timedOut = false;
+        const killTimer = setTimeout(() => { timedOut = true; child.kill(); }, 120000);
+        child.stdout.on('data', c => { if (stdout.length < 1024 * 1024) stdout += c; });
+        child.stderr.on('data', c => { if (stderr.length < 64 * 1024) stderr += c; });
+        child.on('close', (code) => {
+          clearTimeout(killTimer);
+          if (res.headersSent) return;
+          // Timeout
+          if (timedOut) {
+            res.writeHead(504, JSON_H);
+            res.end(JSON.stringify({ ok: false, error: 'Agent request timed out (120s)' }));
+            return;
+          }
+          // Non-zero exit code = process failure
+          if (code !== 0 && code !== null) {
+            const errMsg = stderr.trim() || stdout.trim() || 'openclaw exited with code ' + code;
+            res.writeHead(502, JSON_H);
+            res.end(JSON.stringify({ ok: false, error: errMsg }));
+            return;
+          }
           const json = cleanJson(stdout);
           if (json) {
             try {
               const parsed = JSON.parse(json);
               const payloads = parsed.result?.payloads || [];
               const text = payloads.map(p => p.text || '').filter(Boolean).join('\n') || parsed.summary || '';
+              res.writeHead(200, JSON_H);
               res.end(JSON.stringify({ ok: true, text, raw: parsed }));
-            } catch(e) { res.end(json); }
+            } catch(e) {
+              res.writeHead(500, JSON_H);
+              res.end(JSON.stringify({ ok: false, error: 'Invalid JSON from openclaw' }));
+            }
           } else {
-            res.end(JSON.stringify({ ok: true, text: stdout?.trim() || 'No response' }));
+            // No JSON found — check if stdout looks like an error
+            const out = stdout?.trim() || '';
+            if (!out || out.toLowerCase().includes('error') || out.toLowerCase().includes('not found')) {
+              res.writeHead(502, JSON_H);
+              res.end(JSON.stringify({ ok: false, error: out || 'No response from openclaw' }));
+            } else {
+              res.writeHead(200, JSON_H);
+              res.end(JSON.stringify({ ok: true, text: out }));
+            }
+          }
+        });
+        child.on('error', (err) => {
+          clearTimeout(killTimer);
+          if (!res.headersSent) {
+            res.writeHead(500, JSON_H);
+            res.end(JSON.stringify({ ok: false, error: err.message }));
           }
         });
       } catch(e) {
@@ -196,16 +267,37 @@ const server = http.createServer((req, res) => {
   if (urlPath.startsWith('/api/')) {
     const target = GATEWAY + req.url.replace('/api', '');
     let body = '';
-    req.on('data', c => body += c);
+    let bodySize = 0;
+    req.on('data', c => {
+      bodySize += c.length;
+      if (bodySize > MAX_BODY) { req.destroy(); return; }
+      body += c;
+    });
     req.on('end', () => {
-      const u = new URL(target);
+      if (bodySize > MAX_BODY) {
+        res.writeHead(413, JSON_H);
+        res.end(JSON.stringify({ ok: false, error: 'Request body too large' }));
+        return;
+      }
+      let u;
+      try { u = new URL(target); } catch(e) {
+        res.writeHead(400, JSON_H);
+        res.end(JSON.stringify({ ok: false, error: 'Invalid proxy target' }));
+        return;
+      }
       const headers = { 'Content-Type': 'application/json' };
       if (req.headers.authorization) headers['Authorization'] = req.headers.authorization;
       const proxy = http.request({ hostname: u.hostname, port: u.port, path: u.pathname, method: req.method, headers }, (pRes) => {
-        res.writeHead(pRes.statusCode, { ...pRes.headers, 'Access-Control-Allow-Origin': '*' });
+        // FIX: only forward safe response headers
+        const safeHeaders = { 'Access-Control-Allow-Origin': ALLOWED_ORIGIN };
+        if (pRes.headers['content-type']) safeHeaders['Content-Type'] = pRes.headers['content-type'];
+        if (pRes.headers['content-length']) safeHeaders['Content-Length'] = pRes.headers['content-length'];
+        res.writeHead(pRes.statusCode, safeHeaders);
         pRes.pipe(res);
       });
-      proxy.on('error', () => { res.writeHead(502); res.end('Gateway unavailable'); });
+      proxy.on('error', () => {
+        if (!res.headersSent) { res.writeHead(502, JSON_H); res.end(JSON.stringify({ ok: false, error: 'Gateway unavailable' })); }
+      });
       if (body) proxy.write(body);
       proxy.end();
     });
@@ -215,16 +307,22 @@ const server = http.createServer((req, res) => {
   // ── CORS preflight ──
 
   if (req.method === 'OPTIONS') {
-    res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,Authorization' });
+    res.writeHead(204, { 'Access-Control-Allow-Origin': ALLOWED_ORIGIN, 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,Authorization' });
     res.end();
     return;
   }
 
   // ── Static files ──
 
-  let filePath = path.join(__dirname, req.url.split('?')[0] === '/' ? 'index.html' : req.url.split('?')[0]);
-  const ext = path.extname(filePath);
-  fs.readFile(filePath, (err, data) => {
+  const reqPath = decodeURIComponent(req.url.split('?')[0]);
+  let filePath = path.join(__dirname, reqPath === '/' ? 'index.html' : reqPath);
+  // FIX: prevent path traversal — resolved path must be within __dirname
+  const resolved = path.resolve(filePath);
+  if (!resolved.startsWith(path.resolve(__dirname))) {
+    res.writeHead(403); res.end('Forbidden'); return;
+  }
+  const ext = path.extname(resolved);
+  fs.readFile(resolved, (err, data) => {
     if (err) { res.writeHead(404); res.end('Not found'); return; }
     res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
     res.end(data);

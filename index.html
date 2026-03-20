@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgentHub — Intelligent Agent Orchestration</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:#090a0e;--bg2:#111218;--bg3:#181921;--bg4:#21222c;--bg5:#2b2c38;
   --b0:#1c1d28;--b1:#292a36;--b2:#3a3b4a;
-  --t1:#edeaf4;--t2:#a09eb2;--t3:#716f84;--t4:#504e60;
+  --t1:#edeaf4;--t2:#b0aec2;--t3:#9694a8;--t4:#828092;
   --ac:#b57efc;--ac2:#8b5cf6;--ac3:#6d3fd4;--acb:rgba(181,126,252,.07);--acb2:rgba(181,126,252,.14);
   --tl:#34d4b8;--tlb:rgba(52,212,184,.07);
   --co:#f87185;--cob:rgba(248,113,133,.07);
@@ -18,14 +20,14 @@
   --bl:#6aafff;--blb:rgba(106,175,255,.07);
   --gn:#5ae08a;--gnb:rgba(90,224,138,.07);
   --pk:#f084c0;
-  --fn:'DM Sans',system-ui,sans-serif;--fm:'JetBrains Mono',monospace;
+  --fn:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,system-ui,sans-serif;--fm:'JetBrains Mono','Cascadia Code','Fira Code',Consolas,'Courier New',monospace;
 }
 html{font-family:var(--fn);background:var(--bg);color:var(--t1);font-size:15px;line-height:1.6}
 button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:var(--fn)}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--b1);border-radius:3px}
 
 .app{display:flex;height:100vh;overflow:hidden}
-.sb{width:228px;background:var(--bg2);border-right:1px solid var(--b0);display:flex;flex-direction:column;flex-shrink:0}
+.sb{width:228px;background:var(--bg2);border-right:1px solid var(--b0);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s ease;overflow:hidden}
 .mn{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .tb{height:54px;border-bottom:1px solid var(--b0);display:flex;align-items:center;padding:0 24px;gap:14px;background:var(--bg2);flex-shrink:0}
 .logo{padding:18px 18px 22px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b0)}
@@ -201,6 +203,17 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}.pulse{animation:pulse 2s ease-in-out infinite}
 @keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin 1s linear infinite;display:inline-block}
+
+/* ══ Loading spinner & skeleton ══ */
+.loading-overlay{display:flex;align-items:center;justify-content:center;padding:40px;gap:10px;color:var(--t3);font-size:13px}
+.loading-overlay .spinner{width:20px;height:20px;border:2px solid var(--b1);border-top-color:var(--ac);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite;border-radius:8px}
+.skeleton-card{height:140px;border-radius:14px;margin-bottom:14px}
+.skeleton-row{height:16px;margin-bottom:10px;width:80%}
+.skeleton-row.short{width:50%}
+.skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:14px}
+.skeleton-stat{height:90px;border-radius:14px}
 .fi>*{animation:fadeUp .3s ease both}.fi>*:nth-child(2){animation-delay:.05s}.fi>*:nth-child(3){animation-delay:.1s}
 .claw-status{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;font-size:11px;font-family:var(--fm);cursor:pointer;transition:all .15s}
 .claw-status .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
@@ -210,6 +223,82 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 .claw-status.off{color:var(--t4);background:var(--bg3)}
 .claw-status.connecting .dot{background:var(--am);animation:pulse 1.5s ease-in-out infinite}
 .claw-status.connecting{color:var(--am);background:var(--amb)}
+
+/* ══ Light theme ══ */
+[data-theme="light"]{
+  --bg:#f5f5f8;--bg2:#ffffff;--bg3:#eeeef2;--bg4:#e4e4ea;--bg5:#d8d8e0;
+  --b0:#d0d0da;--b1:#c0c0cc;--b2:#a8a8b8;
+  --t1:#1a1a2e;--t2:#3a3a52;--t3:#5a5a72;--t4:#6e6e86;
+  --ac:#7c3aed;--ac2:#6d28d9;--ac3:#5b21b6;--acb:rgba(124,58,237,.08);--acb2:rgba(124,58,237,.14);
+  --tl:#0d9488;--tlb:rgba(13,148,136,.08);
+  --co:#e11d48;--cob:rgba(225,29,72,.08);
+  --am:#ca8a04;--amb:rgba(202,138,4,.08);
+  --bl:#2563eb;--blb:rgba(37,99,235,.08);
+  --gn:#16a34a;--gnb:rgba(22,163,74,.08);
+  --pk:#db2777;
+}
+[data-theme="light"] html,[data-theme="light"]{color-scheme:light}
+[data-theme="light"] .av{color:#fff}
+[data-theme="light"] .ai.usr{background:var(--bg4);border-color:var(--b1)}
+[data-theme="light"] .mo-box{box-shadow:0 20px 60px rgba(0,0,0,.15)}
+[data-theme="light"] ::-webkit-scrollbar-thumb{background:var(--b1)}
+.theme-toggle{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:1px solid var(--b0);background:var(--bg3);cursor:pointer;color:var(--t2);transition:all .15s;font-size:15px;flex-shrink:0}
+.theme-toggle:hover{background:var(--bg5);color:var(--t1);border-color:var(--b2)}
+
+/* ══ Keyboard shortcuts modal ══ */
+.kb-group{margin-bottom:14px}.kb-group-title{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--t4);margin-bottom:6px;font-weight:500}
+.kb-row{display:flex;align-items:center;padding:6px 0;font-size:13px;color:var(--t2)}
+.kb-row kbd{margin-left:auto;background:var(--bg4);border:1px solid var(--b1);padding:3px 8px;border-radius:6px;font-family:var(--fm);font-size:11px;color:var(--t1);min-width:28px;text-align:center}
+.kb-row kbd+kbd{margin-left:4px}
+
+/* ══ Form validation ══ */
+.ff .ff-err{font-size:11px;color:var(--co);margin-top:4px;display:none}
+.ff.has-error input,.ff.has-error textarea{border-color:var(--co);background:rgba(248,113,133,.04)}
+.ff.has-error .ff-err{display:block}
+.ff.valid input,.ff.valid textarea{border-color:var(--gn)}
+.ff input:invalid:not(:placeholder-shown),.ff textarea:invalid:not(:placeholder-shown){border-color:var(--am)}
+
+/* ══ Responsive design ══ */
+@media(max-width:1200px){
+  .ws{grid-template-columns:1fr 280px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .set-grid{grid-template-columns:1fr}
+  .set-card.full{grid-column:auto}
+  #p-dash .psc>div[style*="grid-template-columns:1fr 320px"]{grid-template-columns:1fr!important}
+}
+@media(max-width:1050px){
+  .sb{width:56px}.sb .ns-l,.sb .logo h1,.sb .logo small{display:none}
+  .sb .ni{justify-content:center;padding:10px;font-size:0;white-space:nowrap}.sb .ni svg{margin:0;font-size:initial}.sb .ni .bd{display:none}
+  .sb .logo{justify-content:center;padding:14px}.sb .logo .ic{margin:0}
+  /* Hover-expand sidebar */
+  .sb:hover{width:228px;position:absolute;top:0;left:0;bottom:0;z-index:100;box-shadow:4px 0 24px rgba(0,0,0,.25)}
+  .sb:hover .ns-l,.sb:hover .logo h1,.sb:hover .logo small{display:initial}
+  .sb:hover .ni{justify-content:flex-start;padding:8px 12px;font-size:13.5px}.sb:hover .ni .bd{display:initial}
+  .sb:hover .logo{justify-content:flex-start;padding:18px 18px 22px}
+}
+@media(max-width:900px){
+  .ws{grid-template-columns:1fr}.wsr{display:none}
+  .ll{flex-direction:column}.lsb{width:100%;border-right:none;border-bottom:1px solid var(--b0);padding:10px;display:flex;flex-wrap:wrap;gap:4px;overflow-x:auto}
+  .lsb .lct{width:100%;padding:4px 0 2px}.lci{padding:4px 8px}
+  .tb{padding:0 12px;gap:8px}
+  .ppb{padding:8px 12px;overflow-x:auto;flex-wrap:nowrap}
+  .pps{font-size:10px;padding:4px 6px;white-space:nowrap}
+  .mo-box{width:calc(100vw - 32px);max-width:540px;padding:20px}
+}
+@media(max-width:600px){
+  .sb{display:none}
+  .stats{grid-template-columns:1fr}
+  .lgr{grid-template-columns:1fr}
+  .tg{grid-template-columns:1fr}
+  .tb .sb-in{max-width:none;flex:1}
+  .tb .btn:not(.btn-p){display:none}
+  .onboard{flex-direction:column;padding:16px}.onboard .ob-steps{flex-wrap:wrap}
+  .psc{padding:14px}
+  .chi input{font-size:14px}
+  #p-crawl div[style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr!important}
+  #p-settings div[style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important}
+  #p-settings div[style*="grid-template-columns:1fr 1fr;gap:12px"]{grid-template-columns:1fr!important}
+}
 </style>
 </head>
 <body>
@@ -243,6 +332,7 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
     <div class="claw-status off" id="claw-status" onclick="claw.reconnect()"><div class="dot"></div><span id="claw-label">Offline</span></div>
     <button class="btn" onclick="syncAll()">⟳ Sync</button>
     <button class="btn btn-p" onclick="openMo()">+ New project</button>
+    <div class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">☀</div>
     <div class="av" onclick="go('settings')">Y</div>
   </div>
 </div>
@@ -412,7 +502,11 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
         <div><div class="ff"><label>Task timeout (seconds)</label><input type="number" value="300"></div></div>
         <div><div class="ff"><label>Language</label><select id="lang-select" onchange="switchLang(this.value);autoSave()"><option value="en">English</option><option value="zh">中文</option></select></div></div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-sm btn-p" onclick="saveWithFeedback(this)">Save all</button><button class="btn btn-sm btn-d" onclick="localStorage.clear();location.reload()">Clear cache</button></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+        <button class="btn btn-sm btn-p" onclick="saveWithFeedback(this)">Save all</button>
+        <button class="btn btn-sm btn-d" onclick="if(confirm('Clear all cached data? Projects and settings will be lost.')){_lastSaveOk=true;localStorage.clear();location.reload()}">Clear cache</button>
+        <div id="storage-indicator" style="margin-left:auto;font-size:11px;font-family:var(--fm);color:var(--t4);display:flex;align-items:center;gap:8px"></div>
+      </div>
     </div>
   </div>
 </div></div>
@@ -469,61 +563,135 @@ button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:va
 </div></div>
 
 <!-- Modal -->
-<div class="mo" id="modal" onclick="if(event.target===this)closeMo()">
+<div class="mo" id="modal" onclick="if(event.target===this)closeMo()" role="dialog" aria-modal="true">
   <div class="mo-box">
     <h2>Create new project</h2>
     <div class="ms">Describe your project — PM-Agent will decompose tasks, match agents, and start building.</div>
-    <div class="ff"><label>Project name</label><input id="mo-name" placeholder="e.g. SaaS Analytics Dashboard"></div>
-    <div class="ff"><label>What do you want to build?</label><textarea id="mo-desc" placeholder="Describe your project in plain language. For example: A real-time analytics dashboard with user tracking, conversion funnels, custom reports, and Stripe billing."></textarea></div>
+    <div class="ff" id="ff-mo-name"><label>Project name <span style="color:var(--co)">*</span></label><input id="mo-name" placeholder="e.g. SaaS Analytics Dashboard" required maxlength="80" oninput="validateField(this,'ff-mo-name','Project name is required')"><div class="ff-err">Project name is required</div></div>
+    <div class="ff" id="ff-mo-desc"><label>What do you want to build? <span style="color:var(--co)">*</span></label><textarea id="mo-desc" placeholder="Describe your project in plain language. For example: A real-time analytics dashboard with user tracking, conversion funnels, custom reports, and Stripe billing." required minlength="5" oninput="validateField(this,'ff-mo-desc','Please describe your project (at least 5 characters)')"></textarea><div class="ff-err">Please describe your project (at least 5 characters)</div></div>
     <div class="ff"><label>Priority</label><select id="mo-pri"><option>Normal</option><option>High — faster</option><option>Critical — all agents</option></select></div>
     <div class="mf"><button class="btn" onclick="closeMo()">Cancel</button><button class="btn btn-p" onclick="createProj()">Create & deploy agents</button></div>
   </div>
 </div>
-<div class="mo" id="detail-modal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="mo" id="detail-modal" onclick="if(event.target===this)_closeModal('detail-modal')" role="dialog" aria-modal="true">
   <div class="mo-box" id="detail-content"></div>
 </div>
-<div class="mo" id="agent-create-modal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="mo" id="agent-create-modal" onclick="if(event.target===this)_closeModal('agent-create-modal')" role="dialog" aria-modal="true">
   <div class="mo-box">
     <h2>Create new agent</h2>
     <div class="ms">Configure a new AI agent with skills from your library.</div>
-    <div class="ff"><label>Agent name</label><input id="ca-name" placeholder="e.g. Frontend-Pro"></div>
-    <div class="ff"><label>Description</label><input id="ca-desc" placeholder="What does this agent do?"></div>
+    <div class="ff" id="ff-ca-name"><label>Agent name <span style="color:var(--co)">*</span></label><input id="ca-name" placeholder="e.g. Frontend-Pro" required maxlength="40" oninput="validateField(this,'ff-ca-name','Agent name is required')"><div class="ff-err">Agent name is required</div></div>
+    <div class="ff" id="ff-ca-desc"><label>Description <span style="color:var(--co)">*</span></label><input id="ca-desc" placeholder="What does this agent do?" required oninput="validateField(this,'ff-ca-desc','Description is required')"><div class="ff-err">Description is required</div></div>
     <div class="ff"><label>Type</label><select id="ca-type"><option value="dev">Development</option><option value="ops">DevOps</option><option value="qa">QA</option><option value="sec">Security</option><option value="data">Data</option><option value="doc">Docs</option></select></div>
     <div class="ff"><label>Skills (comma-separated)</label><input id="ca-skills" placeholder="e.g. code-reviewer, test-writer"></div>
-    <div class="mf"><button class="btn" onclick="document.getElementById('agent-create-modal').classList.remove('open')">Cancel</button><button class="btn btn-p" onclick="createAgent()">Create agent</button></div>
+    <div class="mf"><button class="btn" onclick="_closeModal('agent-create-modal')">Cancel</button><button class="btn btn-p" onclick="createAgent()">Create agent</button></div>
+  </div>
+</div>
+<div class="mo" id="kb-modal" onclick="if(event.target===this)_closeModal('kb-modal')" role="dialog" aria-modal="true">
+  <div class="mo-box" style="max-width:480px">
+    <h2 style="margin-bottom:4px">Keyboard shortcuts</h2>
+    <div class="ms">Press <kbd style="background:var(--bg4);padding:2px 7px;border-radius:5px;font-family:var(--fm);font-size:11px;border:1px solid var(--b1)">?</kbd> anytime to toggle this panel</div>
+    <div id="kb-list"></div>
+    <div class="mf"><button class="btn btn-p" onclick="_closeModal('kb-modal')">Got it</button></div>
   </div>
 </div>
 <div class="toast" id="toast-el"></div>
 
 <script>
+/* ══ Theme toggle ══ */
+function toggleTheme(){
+  const html=document.documentElement;
+  const next=html.getAttribute('data-theme')==='light'?'dark':'light';
+  html.setAttribute('data-theme',next);
+  localStorage.setItem('agenthub_theme',next);
+  const btn=document.getElementById('theme-toggle');
+  if(btn)btn.textContent=next==='light'?'\u263E':'\u2600';
+}
+(function(){
+  const saved=localStorage.getItem('agenthub_theme')||
+    (window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');
+  if(saved==='light')document.documentElement.setAttribute('data-theme','light');
+  const btn=document.getElementById('theme-toggle');
+  if(btn)btn.textContent=saved==='light'?'\u263E':'\u2600';
+})();
+
 /* ══ OpenClaw Integration Layer ══ */
 const CLAW_CONFIG_KEY = 'agenthub_openclaw_config';
 
 const STORAGE_KEY = 'agenthub_state';
 
+const STATE_VERSION = 2;
+
 function saveState() {
   const state = {
+    _v: STATE_VERSION,
+    _ts: Date.now(),
     projects: PROJS,
-    skills: SKS.filter(s => !s.real), // don't save OpenClaw skills
-    agents: AGS.filter(a => !a.real), // don't save OpenClaw agents
+    skills: SKS.filter(s => !s.real),
+    agents: AGS.filter(a => !a.real),
     models: getModelConfigs(),
     settings: getSettingsState()
   };
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+  try {
+    const json = JSON.stringify(state);
+    localStorage.setItem(STORAGE_KEY, json);
+    _lastSaveOk = true;
+    updateStorageIndicator();
+    return true;
+  } catch(e) {
+    _lastSaveOk = false;
+    if (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014) {
+      // Attempt to free space: drop skills/agents (can be re-synced from OpenClaw)
+      const slim = { _v: STATE_VERSION, _ts: Date.now(), projects: PROJS, skills: [], agents: [], models: [], settings: getSettingsState() };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+        toast('Storage nearly full \u2014 skills/agents cleared from cache (will re-sync)');
+        _lastSaveOk = true;
+        return true;
+      } catch(e2) {
+        toast('Storage full \u2014 unable to save. Clear cache in Settings.');
+        console.error('saveState: quota exceeded even after trim', e2);
+        return false;
+      }
+    }
+    toast('Save failed: ' + (e.message || 'unknown error'));
+    console.error('saveState:', e);
+    return false;
+  }
 }
+let _lastSaveOk = true;
 
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
     const state = JSON.parse(raw);
-    if (state.projects && state.projects.length) { PROJS.length = 0; PROJS.push(...state.projects); }
-    if (state.skills && state.skills.length) { SKS.length = 0; SKS.push(...state.skills); }
-    if (state.agents && state.agents.length) { AGS.length = 0; AGS.push(...state.agents); }
+    // Version check — discard incompatible state
+    if (state._v && state._v > STATE_VERSION) {
+      console.warn('loadState: saved state version', state._v, 'is newer than current', STATE_VERSION, '— ignoring');
+      return false;
+    }
+    if (Array.isArray(state.projects) && state.projects.length) {
+      // Validate project shape
+      const valid = state.projects.filter(p => p && typeof p.n === 'string');
+      if (valid.length) { PROJS.length = 0; PROJS.push(...valid); }
+    }
+    if (Array.isArray(state.skills) && state.skills.length) {
+      const valid = state.skills.filter(s => s && typeof s.n === 'string');
+      if (valid.length) { SKS.length = 0; SKS.push(...valid); }
+    }
+    if (Array.isArray(state.agents) && state.agents.length) {
+      const valid = state.agents.filter(a => a && typeof a.n === 'string');
+      if (valid.length) { AGS.length = 0; AGS.push(...valid); }
+    }
     if (state.settings) applySettings(state.settings);
     if (state.models) restoreModels(state.models);
     return true;
-  } catch(e) { return false; }
+  } catch(e) {
+    console.error('loadState: corrupt data, clearing', e);
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e2) {}
+    return false;
+  }
 }
 
 function getModelConfigs() {
@@ -549,28 +717,65 @@ function restoreModels(models) {
 
 function autoSave() {
   clearTimeout(autoSave._t);
-  autoSave._t = setTimeout(saveState, 500);
+  if (!_lastSaveOk) return; // Don't retry if storage is known-full
+  autoSave._t = setTimeout(() => {
+    if (!saveState()) {
+      // Save failed; don't queue more auto-saves until user clears cache
+      console.warn('autoSave: save failed, pausing auto-save');
+    }
+  }, 500);
 }
 autoSave._t = null;
 
 function saveWithFeedback(btn) {
-  saveState();
+  const ok = saveState();
   btn.style.pointerEvents = 'none';
   const orig = btn.textContent;
-  btn.textContent = '\u2713 Saved!';
-  btn.style.background = 'var(--gn)'; btn.style.color = '#090a0e';
-  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; btn.style.pointerEvents = ''; }, 1500);
+  if (ok) {
+    btn.textContent = '\u2713 Saved!';
+    btn.style.background = 'var(--gn)'; btn.style.color = '#090a0e';
+  } else {
+    btn.textContent = '\u2717 Save failed';
+    btn.style.background = 'var(--co)'; btn.style.color = '#fff';
+  }
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; btn.style.pointerEvents = ''; }, 2000);
+  updateStorageIndicator();
+}
+
+function getStorageUsage() {
+  let total = 0;
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); total += (k.length + (localStorage.getItem(k) || '').length) * 2; } } catch(e) {}
+  return total;
+}
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
+}
+function updateStorageIndicator() {
+  const el = document.getElementById('storage-indicator');
+  if (!el) return;
+  const used = getStorageUsage();
+  const quota = 5 * 1024 * 1024; // 5 MB typical localStorage limit
+  const pct = Math.min(100, (used / quota * 100)).toFixed(0);
+  const color = pct > 90 ? 'var(--co)' : pct > 70 ? 'var(--am)' : 'var(--gn)';
+  el.innerHTML = '<span>' + formatBytes(used) + ' / ~5 MB</span>' +
+    '<div style="width:60px;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden">' +
+    '<div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:2px;transition:width .3s"></div></div>';
 }
 
 function getSettingsState() {
   const toggles = {};
-  document.querySelectorAll('#p-settings .toggle').forEach((t, i) => { toggles['t' + i] = t.classList.contains('on'); });
+  const settingsEl = document.getElementById('p-settings');
+  if (!settingsEl) return { toggles };
+  settingsEl.querySelectorAll('.toggle').forEach((t, i) => { toggles['t' + i] = t.classList.contains('on'); });
+  const numInputs = settingsEl.querySelectorAll('input[type="number"]');
+  const selects = settingsEl.querySelectorAll('select');
   return {
     toggles,
-    lang: document.querySelector('#p-settings select')?.value || 'English',
-    maxTasks: document.querySelector('#p-settings input[type="number"]')?.value || '8',
-    timeout: document.querySelectorAll('#p-settings input[type="number"]')[1]?.value || '300',
-    scanInterval: document.querySelectorAll('#p-settings select')[0]?.value || 'Every 15 min'
+    lang: selects[selects.length - 1]?.value || 'en',
+    maxTasks: numInputs[0]?.value || '8',
+    timeout: numInputs[1]?.value || '300'
   };
 }
 
@@ -665,12 +870,16 @@ class OpenClawClient {
     this.ws = null;
     this.connected = false;
     this.connecting = false;
+    this.destroyed = false;       // FIX: intentional teardown flag
+    this._intentionalClose = false; // FIX: distinguish reconnect() from unexpected close
     this.reqId = 0;
     this.pending = new Map();
+    this._pendingTimers = new Map(); // FIX: track timeout handles for cleanup
     this.listeners = {};
     this.reconnectDelay = 3000;
     this.maxReconnectDelay = 30000;
     this.reconnectTimer = null;
+    this._heartbeatTimer = null;  // FIX: connection health check
     this.serverVersion = '';
     const saved = localStorage.getItem(CLAW_CONFIG_KEY);
     if (saved) {
@@ -689,8 +898,9 @@ class OpenClawClient {
   }
 
   connect() {
-    if (this.connected || this.connecting) return;
+    if (this.destroyed || this.connected || this.connecting) return;
     this.connecting = true;
+    this._intentionalClose = false;
     this.updateUI('connecting');
     try {
       this.ws = new WebSocket(this.url);
@@ -711,7 +921,7 @@ class OpenClawClient {
           scopes: ['operator.read', 'operator.write', 'operator.admin']
         };
         if (this.token) params.auth = { token: this.token };
-        this.ws.send(JSON.stringify({ type: 'req', id: 'connect-' + Date.now(), method: 'connect', params }));
+        try { this.ws.send(JSON.stringify({ type: 'req', id: 'connect-' + Date.now(), method: 'connect', params })); } catch(e) {}
         return;
       }
 
@@ -722,6 +932,7 @@ class OpenClawClient {
         this.reconnectDelay = 3000;
         this.serverVersion = frame.payload.server?.version || '';
         this.updateUI('live');
+        this._startHeartbeat();
         this.emit('connected', frame.payload);
         return;
       }
@@ -730,6 +941,9 @@ class OpenClawClient {
       if (frame.type === 'res' && frame.id && this.pending.has(frame.id)) {
         const { resolve, reject } = this.pending.get(frame.id);
         this.pending.delete(frame.id);
+        // FIX: clear the timeout timer for this request
+        const timer = this._pendingTimers.get(frame.id);
+        if (timer) { clearTimeout(timer); this._pendingTimers.delete(frame.id); }
         if (frame.ok) resolve(frame.payload);
         else reject(frame.error || { message: 'Unknown error' });
         return;
@@ -752,30 +966,72 @@ class OpenClawClient {
       const wasConnected = this.connected;
       this.connected = false;
       this.connecting = false;
+      this._stopHeartbeat();
       this.updateUI('off');
-      this.pending.forEach(({ reject }) => reject({ message: 'Connection closed' }));
-      this.pending.clear();
+      // FIX: reject all pending and clear their timers
+      this._rejectAllPending('Connection closed');
       if (wasConnected) this.emit('disconnected');
-      this.scheduleReconnect();
+      // FIX: only auto-reconnect on unexpected close
+      if (!this._intentionalClose && !this.destroyed) {
+        this.scheduleReconnect();
+      }
     };
 
     this.ws.onerror = () => {
-      this.connecting = false;
+      // onerror always fires before onclose; just update UI, onclose handles state
       this.updateUI('off');
     };
   }
 
+  // FIX: centralized pending cleanup
+  _rejectAllPending(reason) {
+    this.pending.forEach(({ reject }, id) => {
+      const timer = this._pendingTimers.get(id);
+      if (timer) clearTimeout(timer);
+      reject({ message: reason });
+    });
+    this.pending.clear();
+    this._pendingTimers.clear();
+  }
+
+  // FIX: heartbeat — detect stale connections (server gone without TCP close)
+  _startHeartbeat() {
+    this._stopHeartbeat();
+    this._heartbeatTimer = setInterval(() => {
+      if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        this._stopHeartbeat();
+        if (this.connected) {
+          this.connected = false;
+          this.updateUI('off');
+          this.emit('disconnected');
+          if (!this.destroyed) this.scheduleReconnect();
+        }
+      }
+    }, 15000);
+  }
+
+  _stopHeartbeat() {
+    clearInterval(this._heartbeatTimer);
+    this._heartbeatTimer = null;
+  }
+
   scheduleReconnect() {
+    if (this.destroyed) return;
     clearTimeout(this.reconnectTimer);
     this.reconnectTimer = setTimeout(() => {
-      this.connect();
-      this.reconnectDelay = Math.min(this.reconnectDelay * 1.5, this.maxReconnectDelay);
+      if (!this.destroyed) {
+        this.connect();
+        this.reconnectDelay = Math.min(this.reconnectDelay * 1.5, this.maxReconnectDelay);
+      }
     }, this.reconnectDelay);
   }
 
   reconnect() {
     clearTimeout(this.reconnectTimer);
     this.reconnectDelay = 3000;
+    this.destroyed = false; // re-enable if previously destroyed
+    // FIX: mark as intentional so onclose doesn't double-reconnect
+    this._intentionalClose = true;
     if (this.ws) { try { this.ws.close(); } catch(e) {} }
     this.connected = false;
     this.connecting = false;
@@ -786,48 +1042,106 @@ class OpenClawClient {
 
   send(method, params = {}) {
     return new Promise((resolve, reject) => {
-      if (!this.connected || !this.ws) { reject({ message: 'Not connected' }); return; }
+      // FIX: check readyState, not just boolean flags
+      if (!this.connected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        reject({ message: 'Not connected' }); return;
+      }
       const id = 'req-' + (++this.reqId);
       this.pending.set(id, { resolve, reject });
-      this.ws.send(JSON.stringify({ type: 'req', id, method, params }));
-      setTimeout(() => { if (this.pending.has(id)) { this.pending.delete(id); reject({ message: 'Timeout' }); } }, 15000);
+      try {
+        this.ws.send(JSON.stringify({ type: 'req', id, method, params }));
+      } catch(e) {
+        this.pending.delete(id);
+        reject({ message: 'Send failed: ' + e.message });
+        return;
+      }
+      // FIX: store timer handle so it can be cleared on response or close
+      const timer = setTimeout(() => {
+        if (this.pending.has(id)) {
+          this.pending.delete(id);
+          this._pendingTimers.delete(id);
+          reject({ message: 'Timeout' });
+        }
+      }, 15000);
+      this._pendingTimers.set(id, timer);
     });
   }
 
   async invoke(tool, args = {}) {
-    // Use local proxy /api/ to avoid CORS, fallback to direct URL
     const proxyUrl = '/api/tools/invoke';
     const directUrl = this.url.replace('ws://', 'http://').replace('wss://', 'https://') + '/tools/invoke';
     const headers = { 'Content-Type': 'application/json' };
     if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
     const body = JSON.stringify({ tool, args });
+    // FIX: proper error handling on both fetch paths
     let res;
-    try { res = await fetch(proxyUrl, { method: 'POST', headers, body }); }
-    catch(e) { res = await fetch(directUrl, { method: 'POST', headers, body }); }
-    const data = await res.json();
+    try {
+      res = await fetch(proxyUrl, { method: 'POST', headers, body });
+    } catch(e) {
+      try {
+        res = await fetch(directUrl, { method: 'POST', headers, body });
+      } catch(e2) {
+        throw { message: 'Network error: both proxy and direct requests failed' };
+      }
+    }
+    let data;
+    try { data = await res.json(); } catch(e) { throw { message: 'Invalid JSON response from invoke' }; }
     if (!data.ok) throw data.error || { message: 'Invoke failed' };
     return data.result;
   }
 
-  on(event, fn) { (this.listeners[event] = this.listeners[event] || []).push(fn); }
-  off(event, fn) { if (this.listeners[event]) this.listeners[event] = this.listeners[event].filter(f => f !== fn); }
-  emit(event, data) { (this.listeners[event] || []).forEach(fn => { try { fn(data); } catch(e) {} }); }
+  on(event, fn) {
+    const list = this.listeners[event] = this.listeners[event] || [];
+    if (!list.includes(fn)) list.push(fn); // deduplicate identical references
+  }
+  once(event, fn) {
+    const wrapped = (data) => { this.off(event, wrapped); fn(data); };
+    wrapped._orig = fn; // allow off() by original reference
+    this.on(event, wrapped);
+  }
+  off(event, fn) {
+    if (!this.listeners[event]) return;
+    this.listeners[event] = this.listeners[event].filter(f => f !== fn && f._orig !== fn);
+  }
+  emit(event, data) { (this.listeners[event] || []).slice().forEach(fn => { try { fn(data); } catch(e) {} }); }
 
-  destroy() { clearTimeout(this.reconnectTimer); if (this.ws) this.ws.close(); }
+  destroy() {
+    this.destroyed = true;
+    this._intentionalClose = true;
+    clearTimeout(this.reconnectTimer);
+    this._stopHeartbeat();
+    this._rejectAllPending('Client destroyed');
+    if (this.ws) {
+      try { this.ws.close(); } catch(e) {}
+      this.ws = null;
+    }
+    this.connected = false;
+    this.connecting = false;
+    this.listeners = {};
+  }
 }
 
 const claw = new OpenClawClient();
+// FIX: clean shutdown on page unload — prevents WebSocket/timer leaks
+window.addEventListener('beforeunload', () => claw.destroy());
+// Also handle visibilitychange for mobile browsers that skip beforeunload
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    // Save state before potential background kill (mobile)
+    saveState();
+  }
+});
 
 /* ── OpenClaw Settings helpers ── */
 function testClawConnection() {
   const st = document.getElementById('oc-status');
-  st.textContent = 'Testing...'; st.style.color = 'var(--am)';
-  claw.url = document.getElementById('oc-url').value || 'ws://127.0.0.1:18789';
-  claw.token = document.getElementById('oc-token').value || '';
+  if(st){st.textContent = 'Testing...'; st.style.color = 'var(--am)';}
+  claw.url = document.getElementById('oc-url')?.value || 'ws://127.0.0.1:18789';
+  claw.token = document.getElementById('oc-token')?.value || '';
   if (claw.ws) { try { claw.ws.close(); } catch(e) {} }
   claw.connected = false; claw.connecting = false;
-  const onOk = () => { st.textContent = '\u25cf Connected to OpenClaw ' + claw.serverVersion; st.style.color = 'var(--gn)'; claw.off('connected', onOk); };
-  claw.on('connected', onOk);
+  const onOk = () => { st.textContent = '\u25cf Connected to OpenClaw ' + claw.serverVersion; st.style.color = 'var(--gn)'; };
+  claw.once('connected', onOk);
   claw.connect();
   setTimeout(() => { if (!claw.connected) { st.textContent = '\u2717 Connection failed \u2014 is OpenClaw gateway running?'; st.style.color = 'var(--co)'; claw.off('connected', onOk); } }, 5000);
 }
@@ -846,6 +1160,8 @@ function saveClawConfig() {
 async function syncAll() {
   const L = LANG[currentLang] || LANG.en;
   toast(L.syncing || 'Syncing from OpenClaw...');
+  const syncBtn = document.querySelector('.tb .btn:not(.btn-p)');
+  if (syncBtn) { syncBtn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:1.5px;display:inline-block"></span> Syncing'; syncBtn.style.pointerEvents = 'none'; }
   try {
     await Promise.all([loadRealSkills(), loadRealAgents(), loadRealConfig()]);
     if (claw.connected) {
@@ -855,6 +1171,7 @@ async function syncAll() {
     renderAll(); updateStats(); updateWizard();
     toast(L.syncDone || 'Sync complete');
   } catch(e) { toast('Sync error: ' + e.message); }
+  if (syncBtn) { syncBtn.innerHTML = '\u27f3 Sync'; syncBtn.style.pointerEvents = ''; }
 }
 
 /* ══ Trending actions (with button feedback) ══ */
@@ -1019,6 +1336,9 @@ function renderSettingsChannels(channels) {
 }
 
 function renderModelsFromConfig(agentsConfig) {
+  try { _renderModelsFromConfig(agentsConfig); } catch(e) { console.error('renderModelsFromConfig:', e); }
+}
+function _renderModelsFromConfig(agentsConfig) {
   const list = document.getElementById('model-list');
   if (!list) return;
   list.innerHTML = '';
@@ -1044,6 +1364,9 @@ function renderModelsFromConfig(agentsConfig) {
 }
 
 function renderChannelStatus(channels) {
+  try { _renderChannelStatus(channels); } catch(e) { console.error('renderChannelStatus:', e); }
+}
+function _renderChannelStatus(channels) {
   const cards = document.getElementById('cr-cards');
   const log = document.getElementById('cr-log');
   if (!cards) return;
@@ -1109,16 +1432,22 @@ async function loadRealSessions() {
 
 /* ── Real chat via OpenClaw (server-side agent CLI) ── */
 async function sendToOpenClaw(text) {
-  if (!claw.connected) return null;
+  if (!claw.connected) return { ok: false, error: 'Not connected to OpenClaw' };
   try {
     const r = await fetch('/api/agent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text, agent: 'main' })
     });
-    const data = await r.json();
+    let data;
+    try { data = await r.json(); } catch(e) {
+      return { ok: false, error: 'Invalid response from server' };
+    }
+    if (!r.ok) return { ok: false, error: data.error || 'Server error (' + r.status + ')' };
     return data;
-  } catch(e) { return null; }
+  } catch(e) {
+    return { ok: false, error: 'Network error: ' + (e.message || 'fetch failed') };
+  }
 }
 
 let currentSessionKey = 'main';
@@ -1140,23 +1469,90 @@ function go(p){
   }
 }
 /* FIX M-07: Ctrl+K shortcut */
-document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.getElementById('gs').focus()}});
+const KB_SHORTCUTS=[
+  {group:'General',items:[
+    {desc:'Search',keys:['Ctrl','K']},
+    {desc:'Keyboard shortcuts',keys:['?']},
+    {desc:'Close dialog',keys:['Esc']},
+    {desc:'Toggle dark / light mode',keys:['Ctrl','Shift','L']}
+  ]},
+  {group:'Navigation',items:[
+    {desc:'Dashboard',keys:['G','D'],action:()=>go('dash')},
+    {desc:'Skills library',keys:['G','S'],action:()=>go('lib-sk')},
+    {desc:'Agents library',keys:['G','A'],action:()=>go('lib-ag')},
+    {desc:'Settings',keys:['G',','],action:()=>go('settings')}
+  ]},
+  {group:'Actions',items:[
+    {desc:'New project',keys:['N'],action:()=>openMo()},
+    {desc:'Sync data',keys:['Ctrl','Shift','S'],action:()=>syncAll()}
+  ]}
+];
+function showKbModal(){
+  const el=document.getElementById('kb-list');
+  if(!el)return;
+  el.innerHTML=KB_SHORTCUTS.map(g=>'<div class="kb-group"><div class="kb-group-title">'+g.group+'</div>'+g.items.map(i=>'<div class="kb-row">'+i.desc+i.keys.map(k=>'<kbd>'+k+'</kbd>').join('')+'</div>').join('')+'</div>').join('');
+  _openModal('kb-modal');
+}
+let _gPressed=false,_gTimer=null;
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement?.tagName;
+  const inInput=tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();const gs=document.getElementById('gs');if(gs)gs.focus();return}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='L'){e.preventDefault();toggleTheme();return}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='S'){e.preventDefault();syncAll();return}
+  if(e.key==='Escape'){const open=document.querySelector('.mo.open');if(open){if(open.id==='modal')closeMo();else _closeModal(open.id);}return}
+  if(inInput)return;
+  if(e.key==='?'){e.preventDefault();const m=document.getElementById('kb-modal');if(m&&m.classList.contains('open'))_closeModal('kb-modal');else showKbModal();return}
+  if(e.key==='n'||e.key==='N'){openMo();return}
+  if(e.key==='g'||e.key==='G'){_gPressed=true;clearTimeout(_gTimer);_gTimer=setTimeout(()=>{_gPressed=false},800);return}
+  if(_gPressed){_gPressed=false;clearTimeout(_gTimer);
+    if(e.key==='d')go('dash');else if(e.key==='s')go('lib-sk');else if(e.key==='a')go('lib-ag');else if(e.key===',')go('settings');
+    return;
+  }
+});
 
-/* ══ Toast — FIX C-05: clear previous timer ══ */
+/* ══ Toast — FIX C-05: clear previous timer, FIX: null guard ══ */
 let toastTimer=null;
 function toast(msg){
   clearTimeout(toastTimer);
   const t=document.getElementById('toast-el');
+  if(!t)return;
   t.textContent=msg;t.classList.add('show');
-  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+  toastTimer=setTimeout(()=>{const el=document.getElementById('toast-el');if(el)el.classList.remove('show')},2200);
 }
 
-/* ══ Modal — FIX M-05: clear fields ══ */
-function openMo(){document.getElementById('modal').classList.add('open')}
-function closeMo(){document.getElementById('modal').classList.remove('open')}
+/* ══ Modal — FIX M-05: clear fields, FIX: focus management ══ */
+let _lastFocused=null;
+function openMo(){_lastFocused=document.activeElement;const m=document.getElementById('modal');m.classList.add('open');const first=m.querySelector('input,textarea,button');if(first)setTimeout(()=>first.focus(),80)}
+function closeMo(){document.getElementById('modal').classList.remove('open');if(_lastFocused&&_lastFocused.focus){setTimeout(()=>_lastFocused.focus(),80);_lastFocused=null}}
+function _openModal(id){_lastFocused=document.activeElement;const m=document.getElementById(id);if(!m)return;m.classList.add('open');const first=m.querySelector('input,textarea,button');if(first)setTimeout(()=>first.focus(),80)}
+function _closeModal(id){const m=document.getElementById(id);if(m)m.classList.remove('open');if(_lastFocused&&_lastFocused.focus){setTimeout(()=>_lastFocused.focus(),80);_lastFocused=null}}
 const PROJS=[];
 const projColors=['var(--bl)','var(--pk)','var(--tl)','var(--co)','var(--am)','var(--gn)','var(--ac)'];
+/* ══ Form validation ══ */
+function validateField(input,wrapperId,errMsg){
+  const w=document.getElementById(wrapperId);if(!w)return true;
+  const val=input.value.trim();
+  const minLen=parseInt(input.getAttribute('minlength'))||0;
+  if(input.required&&!val){w.classList.add('has-error');w.classList.remove('valid');return false}
+  if(minLen&&val.length<minLen){w.classList.add('has-error');w.classList.remove('valid');return false}
+  w.classList.remove('has-error');if(val)w.classList.add('valid');else w.classList.remove('valid');return true;
+}
+function validateForm(fields){
+  let ok=true;
+  fields.forEach(f=>{
+    const input=document.getElementById(f.id);if(!input)return;
+    if(!validateField(input,f.wrapper,f.err)){ok=false;if(!document.querySelector('.ff.has-error input:focus,.ff.has-error textarea:focus'))input.focus()}
+  });
+  return ok;
+}
+function clearValidation(wrapperIds){wrapperIds.forEach(id=>{const w=document.getElementById(id);if(w){w.classList.remove('has-error','valid')}})}
+
 function createProj(){
+  if(!validateForm([
+    {id:'mo-name',wrapper:'ff-mo-name',err:'Project name is required'},
+    {id:'mo-desc',wrapper:'ff-mo-desc',err:'Please describe your project'}
+  ])){toast('Please fill in the required fields');return}
   const btn = document.querySelector('#modal .btn-p');
   if (btn) { btn.style.pointerEvents='none'; btn.textContent='Creating...'; }
   const nm=document.getElementById('mo-name').value||'New Project';
@@ -1171,7 +1567,7 @@ function createProj(){
   }
   PROJS.push(newProj);
   setTimeout(()=>{ if(btn){btn.style.pointerEvents='';btn.textContent='Create & deploy agents'} },500);
-  closeMo();toast('"'+nm+'" created \u2014 PM-Agent deploying...');
+  closeMo();clearValidation(['ff-mo-name','ff-mo-desc']);toast('"'+nm+'" created \u2014 PM-Agent deploying...');
   document.getElementById('mo-name').value='';
   document.getElementById('mo-desc').value='';
   renderProjs();renderDashProjs();
@@ -1204,8 +1600,9 @@ function getReply(txt){
 /* ══ Chat — FIX C-01 XSS, FIX M-06 animation fill ══ */
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function sendMsg(){
-  const inp=document.getElementById('ci'),txt=inp.value.trim();if(!txt)return;
-  const log=document.getElementById('build-phase');
+  const inp=document.getElementById('ci');if(!inp)return;
+  const txt=inp.value.trim();if(!txt)return;
+  const log=document.getElementById('build-phase');if(!log)return;
   const d=document.createElement('div');d.className='ai usr';d.style.animation='fadeUp .25s ease both';
   d.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--co),var(--am));color:#090a0e">Y</div><div class="ab"><div class="an" style="color:var(--t1)">You \u2192 PM-Agent</div><div class="am">'+esc(txt)+'</div><div class="at">'+now()+'</div></div>';
   log.appendChild(d);inp.value='';scrollLog();
@@ -1214,19 +1611,21 @@ function sendMsg(){
     // Real OpenClaw agent call
     const thinking = document.createElement('div');
     thinking.className='ai';thinking.style.animation='fadeUp .25s ease both';
-    thinking.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am"><span class="pulse" style="color:var(--t3)">Thinking...</span></div></div>';
+    thinking.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am" style="display:flex;align-items:center;gap:8px"><div class="spinner" style="width:14px;height:14px;border-width:1.5px"></div><span class="pulse" style="color:var(--t3)">Thinking...</span></div></div>';
     log.appendChild(thinking);scrollLog();
     sendToOpenClaw(txt).then(result => {
-      if (result && (result.text || result.message || result.content)) {
+      if (result && result.ok !== false && (result.text || result.message || result.content)) {
         const reply = result.text || result.message || (Array.isArray(result.content) ? result.content.map(c=>c.text||'').join('') : String(result.content));
         thinking.querySelector('.am').innerHTML = reply.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+      } else if (result && result.ok === false) {
+        thinking.querySelector('.am').innerHTML = '<span style="color:var(--co)">\u26a0 ' + esc(result.error || 'Agent request failed') + '</span>';
       } else {
         thinking.querySelector('.am').innerHTML = getReply(txt) + ' <span style="font-size:9px;color:var(--t4)">(fallback)</span>';
       }
       thinking.querySelector('.ab').insertAdjacentHTML('beforeend','<div class="at">'+now()+'</div>');
       scrollLog(); saveChatToProject();
-    }).catch(() => {
-      thinking.querySelector('.am').innerHTML = getReply(txt) + ' <span style="font-size:9px;color:var(--t4)">(fallback)</span>';
+    }).catch((e) => {
+      thinking.querySelector('.am').innerHTML = '<span style="color:var(--co)">\u26a0 ' + esc(e.message || 'Request failed') + '</span>';
       thinking.querySelector('.ab').insertAdjacentHTML('beforeend','<div class="at">'+now()+'</div>');
       scrollLog(); saveChatToProject();
     });
@@ -1347,19 +1746,23 @@ function viewSkill(idx){
   const s=SKS[idx];if(!s)return;
   const catNames={code:'Code gen',test:'Testing',infra:'DevOps',data:'Data / DB',sec:'Security',doc:'Docs',ai:'AI / ML',ui:'Frontend'};
   const srcNames={github:'GitHub',clawhub:'ClawHub',trending:'Trending'};
-  document.getElementById('detail-content').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div style="width:48px;height:48px;border-radius:12px;background:'+s.b+';color:'+s.c+';display:flex;align-items:center;justify-content:center;font-size:22px">'+s.i+'</div><div><h2 style="margin:0">'+s.n+'</h2><div class="ms" style="margin:0">'+s.s+'</div></div></div><p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">'+s.d+'</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'+s.t.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px"><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600;color:var(--am)">★ '+s.r+'</div><div style="font-size:10px;color:var(--t4)">Rating</div></div><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600">'+(srcNames[s.src]||s.src)+'</div><div style="font-size:10px;color:var(--t4)">Source</div></div><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600">'+(catNames[s.cat]||s.cat)+'</div><div style="font-size:10px;color:var(--t4)">Category</div></div></div><div class="mf"><button class="btn" onclick="document.getElementById(\'detail-modal\').classList.remove(\'open\')">Close</button><button class="btn btn-p" onclick="toast(\''+s.n+' added to project\');document.getElementById(\'detail-modal\').classList.remove(\'open\')">+ Add to project</button></div>';
-  document.getElementById('detail-modal').classList.add('open');
+  document.getElementById('detail-content').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div style="width:48px;height:48px;border-radius:12px;background:'+s.b+';color:'+s.c+';display:flex;align-items:center;justify-content:center;font-size:22px">'+s.i+'</div><div><h2 style="margin:0">'+s.n+'</h2><div class="ms" style="margin:0">'+s.s+'</div></div></div><p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">'+s.d+'</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'+s.t.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px"><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600;color:var(--am)">★ '+s.r+'</div><div style="font-size:10px;color:var(--t4)">Rating</div></div><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600">'+(srcNames[s.src]||s.src)+'</div><div style="font-size:10px;color:var(--t4)">Source</div></div><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600">'+(catNames[s.cat]||s.cat)+'</div><div style="font-size:10px;color:var(--t4)">Category</div></div></div><div class="mf"><button class="btn" onclick="_closeModal(\'detail-modal\')">Close</button><button class="btn btn-p" onclick="toast(\''+s.n+' added to project\');_closeModal(\'detail-modal\')">+ Add to project</button></div>';
+  _openModal('detail-modal');
 }
 function viewAgent(idx){
   const a=AGS[idx];if(!a)return;
   const tpNames={dev:'Development',ops:'DevOps',qa:'QA',sec:'Security',data:'Data',doc:'Docs'};
-  document.getElementById('detail-content').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div style="width:48px;height:48px;border-radius:50%;background:'+a.c+'15;color:'+a.c+';display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700">'+a.n[0]+'</div><div><h2 style="margin:0">'+a.n+'</h2><div class="ms" style="margin:0">'+(tpNames[a.tp]||a.tp)+' agent</div></div><span style="margin-left:auto;font-size:11px;padding:4px 10px;border-radius:6px;background:'+(a.st==='Active'?'var(--gnb)':'var(--bg5)')+';color:'+(a.st==='Active'?'var(--gn)':'var(--t4)')+'">'+a.st+'</span></div><p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">'+a.d+'</p><div style="margin-bottom:16px"><div style="font-size:12px;font-weight:500;margin-bottom:8px">Equipped skills ('+a.sk.length+')</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+a.sk.map(s=>'<span class="tag" style="cursor:pointer" onclick="event.stopPropagation();document.getElementById(\'detail-modal\').classList.remove(\'open\');const i=SKS.findIndex(x=>x.n===\''+s+'\');if(i>=0)viewSkill(i);else toast(\'Skill not found\')">'+s+'</span>').join('')+'</div></div><div class="mf"><button class="btn" onclick="document.getElementById(\'detail-modal\').classList.remove(\'open\')">Close</button><button class="btn btn-p" onclick="toast(\''+a.n+' assigned to project\');document.getElementById(\'detail-modal\').classList.remove(\'open\')">Assign to project</button></div>';
-  document.getElementById('detail-modal').classList.add('open');
+  document.getElementById('detail-content').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div style="width:48px;height:48px;border-radius:50%;background:'+a.c+'15;color:'+a.c+';display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700">'+a.n[0]+'</div><div><h2 style="margin:0">'+a.n+'</h2><div class="ms" style="margin:0">'+(tpNames[a.tp]||a.tp)+' agent</div></div><span style="margin-left:auto;font-size:11px;padding:4px 10px;border-radius:6px;background:'+(a.st==='Active'?'var(--gnb)':'var(--bg5)')+';color:'+(a.st==='Active'?'var(--gn)':'var(--t4)')+'">'+a.st+'</span></div><p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">'+a.d+'</p><div style="margin-bottom:16px"><div style="font-size:12px;font-weight:500;margin-bottom:8px">Equipped skills ('+a.sk.length+')</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+a.sk.map(s=>'<span class="tag" style="cursor:pointer" onclick="event.stopPropagation();_closeModal(\'detail-modal\');const i=SKS.findIndex(x=>x.n===\''+s+'\');if(i>=0)viewSkill(i);else toast(\'Skill not found\')">'+s+'</span>').join('')+'</div></div><div class="mf"><button class="btn" onclick="_closeModal(\'detail-modal\')">Close</button><button class="btn btn-p" onclick="toast(\''+a.n+' assigned to project\');_closeModal(\'detail-modal\')">Assign to project</button></div>';
+  _openModal('detail-modal');
 }
 
 /* ══ Create agent ══ */
-function openCreateAgent(){document.getElementById('agent-create-modal').classList.add('open')}
+function openCreateAgent(){_openModal('agent-create-modal')}
 function createAgent(){
+  if(!validateForm([
+    {id:'ca-name',wrapper:'ff-ca-name',err:'Agent name is required'},
+    {id:'ca-desc',wrapper:'ff-ca-desc',err:'Description is required'}
+  ])){toast('Please fill in the required fields');return}
   const btn = document.querySelector('#agent-create-modal .btn-p');
   if (btn) { btn.style.pointerEvents='none'; btn.textContent='Creating...'; }
   const nm=document.getElementById('ca-name').value||'New-Agent';
@@ -1369,7 +1772,7 @@ function createAgent(){
   const colors={dev:'var(--ac)',ops:'var(--bl)',qa:'var(--tl)',sec:'var(--co)',data:'var(--am)',doc:'var(--gn)'};
   AGS.push({n:nm,d:ds,sk:sks.length?sks:['general'],c:colors[tp]||'var(--ac)',st:'Idle',tp:tp});
   setTimeout(()=>{ if(btn){btn.style.pointerEvents='';btn.textContent='Create agent'} },500);
-  document.getElementById('agent-create-modal').classList.remove('open');
+  _closeModal('agent-create-modal');clearValidation(['ff-ca-name','ff-ca-desc']);
   document.getElementById('ca-name').value='';document.getElementById('ca-desc').value='';document.getElementById('ca-skills').value='';
   renderAg();toast('\u2713 "'+nm+'" created');
   autoSave();
@@ -1477,7 +1880,13 @@ function deleteProj(i) {
 }
 
 function renderAll() {
-  renderSk(); renderAg(); renderProjs(); renderDashProjs(); renderDashActivity(); updateStats(); updateWizard();
+  try{ renderSk() }catch(e){ console.error('renderSk:',e) }
+  try{ renderAg() }catch(e){ console.error('renderAg:',e) }
+  try{ renderProjs() }catch(e){ console.error('renderProjs:',e) }
+  try{ renderDashProjs() }catch(e){ console.error('renderDashProjs:',e) }
+  try{ renderDashActivity() }catch(e){ console.error('renderDashActivity:',e) }
+  try{ updateStats() }catch(e){ console.error('updateStats:',e) }
+  try{ updateWizard() }catch(e){ console.error('updateWizard:',e) }
   const skB = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skB) skB.textContent = SKS.length || '0';
   const agB = document.querySelector('.ni[data-p="lib-ag"] .bd'); if(agB) agB.textContent = AGS.length || '0';
   const pjB = document.querySelector('.ni[data-p="projs"] .bd'); if(pjB) pjB.textContent = PROJS.length || '0';
@@ -1551,7 +1960,7 @@ renderDashProjs();
 async function loadTrending() {
   const el = document.getElementById('tr-list');
   if (!el) return;
-  el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)"><span class="pulse">Loading trending repos...</span></div>';
+  el.innerHTML = '<div class="loading-overlay"><div class="spinner"></div>Loading trending repos...</div><div class="skeleton-grid">' + Array(6).fill('<div class="skeleton skeleton-card"></div>').join('') + '</div>';
   try {
     const res = await fetch('/api/trending');
     const data = await res.json();
@@ -1632,6 +2041,7 @@ setTimeout(()=>{const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scroll
 /* ══ Load saved state ══ */
 const hadState = loadState();
 if (hadState) { renderAll(); }
+updateStorageIndicator();
 
 /* ══ Initial data load ══ */
 updateWizard();
