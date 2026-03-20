@@ -1,0 +1,2543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentHub — Intelligent Agent Orchestration</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#090a0e;--bg2:#111218;--bg3:#181921;--bg4:#21222c;--bg5:#2b2c38;
+  --b0:#1c1d28;--b1:#292a36;--b2:#3a3b4a;
+  --t1:#edeaf4;--t2:#b0aec2;--t3:#9e9cb2;--t4:#908ea4;
+  --ac:#b57efc;--ac2:#8b5cf6;--ac3:#6d3fd4;--acb:rgba(181,126,252,.07);--acb2:rgba(181,126,252,.14);
+  --tl:#34d4b8;--tlb:rgba(52,212,184,.07);
+  --co:#f87185;--cob:rgba(248,113,133,.07);
+  --am:#f9c74f;--amb:rgba(249,199,79,.07);
+  --bl:#6aafff;--blb:rgba(106,175,255,.07);
+  --gn:#5ae08a;--gnb:rgba(90,224,138,.07);
+  --pk:#f084c0;
+  --fn:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,system-ui,sans-serif;--fm:'JetBrains Mono','Cascadia Code','Fira Code',Consolas,'Courier New',monospace;
+}
+html{font-family:var(--fn);background:var(--bg);color:var(--t1);font-size:15px;line-height:1.6}
+button{font-family:var(--fn);cursor:pointer}input,select,textarea{font-family:var(--fn)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--b1);border-radius:3px}
+
+.app{display:flex;height:100vh;overflow:hidden}
+.sb{width:228px;background:var(--bg2);border-right:1px solid var(--b0);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s ease;overflow:hidden}
+.mn{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tb{height:54px;border-bottom:1px solid var(--b0);display:flex;align-items:center;padding:0 24px;gap:14px;background:var(--bg2);flex-shrink:0}
+.logo{padding:18px 18px 22px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b0)}
+.logo .ic{width:30px;height:30px;background:linear-gradient(135deg,var(--ac),var(--tl));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#090a0e}
+.logo h1{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.logo small{font-size:10px;color:var(--t4);margin-left:auto;background:var(--acb);padding:2px 6px;border-radius:4px;font-family:var(--fm)}
+.nv{flex:1;padding:14px 10px;overflow-y:auto}
+.ns{margin-bottom:18px}.ns-l{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t4);padding:0 10px 6px;font-weight:500}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:10px;font-size:13.5px;color:var(--t2);cursor:pointer;transition:all .15s;position:relative;user-select:none}
+.ni:hover{background:var(--bg4);color:var(--t1)}.ni.on{background:var(--acb);color:var(--ac)}
+.ni.on::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--ac);border-radius:0 3px 3px 0}
+.ni svg{width:17px;height:17px;opacity:.55;flex-shrink:0}
+.ni .bd{margin-left:auto;font-size:10px;font-family:var(--fm);background:var(--acb);color:var(--ac);padding:1px 6px;border-radius:8px}
+.ni .bd.lv{background:var(--gnb);color:var(--gn)}
+
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:9px;font-size:12.5px;border:1px solid var(--b1);background:transparent;color:var(--t2);transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--bg5);color:var(--t1);border-color:var(--b2)}
+.btn-p{background:var(--ac3);border-color:var(--ac3);color:#fff}.btn-p:hover{background:var(--ac2)}
+.btn-d{border-color:var(--co);color:var(--co)}.btn-s{border-color:var(--gn);color:var(--gn)}
+.btn-w{border-color:var(--am);color:var(--am)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.tag{font-size:10.5px;padding:3px 8px;border-radius:6px;background:var(--bg5);color:var(--t3);font-family:var(--fm)}
+.sb-in{flex:1;max-width:420px;position:relative}
+.sb-in input{width:100%;background:var(--bg3);border:1px solid var(--b0);border-radius:10px;padding:8px 14px 8px 34px;color:var(--t1);font-size:12.5px;outline:none}
+.sb-in input:focus{border-color:var(--ac)}
+.sb-in svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);width:15px;height:15px}
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--co),var(--am));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#090a0e;cursor:pointer}
+.page{display:none;height:100%;overflow:hidden}.page.on{display:flex;flex-direction:column}
+.psc{flex:1;overflow-y:auto;padding:26px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.sc{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:-10px;right:-10px;width:60px;height:60px;border-radius:50%;filter:blur(30px);opacity:.1;pointer-events:none}
+.sc:nth-child(1)::after{background:var(--ac)}.sc:nth-child(2)::after{background:var(--tl)}.sc:nth-child(3)::after{background:var(--co)}.sc:nth-child(4)::after{background:var(--am)}
+.sc-l{font-size:11.5px;color:var(--t4);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.sc-v{font-size:26px;font-weight:600;letter-spacing:-.03em}
+.sc-c{font-size:11px;color:var(--gn);font-family:var(--fm);margin-top:4px}
+
+/* Library */
+.ll{display:flex;height:100%;overflow:hidden}
+.lsb{width:210px;border-right:1px solid var(--b0);padding:18px 14px;overflow-y:auto;flex-shrink:0}
+.lct{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--t4);padding:10px 0 6px;font-weight:500}
+.lci{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;font-size:12.5px;color:var(--t2);cursor:pointer;transition:all .12s;margin-bottom:2px}
+.lci:hover{background:var(--bg4);color:var(--t1)}.lci.on{background:var(--acb2);color:var(--ac)}
+.lci .dt{width:7px;height:7px;border-radius:50%;flex-shrink:0}.lci .ct{margin-left:auto;font-size:10px;font-family:var(--fm);color:var(--t4)}
+.lmn{flex:1;overflow-y:auto;padding:22px}
+.lgr{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:14px}
+.lcd{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:16px;cursor:pointer;transition:all .18s}
+.lcd:hover{border-color:var(--b2);transform:translateY(-1px)}
+.lcd .lh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.lcd .li{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.lcd .ln{font-size:13.5px;font-weight:500}.lcd .ls{font-size:10.5px;color:var(--t4);font-family:var(--fm)}
+.lcd .ld{font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lcd .lf{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--t3);padding-top:8px;border-top:1px solid var(--b0)}
+
+/* Workspace */
+.ws{display:grid;grid-template-columns:1fr 370px;height:100%;overflow:hidden}
+.wsl{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--b0)}
+.wsr{display:flex;flex-direction:column;overflow-y:auto;background:var(--bg2)}
+.ppb{display:flex;align-items:center;gap:0;padding:12px 20px;border-bottom:1px solid var(--b0);background:var(--bg2);flex-shrink:0;flex-wrap:wrap}
+.pps{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:7px;font-size:11.5px;font-weight:500;color:var(--t4)}
+.pps .ddd{width:8px;height:8px;border-radius:50%;border:2px solid var(--t4);flex-shrink:0}
+.pps.dn .ddd{background:var(--gn);border-color:var(--gn)}.pps.dn{color:var(--gn)}
+.pps.ac .ddd{background:var(--ac);border-color:var(--ac);box-shadow:0 0 8px rgba(181,126,252,.35)}.pps.ac{color:var(--ac)}
+.ppc{width:20px;height:1.5px;background:var(--b0)}.ppc.dn{background:var(--gn)}
+.wsc{flex:1;overflow-y:auto}
+.al{padding:16px 20px;display:flex;flex-direction:column;gap:3px}
+.ag{margin-bottom:16px}
+.agh{display:flex;align-items:center;gap:8px;padding:4px 0;margin-bottom:6px}
+.agh .pt{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.03em}
+.agh .ln{flex:1;height:1px;background:var(--b0)}.agh .st{font-size:10px;font-family:var(--fm)}
+.ai{display:flex;gap:10px;padding:8px 12px;border-radius:12px;transition:background .12s}
+.ai:hover{background:rgba(255,255,255,.02)}
+.ai .aa{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ai .ab{flex:1;min-width:0}.ai .an{font-size:11px;font-weight:500;font-family:var(--fm);margin-bottom:2px}
+.ai .am{font-size:12.5px;color:var(--t2);line-height:1.55}.ai .am strong{color:var(--t1);font-weight:500}
+.ai .at{font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:3px}
+.ai .ax{display:flex;gap:5px;margin-top:6px}
+.ai.sy{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:12px 14px;margin:4px 0}
+.ai.usr{background:var(--bg4);border:1px solid var(--b1);border-radius:14px;padding:12px 14px;margin:4px 0}
+.plb{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;margin:8px 0}
+.plb .plt{font-size:12.5px;font-weight:500;margin-bottom:8px}.plb .pli{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:var(--t2)}
+.plb .pln{width:20px;height:20px;border-radius:50%;background:var(--bg5);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--fm);color:var(--t3);flex-shrink:0}
+.plb .pla{font-size:10px;font-family:var(--fm);margin-left:auto;padding:2px 6px;border-radius:4px}
+.plx{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--b0)}
+.cha{border-top:1px solid var(--b0);flex-shrink:0;background:var(--bg2)}
+.chm{display:flex;gap:2px;padding:8px 14px;border-bottom:1px solid var(--b0)}
+.cmb{flex:1;padding:6px 0;text-align:center;font-size:11px;color:var(--t4);cursor:pointer;border-radius:7px;transition:all .15s}.cmb.on{background:var(--acb2);color:var(--ac)}
+.chi{display:flex;gap:8px;padding:10px 14px}
+.chi input{flex:1;background:var(--bg);border:1px solid var(--b0);border-radius:10px;padding:10px 14px;color:var(--t1);font-size:13px;outline:none}
+.chi input:focus{border-color:var(--ac)}
+.wp{padding:14px 16px;border-bottom:1px solid var(--b0)}
+.wp h4{font-size:12px;font-weight:500;margin-bottom:10px;color:var(--t2);display:flex;align-items:center;gap:6px}
+.rng{width:96px;height:96px;position:relative;margin:0 auto 10px}.rng svg{transform:rotate(-90deg)}
+.rng-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rng-c .rv{font-size:22px;font-weight:600}.rng-c .rl{font-size:9px;color:var(--t4);text-transform:uppercase;letter-spacing:.04em}
+.agc{background:var(--bg3);border:1px solid var(--b0);border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.agc .ah{display:flex;align-items:center;gap:8px;margin-bottom:5px}.agc .aav{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.agc .anm{font-size:12px;font-weight:500;flex:1}.agc .ast{font-size:9.5px;font-family:var(--fm);padding:2px 6px;border-radius:4px}
+.agc .atx{font-size:11px;color:var(--t3)}.agc .abr{height:3px;background:var(--bg5);border-radius:2px;margin-top:6px;overflow:hidden}.agc .abr .fl{height:100%;border-radius:2px}
+.ial{background:var(--cob);border:1px solid rgba(248,113,133,.15);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;transition:all .3s}
+.ial .it{flex:1}.ial .itx{font-size:12px;color:var(--co);margin-bottom:2px;transition:color .3s}.ial .ifl{font-size:10px;color:var(--t4);font-family:var(--fm)}
+.dli{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}.dli .dlnm{flex:1}.dli .dlag{font-size:10px;color:var(--t4);font-family:var(--fm)}
+
+/* Settings page */
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.set-card{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:20px}
+.set-card h3{font-size:14px;font-weight:500;margin-bottom:4px}.set-card .set-desc{font-size:12px;color:var(--t3);margin-bottom:16px}
+.set-card.full{grid-column:1/-1}
+.ff{margin-bottom:14px}.ff label{display:block;font-size:12px;color:var(--t2);margin-bottom:5px;font-weight:500}
+.ff input,.ff textarea,.ff select{width:100%;background:var(--bg4);border:1px solid var(--b0);border-radius:10px;padding:10px 14px;color:var(--t1);font-size:13px;outline:none}
+.ff input:focus,.ff textarea:focus,.ff select:focus{border-color:var(--ac)}.ff textarea{resize:vertical;min-height:60px}
+.ff .hint{font-size:11px;color:var(--t4);margin-top:4px}
+.ff .hint a{color:var(--ac)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0)}
+.toggle-row:last-child{border:none}.toggle-row .tl{font-size:13px}.toggle-row .td{font-size:11px;color:var(--t3)}
+.toggle{width:40px;height:22px;background:var(--bg5);border-radius:11px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--ac3)}.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}
+.toggle.on::after{transform:translateX(18px)}
+.model-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg4);border:1px solid var(--b0);border-radius:12px;margin-bottom:8px;flex-wrap:wrap}
+.mr-left{display:flex;align-items:center;gap:10px;min-width:150px}
+.mr-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.mr-name{font-size:13px;font-weight:500}.mr-provider{font-size:10.5px;color:var(--t4);font-family:var(--fm)}
+.mr-mid{flex:1;min-width:180px;display:flex;align-items:center;gap:8px}
+.mr-key{flex:1;background:var(--bg);border:1px solid var(--b0);border-radius:8px;padding:7px 10px;color:var(--t1);font-size:12px;font-family:var(--fm);outline:none;min-width:0}
+.mr-key:focus{border-color:var(--ac)}
+.mr-status{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:6px;white-space:nowrap}
+.mr-status.ok{background:var(--gnb);color:var(--gn)}.mr-status.miss{background:var(--cob);color:var(--co)}.mr-status.testing{background:var(--amb);color:var(--am)}
+.mr-right{display:flex;align-items:center;gap:6px}
+.mr-right select{background:var(--bg);border:1px solid var(--b0);border-radius:7px;padding:5px 8px;color:var(--t1);font-size:11px;outline:none;font-family:var(--fn)}
+.builtin-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b0)}
+.builtin-item:last-of-type{border:none}
+.bi-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.bi-info{flex:1}.bi-name{font-size:13px;font-weight:500}.bi-desc{font-size:11px;color:var(--t3)}
+.bi-status{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:6px}.bi-status.on{background:var(--gnb);color:var(--gn)}
+.auth-tab{padding:6px 14px;border-radius:7px;font-size:11.5px;color:var(--t4);cursor:pointer;transition:all .12s}
+.auth-tab.on{background:var(--bg);color:var(--t1)}
+.auth-badge{font-size:9px;font-family:var(--fm);padding:1px 5px;border-radius:4px;margin-left:4px;vertical-align:middle}
+.auth-badge.key{background:var(--acb2);color:var(--ac)}
+.auth-badge.oauth{background:var(--gnb);color:var(--gn)}
+.oauth-status{display:flex;align-items:center;gap:8px;flex:1}
+.oauth-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--bl),var(--tl));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#090a0e;flex-shrink:0}
+.oauth-email{font-size:12px;font-weight:500}.oauth-plan{font-size:10px;color:var(--t3);font-family:var(--fm)}
+.oauth-login-btn{white-space:nowrap}
+.model-pick{background:var(--bg);border:1px solid var(--b0);border-radius:10px;padding:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px}
+.model-pick:hover{border-color:var(--b2);background:var(--bg3)}
+.model-pick .mp-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.model-pick .mp-name{font-size:12.5px;font-weight:500}.model-pick .mp-type{font-size:10px;color:var(--t4);font-family:var(--fm)}
+
+/* Onboarding banner */
+.onboard{background:linear-gradient(135deg,var(--ac3),rgba(52,212,184,.3));border-radius:16px;padding:24px;margin-bottom:26px;display:flex;align-items:center;gap:20px}
+.onboard .ob-text h2{font-size:18px;font-weight:500;margin-bottom:4px}.onboard .ob-text p{font-size:13px;color:rgba(255,255,255,.7)}
+.onboard .ob-steps{display:flex;gap:10px;margin-top:12px}
+.ob-step{display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);cursor:pointer;transition:all .15s}
+.ob-step:hover{background:rgba(255,255,255,.18)}
+.ob-step.done{opacity:.5;text-decoration:line-through}
+
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.open{opacity:1;pointer-events:auto}
+.mo-box{background:var(--bg2);border:1px solid var(--b1);border-radius:20px;width:540px;max-height:80vh;overflow-y:auto;padding:28px}
+.mo-box h2{font-size:20px;font-weight:500;margin-bottom:4px}.mo-box .ms{font-size:13px;color:var(--t2);margin-bottom:22px}
+.mf{display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--b0)}
+
+/* Toast - FIX C-05: proper timer management */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg4);border:1px solid var(--b1);border-radius:12px;padding:10px 20px;font-size:13px;color:var(--t1);z-index:300;transition:transform .3s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Trend */
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.tc{background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:16px;transition:all .18s}.tc:hover{border-color:var(--b2)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}.pulse{animation:pulse 2s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin 1s linear infinite;display:inline-block}
+
+/* ══ Loading spinner & skeleton ══ */
+.loading-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:10px;color:var(--t3);font-size:13px}
+.loading-overlay .spinner{width:20px;height:20px;border:2px solid var(--b1);border-top-color:var(--ac);border-radius:50%;animation:spin .7s linear infinite}
+.loading-overlay .load-row{display:flex;align-items:center;gap:10px}
+.loading-progress{width:180px;height:3px;background:var(--b0);border-radius:2px;overflow:hidden;margin-top:6px}
+.loading-progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--tl));border-radius:2px;animation:indeterminate 1.8s ease-in-out infinite}
+@keyframes indeterminate{0%{width:0;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0;margin-left:100%}}
+.loading-overlay .load-hint{font-size:11px;color:var(--t4);margin-top:4px;opacity:0;transition:opacity .3s}
+.loading-overlay .load-hint.show{opacity:1}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite;border-radius:8px}
+.skeleton-card{height:140px;border-radius:14px;margin-bottom:14px}
+.skeleton-row{height:16px;margin-bottom:10px;width:80%}
+.skeleton-row.short{width:50%}
+.skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:14px}
+.skeleton-stat{height:90px;border-radius:14px}
+.fi>*{animation:fadeUp .3s ease both}.fi>*:nth-child(2){animation-delay:.05s}.fi>*:nth-child(3){animation-delay:.1s}
+.claw-status{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;font-size:11px;font-family:var(--fm);cursor:pointer;transition:all .15s}
+.claw-status .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.claw-status.live .dot{background:var(--gn);box-shadow:0 0 6px rgba(90,224,138,.4)}
+.claw-status.live{color:var(--gn);background:var(--gnb)}
+.claw-status.off .dot{background:var(--t4)}
+.claw-status.off{color:var(--t4);background:var(--bg3)}
+.claw-status.connecting .dot{background:var(--am);animation:pulse 1.5s ease-in-out infinite}
+.claw-status.connecting{color:var(--am);background:var(--amb)}
+
+/* ══ Light theme ══ */
+[data-theme="light"]{
+  --bg:#f5f5f8;--bg2:#ffffff;--bg3:#eeeef2;--bg4:#e4e4ea;--bg5:#d8d8e0;
+  --b0:#d0d0da;--b1:#c0c0cc;--b2:#a8a8b8;
+  --t1:#1a1a2e;--t2:#3a3a52;--t3:#525268;--t4:#5e5e76;
+  --ac:#7c3aed;--ac2:#6d28d9;--ac3:#5b21b6;--acb:rgba(124,58,237,.08);--acb2:rgba(124,58,237,.14);
+  --tl:#0d9488;--tlb:rgba(13,148,136,.08);
+  --co:#e11d48;--cob:rgba(225,29,72,.08);
+  --am:#ca8a04;--amb:rgba(202,138,4,.08);
+  --bl:#2563eb;--blb:rgba(37,99,235,.08);
+  --gn:#16a34a;--gnb:rgba(22,163,74,.08);
+  --pk:#db2777;
+}
+[data-theme="light"] html,[data-theme="light"]{color-scheme:light}
+[data-theme="light"] .av{color:#fff}
+[data-theme="light"] .ai.usr{background:var(--bg4);border-color:var(--b1)}
+[data-theme="light"] .mo-box{box-shadow:0 20px 60px rgba(0,0,0,.15)}
+[data-theme="light"] ::-webkit-scrollbar-thumb{background:var(--b1)}
+.theme-toggle{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:1px solid var(--b0);background:var(--bg3);cursor:pointer;color:var(--t2);transition:all .15s;font-size:15px;flex-shrink:0}
+.theme-toggle:hover{background:var(--bg5);color:var(--t1);border-color:var(--b2)}
+
+/* ══ Keyboard shortcuts modal ══ */
+.kb-group{margin-bottom:14px}.kb-group-title{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--t4);margin-bottom:6px;font-weight:500}
+.kb-row{display:flex;align-items:center;padding:6px 0;font-size:13px;color:var(--t2)}
+.kb-row kbd{margin-left:auto;background:var(--bg4);border:1px solid var(--b1);padding:3px 8px;border-radius:6px;font-family:var(--fm);font-size:11px;color:var(--t1);min-width:28px;text-align:center}
+.kb-row kbd+kbd{margin-left:4px}
+
+/* ══ Form validation ══ */
+.ff .ff-err{font-size:11px;color:var(--co);margin-top:4px;display:none}
+.ff.has-error input,.ff.has-error textarea{border-color:var(--co);background:rgba(248,113,133,.04)}
+.ff.has-error .ff-err{display:block}
+.ff.valid input,.ff.valid textarea{border-color:var(--gn)}
+.ff input:invalid:not(:placeholder-shown),.ff textarea:invalid:not(:placeholder-shown){border-color:var(--am)}
+
+/* ══ Smooth layout transitions for responsive breakpoints ══ */
+.ws,.stats,.lgr,.tg,.set-grid,.ll,.lsb,.tb,.mo-box,.psc{transition:all .25s ease}
+
+/* ══ Responsive design ══ */
+@media(max-width:1200px){
+  .ws{grid-template-columns:1fr 280px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .set-grid{grid-template-columns:1fr}
+  .set-card.full{grid-column:auto}
+  #p-dash .psc>div[style*="grid-template-columns:1fr 320px"]{grid-template-columns:1fr!important}
+}
+@media(max-width:1050px){
+  .sb{width:56px}.sb .ns-l,.sb .logo h1,.sb .logo small{opacity:0;overflow:hidden;width:0;height:0;transition:opacity .2s ease}
+  .sb .ni{justify-content:center;padding:10px;font-size:0;white-space:nowrap}.sb .ni svg{margin:0;font-size:initial}.sb .ni .bd{opacity:0;overflow:hidden;width:0;transition:opacity .2s ease}
+  .sb .logo{justify-content:center;padding:14px}.sb .logo .ic{margin:0}
+  /* Hover-expand sidebar */
+  .sb:hover{width:228px;position:absolute;top:0;left:0;bottom:0;z-index:100;box-shadow:4px 0 24px rgba(0,0,0,.25)}
+  .sb:hover .ns-l,.sb:hover .logo h1,.sb:hover .logo small{opacity:1;width:auto;height:auto}
+  .sb:hover .ni{justify-content:flex-start;padding:8px 12px;font-size:13.5px}.sb:hover .ni .bd{opacity:1;width:auto}
+  .sb:hover .logo{justify-content:flex-start;padding:18px 18px 22px}
+}
+@media(max-width:900px){
+  .ws{grid-template-columns:1fr}.wsr{display:none}
+  .ll{flex-direction:column}.lsb{width:100%;border-right:none;border-bottom:1px solid var(--b0);padding:10px;display:flex;flex-wrap:wrap;gap:4px;overflow-x:auto}
+  .lsb .lct{width:100%;padding:4px 0 2px}.lci{padding:4px 8px}
+  .tb{padding:0 12px;gap:8px}
+  .ppb{padding:8px 12px;overflow-x:auto;flex-wrap:nowrap}
+  .pps{font-size:10px;padding:4px 6px;white-space:nowrap}
+  .mo-box{width:calc(100vw - 32px);max-width:540px;padding:20px}
+}
+@media(max-width:600px){
+  .app{height:100dvh} /* dynamic viewport height — accounts for mobile address bar */
+  .sb{display:none}
+  .stats{grid-template-columns:1fr}
+  .lgr{grid-template-columns:1fr}
+  .tg{grid-template-columns:1fr}
+  .tb{padding:0 10px;gap:6px;height:48px}
+  .tb .sb-in{max-width:none;flex:1}
+  .tb .sb-in input{font-size:16px} /* 16px prevents iOS auto-zoom on focus */
+  .tb .btn:not(.btn-p){display:none}
+  .onboard{flex-direction:column;padding:16px}.onboard .ob-steps{flex-wrap:wrap}
+  .psc{padding:14px;-webkit-overflow-scrolling:touch}
+  .chi input{font-size:16px} /* 16px prevents iOS auto-zoom on focus */
+  .mo-box{width:calc(100vw - 24px);max-width:none;max-height:85dvh;overflow-y:auto;padding:16px}
+  #p-crawl div[style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr!important}
+  #p-settings div[style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important}
+  #p-settings div[style*="grid-template-columns:1fr 1fr;gap:12px"]{grid-template-columns:1fr!important}
+}
+/* iOS viewport meta: prevent auto-zoom on any input */
+@supports(-webkit-touch-callout:none){input,select,textarea{font-size:16px!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sb">
+  <div class="logo"><div class="ic">A</div><h1>AgentHub</h1><small>v5</small></div>
+  <div class="nv">
+    <div class="ns"><div class="ns-l">Overview</div>
+      <div class="ni on" data-p="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Dashboard</div>
+      <div class="ni" data-p="trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Trending<span class="bd lv">NEW</span></div>
+      <div class="ni" data-p="crawl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 014 9 15 15 0 01-4 9"/><path d="M3 12h18"/></svg>Channels<span class="bd lv">LIVE</span></div>
+    </div>
+    <div class="ns"><div class="ns-l">Library</div>
+      <div class="ni" data-p="lib-sk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Skills<span class="bd">0</span></div>
+      <div class="ni" data-p="lib-ag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 00-16 0"/></svg>Agents<span class="bd">0</span></div>
+    </div>
+    <div class="ns"><div class="ns-l">Workspace</div>
+      <div class="ni" data-p="projs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>My projects<span class="bd">0</span></div>
+      <div class="ni" data-p="ws"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg>Active project</div>
+    </div>
+    <div class="ns"><div class="ns-l">System</div>
+      <div class="ni" data-p="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Settings</div>
+    </div>
+  </div>
+</nav>
+
+<div class="mn">
+<div class="tb">
+  <div class="sb-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input id="gs" placeholder="Search skills, agents, projects... (Ctrl+K)" oninput="globalSearch(this.value)"></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
+    <div class="claw-status off" id="claw-status" onclick="claw.reconnect()"><div class="dot"></div><span id="claw-label">Offline</span></div>
+    <button class="btn" onclick="syncAll()">⟳ Sync</button>
+    <button class="btn btn-p" onclick="openMo()">+ New project</button>
+    <div class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">☀</div>
+    <div class="av" onclick="go('settings')">Y</div>
+  </div>
+</div>
+
+<!-- ═══ Dashboard ═══ -->
+<div class="page on" id="p-dash"><div class="psc fi">
+  <div class="onboard" id="onboard">
+    <div class="ob-text" style="flex:1">
+      <h2>Welcome to AgentHub</h2>
+      <p>Complete setup to start building with AI agents</p>
+      <div class="ob-steps">
+        <div class="ob-step done">1. Installed</div>
+        <div class="ob-step" onclick="go('settings')">2. Connect OpenClaw</div>
+        <div class="ob-step" onclick="openMo()">3. Create project</div>
+        <div class="ob-step" onclick="go('lib-sk')">4. Skills synced</div>
+      </div>
+    </div>
+    <button class="btn-sm btn" style="color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2)" onclick="this.closest('.onboard').style.display='none'">Dismiss</button>
+  </div>
+  <div class="stats">
+    <div class="sc"><div class="sc-l">Total skills</div><div class="sc-v" id="stat-sk">0</div><div class="sc-c">from OpenClaw</div></div>
+    <div class="sc"><div class="sc-l">Active agents</div><div class="sc-v">0</div><div class="sc-c">from OpenClaw</div></div>
+    <div class="sc"><div class="sc-l">Projects</div><div class="sc-v">0</div><div class="sc-c">Create your first project</div></div>
+    <div class="sc"><div class="sc-l">Success rate</div><div class="sc-v">—</div><div class="sc-c">No data yet</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:22px">
+    <div><h3 style="font-size:15px;font-weight:500;margin-bottom:12px">Activity</h3><div id="d-act"></div></div>
+    <div><h3 style="font-size:15px;font-weight:500;margin-bottom:12px">Projects</h3><div id="d-proj"></div></div>
+  </div>
+</div></div>
+
+<!-- ═══ Trending ═══ -->
+<div class="page" id="p-trend"><div class="psc fi"><div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><h2 style="font-size:18px;font-weight:500;flex:1">GitHub daily trending</h2><button class="btn btn-sm" onclick="loadTrending()">⟳</button></div><div class="tg" id="tr-list"></div></div></div>
+
+<!-- ═══ Channel Status ═══ -->
+<div class="page" id="p-crawl"><div class="psc fi"><h2 style="font-size:18px;font-weight:500;margin-bottom:16px">Channel status</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:22px" id="cr-cards"></div><h3 style="font-size:14px;font-weight:500;margin-bottom:10px">Event log</h3><div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;font-family:var(--fm);font-size:11px;line-height:2.1;color:var(--t2);max-height:220px;overflow-y:auto" id="cr-log"></div></div></div>
+
+<!-- ═══ Skills Library ═══ -->
+<div class="page" id="p-lib-sk"><div class="ll">
+  <div class="lsb">
+    <div style="font-size:14px;font-weight:500;margin-bottom:14px">Skills</div>
+    <div class="lct">Source</div>
+    <div class="lci on" data-g="src" data-f="all" onclick="fltSk(this)"><div class="dt" style="background:var(--t3)"></div>All<span class="ct" id="sk-cnt-all"></span></div>
+    <div class="lci" data-g="src" data-f="github" onclick="fltSk(this)"><div class="dt" style="background:var(--tl)"></div>GitHub<span class="ct" id="sk-cnt-github"></span></div>
+    <div class="lci" data-g="src" data-f="clawhub" onclick="fltSk(this)"><div class="dt" style="background:var(--ac)"></div>ClawHub<span class="ct" id="sk-cnt-clawhub"></span></div>
+    <div class="lci" data-g="src" data-f="trending" onclick="fltSk(this)"><div class="dt" style="background:var(--am)"></div>Trending<span class="ct" id="sk-cnt-trending"></span></div>
+    <div class="lct">Category</div>
+    <div class="lci on" data-g="cat" data-f="all" onclick="fltSk(this)"><div class="dt" style="background:var(--t3)"></div>All<span class="ct" id="sk-cnt-cat-all"></span></div>
+    <div class="lci" data-g="cat" data-f="code" onclick="fltSk(this)"><div class="dt" style="background:var(--ac)"></div>Code gen<span class="ct" id="sk-cnt-code"></span></div>
+    <div class="lci" data-g="cat" data-f="test" onclick="fltSk(this)"><div class="dt" style="background:var(--tl)"></div>Testing<span class="ct" id="sk-cnt-test"></span></div>
+    <div class="lci" data-g="cat" data-f="infra" onclick="fltSk(this)"><div class="dt" style="background:var(--bl)"></div>DevOps<span class="ct" id="sk-cnt-infra"></span></div>
+    <div class="lci" data-g="cat" data-f="data" onclick="fltSk(this)"><div class="dt" style="background:var(--am)"></div>Data / DB<span class="ct" id="sk-cnt-data"></span></div>
+    <div class="lci" data-g="cat" data-f="sec" onclick="fltSk(this)"><div class="dt" style="background:var(--co)"></div>Security<span class="ct" id="sk-cnt-sec"></span></div>
+    <div class="lci" data-g="cat" data-f="doc" onclick="fltSk(this)"><div class="dt" style="background:var(--gn)"></div>Docs<span class="ct" id="sk-cnt-doc"></span></div>
+    <div class="lci" data-g="cat" data-f="ai" onclick="fltSk(this)"><div class="dt" style="background:var(--pk)"></div>AI / ML<span class="ct" id="sk-cnt-ai"></span></div>
+    <div class="lci" data-g="cat" data-f="ui" onclick="fltSk(this)"><div class="dt" style="background:var(--bl)"></div>Frontend<span class="ct" id="sk-cnt-ui"></span></div>
+  </div>
+  <div class="lmn"><div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><h2 id="sk-title" style="font-size:17px;font-weight:500;flex:1">All skills</h2><span id="sk-count" style="font-size:11px;color:var(--t4);font-family:var(--fm)"></span></div><div class="lgr" id="sk-grid"></div></div>
+</div></div>
+
+<!-- ═══ Agents Library ═══ -->
+<div class="page" id="p-lib-ag"><div class="ll">
+  <div class="lsb">
+    <div style="font-size:14px;font-weight:500;margin-bottom:14px">Agents</div>
+    <div class="lct">Type</div>
+    <div class="lci on" data-g="tp" data-f="all" onclick="fltAg(this)"><div class="dt" style="background:var(--t3)"></div>All<span class="ct" id="ag-cnt-all"></span></div>
+    <div class="lci" data-g="tp" data-f="dev" onclick="fltAg(this)"><div class="dt" style="background:var(--ac)"></div>Development<span class="ct" id="ag-cnt-dev"></span></div>
+    <div class="lci" data-g="tp" data-f="ops" onclick="fltAg(this)"><div class="dt" style="background:var(--bl)"></div>DevOps<span class="ct" id="ag-cnt-ops"></span></div>
+    <div class="lci" data-g="tp" data-f="qa" onclick="fltAg(this)"><div class="dt" style="background:var(--tl)"></div>QA<span class="ct" id="ag-cnt-qa"></span></div>
+    <div class="lci" data-g="tp" data-f="sec" onclick="fltAg(this)"><div class="dt" style="background:var(--co)"></div>Security<span class="ct" id="ag-cnt-sec"></span></div>
+    <div class="lci" data-g="tp" data-f="data" onclick="fltAg(this)"><div class="dt" style="background:var(--am)"></div>Data<span class="ct" id="ag-cnt-data"></span></div>
+    <div class="lci" data-g="tp" data-f="doc" onclick="fltAg(this)"><div class="dt" style="background:var(--gn)"></div>Docs<span class="ct" id="ag-cnt-doc"></span></div>
+    <div class="lct">Status</div>
+    <div class="lci on" data-g="st" data-f="all" onclick="fltAg(this)"><div class="dt" style="background:var(--t3)"></div>All<span class="ct" id="ag-cnt-st-all"></span></div>
+    <div class="lci" data-g="st" data-f="active" onclick="fltAg(this)"><div class="dt" style="background:var(--gn)"></div>Active<span class="ct" id="ag-cnt-active"></span></div>
+    <div class="lci" data-g="st" data-f="idle" onclick="fltAg(this)"><div class="dt" style="background:var(--t4)"></div>Idle<span class="ct" id="ag-cnt-idle"></span></div>
+  </div>
+  <div class="lmn"><div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><h2 id="ag-title" style="font-size:17px;font-weight:500;flex:1">All agents</h2><span id="ag-count" style="font-size:11px;color:var(--t4);font-family:var(--fm)"></span><button class="btn btn-p btn-sm" onclick="openCreateAgent()">+ Create</button></div><div class="lgr" id="ag-grid"></div></div>
+</div></div>
+
+<!-- ═══ Projects ═══ -->
+<div class="page" id="p-projs"><div class="psc fi"><div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><h2 style="font-size:18px;font-weight:500;flex:1">My projects</h2><button class="btn btn-p" onclick="openMo()">+ New</button></div><div class="lgr" id="pj-list"></div></div></div>
+
+<!-- ═══ Settings ═══ -->
+<div class="page" id="p-settings"><div class="psc fi">
+  <h2 style="font-size:20px;font-weight:500;margin-bottom:6px">Settings</h2>
+  <p style="font-size:13px;color:var(--t3);margin-bottom:24px">Configure your AI models and preferences. Crawlers and tools are pre-installed — zero config needed.</p>
+
+  <div class="set-grid">
+    <!-- ── AI Models: API Key OR OAuth ── -->
+    <div class="set-card full">
+      <h3>AI models</h3>
+      <div class="set-desc">Models managed by OpenClaw. Run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw configure</code> to change.</div>
+
+      <!-- Auth method tabs -->
+      <div style="display:flex;gap:2px;background:var(--bg4);border-radius:9px;padding:3px;margin-bottom:16px;width:fit-content">
+        <div class="auth-tab on" id="tab-all" onclick="filterModels('all')">All models</div>
+        <div class="auth-tab" id="tab-key" onclick="filterModels('key')">API key</div>
+        <div class="auth-tab" id="tab-oauth" onclick="filterModels('oauth')">Account login</div>
+      </div>
+
+      <div id="model-list">
+        <!-- Models loaded dynamically -->
+      </div>
+
+      <!-- Add model -->
+      <div style="margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-sm btn-p" onclick="syncModels(this)">⟳ Sync models</button>
+        <span style="font-size:11px;color:var(--t4)">Models synced from OpenClaw config</span>
+      </div>
+
+      <!-- Add model panel (hidden by default) -->
+      <div id="add-model-panel" style="display:none;margin-top:14px;padding:16px;background:var(--bg4);border:1px solid var(--b1);border-radius:12px">
+        <div style="font-size:13px;font-weight:500;margin-bottom:12px">Choose a model to add</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px" id="model-picker"></div>
+      </div>
+
+      <!-- Smart routing -->
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--b0)">
+        <div style="font-size:12.5px;font-weight:500;margin-bottom:8px">Smart routing</div>
+        <div class="toggle-row"><div><div class="tl">Auto-fallback on rate limit</div><div class="td">Switch to next model when rate limited</div></div><div class="toggle on" onclick="this.classList.toggle('on');autoSave()"></div></div>
+        <div class="toggle-row"><div><div class="tl">Auto-fallback on error</div><div class="td">Switch if API returns error or timeout</div></div><div class="toggle on" onclick="this.classList.toggle('on');autoSave()"></div></div>
+        <div class="toggle-row"><div><div class="tl">Cost optimization</div><div class="td">Cheap models for simple tasks, powerful for complex</div></div><div class="toggle on" onclick="this.classList.toggle('on');autoSave()"></div></div>
+        <div class="toggle-row"><div><div class="tl">Session persistence</div><div class="td">Keep OAuth sessions alive, auto-refresh tokens</div></div><div class="toggle on" onclick="this.classList.toggle('on');autoSave()"></div></div>
+      </div>
+    </div>
+
+    <!-- ── OpenClaw Connection ── -->
+    <div class="set-card full" style="border-color:var(--tl)">
+      <h3 style="display:flex;align-items:center;gap:8px">OpenClaw Gateway <span id="oc-ver" style="font-size:10px;font-family:var(--fm);color:var(--t4)"></span></h3>
+      <div class="set-desc">Connect to your local OpenClaw gateway for real AI agent capabilities. <a href="https://docs.openclaw.ai" target="_blank" style="color:var(--tl)">Docs</a></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="ff"><label>Gateway URL</label><input id="oc-url" value="ws://127.0.0.1:18789" placeholder="ws://127.0.0.1:18789"></div>
+        <div class="ff"><label>Auth Token</label><input id="oc-token" type="password" placeholder="OPENCLAW_GATEWAY_TOKEN (leave empty for no-auth)"></div>
+        <div class="ff"><label>Connection Timeout (ms)</label><input id="oc-timeout" type="number" value="10000" min="3000" max="60000" step="1000" placeholder="10000"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+        <button class="btn btn-sm" style="border-color:var(--tl);color:var(--tl)" onclick="testClawConnection()">Test connection</button>
+        <button class="btn btn-sm btn-p" onclick="saveClawConfig()">Save & connect</button>
+        <span id="oc-status" style="font-size:11px;font-family:var(--fm);color:var(--t4);margin-left:8px"></span>
+      </div>
+    </div>
+
+    <!-- ── OpenClaw Skills Status ── -->
+    <div class="set-card">
+      <h3>Skills status</h3>
+      <div class="set-desc">Skills loaded from OpenClaw. Status reflects real availability.</div>
+      <div id="settings-skills-status">
+        <div style="text-align:center;padding:20px;color:var(--t4);font-size:12px">Loading skills status...</div>
+      </div>
+      <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px;font-size:11.5px;color:var(--t3)">Skills managed by OpenClaw. Run <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw skills list</code> for details.</div>
+    </div>
+
+    <!-- ── Channels ── -->
+    <div class="set-card">
+      <h3>Channels</h3>
+      <div class="set-desc">Message channels configured in OpenClaw gateway.</div>
+      <div id="settings-channels-status">
+        <div style="text-align:center;padding:20px;color:var(--t4);font-size:12px">Loading channel status...</div>
+      </div>
+      <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px;font-size:11.5px;color:var(--t3)">Channels managed by OpenClaw. Run <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw setup</code> to configure.</div>
+    </div>
+
+    <!-- ── System ── -->
+    <div class="set-card full">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <div><div class="ff"><label>Max concurrent tasks</label><input type="number" value="8" min="1" max="32"></div></div>
+        <div><div class="ff"><label>Task timeout (seconds)</label><input type="number" value="300"></div></div>
+        <div><div class="ff"><label>Language</label><select id="lang-select" onchange="switchLang(this.value);autoSave()"><option value="en">English</option><option value="zh">中文</option></select></div></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+        <button class="btn btn-sm btn-p" onclick="saveWithFeedback(this)">Save all</button>
+        <button class="btn btn-sm btn-d" onclick="if(confirm('Clear all cached data? Projects and settings will be lost.')){_lastSaveOk=true;localStorage.clear();location.reload()}">Clear cache</button>
+        <div id="storage-indicator" style="margin-left:auto;font-size:11px;font-family:var(--fm);color:var(--t4);display:flex;align-items:center;gap:8px"></div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ═══ Workspace ═══ -->
+<div class="page" id="p-ws">
+  <div class="ppb">
+    <span style="font-size:13px;font-weight:500;margin-right:16px" id="ws-proj-name">No project selected</span>
+    <div class="pps dn"><div class="ddd"></div>Analyze</div><div class="ppc dn"></div>
+    <div class="pps dn"><div class="ddd"></div>Plan</div><div class="ppc dn"></div>
+    <div class="pps dn"><div class="ddd"></div>Assign</div><div class="ppc dn"></div>
+    <div class="pps ac"><div class="ddd"></div>Build</div><div class="ppc"></div>
+    <div class="pps"><div class="ddd"></div>Review</div><div class="ppc"></div>
+    <div class="pps"><div class="ddd"></div>Deliver</div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:6px"><span style="font-size:11px;color:var(--gn);font-family:var(--fm);font-weight:500" id="ws-pct">0%</span><div style="width:70px;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden"><div style="width:0%;height:100%;background:var(--gn);border-radius:2px" id="ws-bar"></div></div></div>
+  </div>
+  <div class="ws">
+    <div class="wsl">
+      <div class="wsc"><div class="al" id="alog">
+        <div id="ws-empty" style="text-align:center;padding:80px 20px">
+          <div style="font-size:40px;margin-bottom:16px;opacity:.25">🚀</div>
+          <div style="font-size:16px;color:var(--t2);margin-bottom:6px">No active project</div>
+          <div style="font-size:12px;color:var(--t4);margin-bottom:20px;max-width:300px;margin-left:auto;margin-right:auto">Create a project or select one from My Projects to start building with AI agents</div>
+          <button class="btn btn-p" onclick="openMo()">+ Create project</button>
+          <button class="btn" style="margin-left:8px" onclick="go('projs')">My projects</button>
+        </div>
+        <div id="demo-activity" style="display:none">
+        <div class="ag" id="build-phase"><div class="agh"><span class="pt" style="background:var(--gnb);color:var(--gn)">Chat</span><div class="ln"></div><span class="st" style="color:var(--tl)">Ready</span></div>
+        </div>
+        </div>
+      </div></div>
+      <div class="cha">
+        <div class="chm"><div class="cmb on" id="m-plan" onclick="setM('plan')">Plan first</div><div class="cmb" id="m-auto" onclick="setM('auto')">Auto execute</div></div>
+        <div class="chi"><input id="ci" placeholder="Talk to PM-Agent..." onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn btn-p" onclick="sendMsg()">Send</button></div>
+      </div>
+    </div>
+    <div class="wsr">
+      <div class="wp" style="text-align:center">
+        <div class="rng"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="var(--b0)" stroke-width="6"/><circle id="ring-fill" cx="48" cy="48" r="40" fill="none" stroke="var(--gn)" stroke-width="6" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3"/></svg><div class="rng-c"><div class="rv" style="color:var(--gn)" id="ring-pct">0%</div><div class="rl">Complete</div></div></div>
+      </div>
+      <div class="wp"><h4>Agent team</h4>
+        <div id="ws-agent-team" style="font-size:12px;color:var(--t4);padding:8px 0">Select a project to see assigned agents</div>
+      </div>
+      <div class="wp"><h4 id="issue-count">Issues</h4>
+        <div id="ws-issues" style="font-size:12px;color:var(--t4);padding:8px 0">No issues</div>
+      </div>
+      <div class="wp"><h4>Deliverables</h4>
+        <div id="ws-deliverables" style="font-size:12px;color:var(--t4);padding:8px 0">No deliverables yet</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div></div>
+
+<!-- Modal -->
+<div class="mo" id="modal" onclick="if(event.target===this)closeMo()" role="dialog" aria-modal="true">
+  <div class="mo-box">
+    <h2>Create new project</h2>
+    <div class="ms">Describe your project — PM-Agent will decompose tasks, match agents, and start building.</div>
+    <div class="ff" id="ff-mo-name"><label>Project name <span style="color:var(--co)">*</span></label><input id="mo-name" placeholder="e.g. SaaS Analytics Dashboard" required maxlength="80" oninput="validateField(this,'ff-mo-name','Project name is required')"><div class="ff-err">Project name is required</div></div>
+    <div class="ff" id="ff-mo-desc"><label>What do you want to build? <span style="color:var(--co)">*</span></label><textarea id="mo-desc" placeholder="Describe your project in plain language. For example: A real-time analytics dashboard with user tracking, conversion funnels, custom reports, and Stripe billing." required minlength="5" oninput="validateField(this,'ff-mo-desc','Please describe your project (at least 5 characters)')"></textarea><div class="ff-err">Please describe your project (at least 5 characters)</div></div>
+    <div class="ff"><label>Priority</label><select id="mo-pri"><option>Normal</option><option>High — faster</option><option>Critical — all agents</option></select></div>
+    <div class="mf"><button class="btn" onclick="closeMo()">Cancel</button><button class="btn btn-p" onclick="createProj()">Create & deploy agents</button></div>
+  </div>
+</div>
+<div class="mo" id="detail-modal" onclick="if(event.target===this)_closeModal('detail-modal')" role="dialog" aria-modal="true">
+  <div class="mo-box" id="detail-content"></div>
+</div>
+<div class="mo" id="agent-create-modal" onclick="if(event.target===this)_closeModal('agent-create-modal')" role="dialog" aria-modal="true">
+  <div class="mo-box">
+    <h2>Create new agent</h2>
+    <div class="ms">Configure a new AI agent with skills from your library.</div>
+    <div class="ff" id="ff-ca-name"><label>Agent name <span style="color:var(--co)">*</span></label><input id="ca-name" placeholder="e.g. Frontend-Pro" required maxlength="40" oninput="validateField(this,'ff-ca-name','Agent name is required')"><div class="ff-err">Agent name is required</div></div>
+    <div class="ff" id="ff-ca-desc"><label>Description <span style="color:var(--co)">*</span></label><input id="ca-desc" placeholder="What does this agent do?" required oninput="validateField(this,'ff-ca-desc','Description is required')"><div class="ff-err">Description is required</div></div>
+    <div class="ff"><label>Type</label><select id="ca-type"><option value="dev">Development</option><option value="ops">DevOps</option><option value="qa">QA</option><option value="sec">Security</option><option value="data">Data</option><option value="doc">Docs</option></select></div>
+    <div class="ff"><label>Skills (comma-separated)</label><input id="ca-skills" placeholder="e.g. code-reviewer, test-writer"></div>
+    <div class="mf"><button class="btn" onclick="_closeModal('agent-create-modal')">Cancel</button><button class="btn btn-p" onclick="createAgent()">Create agent</button></div>
+  </div>
+</div>
+<div class="mo" id="kb-modal" onclick="if(event.target===this)_closeModal('kb-modal')" role="dialog" aria-modal="true">
+  <div class="mo-box" style="max-width:480px">
+    <h2 style="margin-bottom:4px">Keyboard shortcuts</h2>
+    <div class="ms">Press <kbd style="background:var(--bg4);padding:2px 7px;border-radius:5px;font-family:var(--fm);font-size:11px;border:1px solid var(--b1)">?</kbd> anytime to toggle this panel</div>
+    <div id="kb-list"></div>
+    <div class="mf"><button class="btn btn-p" onclick="_closeModal('kb-modal')">Got it</button></div>
+  </div>
+</div>
+<div class="toast" id="toast-el"></div>
+
+<script>
+/* FIX F-31: localStorage fallback for incognito/old browsers — memory shim */
+(function(){
+  try{localStorage.setItem('__ls_test','1');localStorage.removeItem('__ls_test')}
+  catch(e){
+    console.warn('localStorage unavailable — using in-memory fallback');
+    var _mem={};
+    var _MemStorage={
+      getItem:function(k){return _mem.hasOwnProperty(k)?_mem[k]:null},
+      setItem:function(k,v){_mem[k]=String(v)},
+      removeItem:function(k){delete _mem[k]},
+      clear:function(){_mem={}},
+      get length(){return Object.keys(_mem).length},
+      key:function(i){return Object.keys(_mem)[i]||null}
+    };
+    Object.defineProperty(window,'localStorage',{value:_MemStorage,writable:false,configurable:true});
+    /* Also shim sessionStorage if needed */
+    try{sessionStorage.setItem('__ss_test','1');sessionStorage.removeItem('__ss_test')}
+    catch(e2){Object.defineProperty(window,'sessionStorage',{value:_MemStorage,writable:false,configurable:true})}
+  }
+})();
+/* ══ Theme toggle ══ */
+function toggleTheme(){
+  const html=document.documentElement;
+  const next=html.getAttribute('data-theme')==='light'?'dark':'light';
+  html.setAttribute('data-theme',next);
+  localStorage.setItem('agenthub_theme',next);
+  const btn=document.getElementById('theme-toggle');
+  if(btn)btn.textContent=next==='light'?'\u263E':'\u2600';
+}
+(function(){
+  const saved=localStorage.getItem('agenthub_theme')||
+    (window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');
+  if(saved==='light')document.documentElement.setAttribute('data-theme','light');
+  const btn=document.getElementById('theme-toggle');
+  if(btn)btn.textContent=saved==='light'?'\u263E':'\u2600';
+})();
+
+/* ══ OpenClaw Integration Layer ══ */
+const CLAW_CONFIG_KEY = 'agenthub_openclaw_config';
+
+const STORAGE_KEY = 'agenthub_state';
+
+const STATE_VERSION = 2;
+
+function saveState() {
+  const state = {
+    _v: STATE_VERSION,
+    _ts: Date.now(),
+    projects: PROJS,
+    skills: SKS.filter(s => !s.real),
+    agents: AGS.filter(a => !a.real),
+    models: getModelConfigs(),
+    settings: getSettingsState()
+  };
+  try {
+    const json = JSON.stringify(state);
+    localStorage.setItem(STORAGE_KEY, json);
+    _lastSaveOk = true;
+    updateStorageIndicator();
+    return true;
+  } catch(e) {
+    _lastSaveOk = false;
+    if (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014) {
+      // FIX #19: Show visible persistent warning banner, not just a toast
+      _showStorageWarning('nearly-full');
+      // Attempt to free space: drop skills/agents (can be re-synced from OpenClaw)
+      const slim = { _v: STATE_VERSION, _ts: Date.now(), projects: PROJS, skills: [], agents: [], models: [], settings: getSettingsState() };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+        toast('Storage nearly full \u2014 skills/agents cleared (re-sync to restore)');
+        _lastSaveOk = true;
+        return true;
+      } catch(e2) {
+        _showStorageWarning('full');
+        console.error('saveState: quota exceeded even after trim', e2);
+        return false;
+      }
+    }
+    toast('Save failed: ' + (e.message || 'unknown error'));
+    console.error('saveState:', e);
+    return false;
+  }
+}
+let _lastSaveOk = true;
+
+/* FIX #19: Persistent storage warning banner */
+function _showStorageWarning(level) {
+  let banner = document.getElementById('storage-warning');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'storage-warning';
+    banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:300;padding:10px 20px;font-size:13px;display:flex;align-items:center;gap:10px;justify-content:center;animation:fadeUp .3s ease';
+    document.body.appendChild(banner);
+  }
+  if (level === 'full') {
+    banner.style.background = 'var(--co)';
+    banner.style.color = '#fff';
+    banner.innerHTML = '<strong>Storage full</strong> \u2014 Data cannot be saved. Clear cache in Settings or free browser storage. <button onclick="go(\'settings\');this.parentElement.remove()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px">Open Settings</button> <button onclick="this.parentElement.remove()" style="background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:16px">\u2715</button>';
+  } else {
+    banner.style.background = 'var(--am)';
+    banner.style.color = '#1a1a2e';
+    banner.innerHTML = '<strong>Storage nearly full</strong> \u2014 Cached skills/agents were cleared. Re-sync to restore. <button onclick="syncAll();this.parentElement.remove()" style="background:rgba(0,0,0,.15);border:1px solid rgba(0,0,0,.2);color:#1a1a2e;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px">Re-sync now</button> <button onclick="this.parentElement.remove()" style="background:none;border:none;color:rgba(0,0,0,.5);cursor:pointer;font-size:16px">\u2715</button>';
+  }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    // Version check — discard incompatible state
+    if (state._v && state._v > STATE_VERSION) {
+      console.warn('loadState: saved state version', state._v, 'is newer than current', STATE_VERSION, '— ignoring');
+      return false;
+    }
+    if (Array.isArray(state.projects) && state.projects.length) {
+      // Validate project shape and migrate legacy projects without _id
+      const valid = state.projects.filter(p => p && typeof p.n === 'string');
+      valid.forEach(p => { if (!p._id) p._id = _uid(); }); // FIX F-01: ensure UUID
+      if (valid.length) { PROJS.length = 0; PROJS.push(...valid); }
+    }
+    if (Array.isArray(state.skills) && state.skills.length) {
+      const valid = state.skills.filter(s => s && typeof s.n === 'string');
+      if (valid.length) { SKS.length = 0; SKS.push(...valid); }
+    }
+    if (Array.isArray(state.agents) && state.agents.length) {
+      const valid = state.agents.filter(a => a && typeof a.n === 'string');
+      if (valid.length) { AGS.length = 0; AGS.push(...valid); }
+    }
+    if (state.settings) applySettings(state.settings);
+    if (state.models) restoreModels(state.models);
+    return true;
+  } catch(e) {
+    console.error('loadState: corrupt data, clearing', e);
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e2) {}
+    return false;
+  }
+}
+
+function getModelConfigs() {
+  const models = [];
+  document.querySelectorAll('.model-row').forEach(row => {
+    const name = row.querySelector('.mr-name')?.textContent || '';
+    const provider = row.querySelector('.mr-provider')?.textContent || '';
+    const key = row.querySelector('.mr-key')?.value || '';
+    const priority = row.querySelector('.mr-priority')?.value || 'Disabled';
+    const status = row.querySelector('.mr-status')?.textContent || '';
+    const auth = row.dataset.auth || 'key';
+    const icon = row.querySelector('.mr-icon')?.textContent || '';
+    const iconBg = row.querySelector('.mr-icon')?.style.background || '';
+    const iconColor = row.querySelector('.mr-icon')?.style.color || '';
+    models.push({ name, provider, key, priority, status, auth, icon, iconBg, iconColor, id: row.dataset.id });
+  });
+  return models;
+}
+
+function restoreModels(models) {
+  // Models are now managed by OpenClaw config - no local restore needed
+}
+
+// FIX #21: Single debounce timer — clearTimeout always runs before setTimeout
+let _autoSaveTimer = null;
+function autoSave() {
+  if (_autoSaveTimer !== null) { clearTimeout(_autoSaveTimer); _autoSaveTimer = null; }
+  if (!_lastSaveOk) return; // Don't retry if storage is known-full
+  _autoSaveTimer = setTimeout(() => {
+    _autoSaveTimer = null;
+    if (!saveState()) {
+      console.warn('autoSave: save failed, pausing auto-save');
+    }
+  }, 500);
+}
+
+function saveWithFeedback(btn) {
+  const ok = saveState();
+  btn.style.pointerEvents = 'none';
+  const orig = btn.textContent;
+  if (ok) {
+    btn.textContent = '\u2713 Saved!';
+    btn.style.background = 'var(--gn)'; btn.style.color = '#090a0e';
+  } else {
+    btn.textContent = '\u2717 Save failed';
+    btn.style.background = 'var(--co)'; btn.style.color = '#fff';
+  }
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; btn.style.pointerEvents = ''; }, 2000);
+  updateStorageIndicator();
+}
+
+function getStorageUsage() {
+  let total = 0;
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); total += (k.length + (localStorage.getItem(k) || '').length) * 2; } } catch(e) {}
+  return total;
+}
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
+}
+function updateStorageIndicator() {
+  const el = document.getElementById('storage-indicator');
+  if (!el) return;
+  const used = getStorageUsage();
+  const quota = 5 * 1024 * 1024; // 5 MB typical localStorage limit
+  const pct = Math.min(100, (used / quota * 100)).toFixed(0);
+  const color = pct > 90 ? 'var(--co)' : pct > 70 ? 'var(--am)' : 'var(--gn)';
+  el.innerHTML = '<span>' + formatBytes(used) + ' / ~5 MB</span>' +
+    '<div style="width:60px;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden">' +
+    '<div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:2px;transition:width .3s"></div></div>';
+}
+
+/* FIX F-09: Cross-tab storage synchronization */
+let _lastKnownSaveTs = Date.now();
+window.addEventListener('storage', (e) => {
+  if (e.key !== STORAGE_KEY || !e.newValue) return;
+  try {
+    const incoming = JSON.parse(e.newValue);
+    // Only accept if newer than our last save
+    if (incoming._ts && incoming._ts > _lastKnownSaveTs) {
+      _lastKnownSaveTs = incoming._ts;
+      // Reload state from the other tab's changes
+      if (Array.isArray(incoming.projects)) {
+        incoming.projects.forEach(p => { if (!p._id) p._id = _uid(); });
+        const localOnlyProjs = PROJS.filter(p => !incoming.projects.some(ip => ip._id === p._id));
+        PROJS.length = 0;
+        PROJS.push(...incoming.projects, ...localOnlyProjs);
+      }
+      if (Array.isArray(incoming.skills)) {
+        const realOnly = SKS.filter(s => s.real);
+        SKS.length = 0; SKS.push(...realOnly, ...incoming.skills.filter(s => !s.real));
+      }
+      if (Array.isArray(incoming.agents)) {
+        const realOnly = AGS.filter(a => a.real);
+        AGS.length = 0; AGS.push(...realOnly, ...incoming.agents.filter(a => !a.real));
+      }
+      if (incoming.settings) applySettings(incoming.settings);
+      renderAll();
+      toast('Data updated from another tab');
+    }
+  } catch(e) { console.warn('storage sync: parse error', e); }
+});
+// Update timestamp on every save
+const _origSaveState = saveState;
+saveState = function() {
+  const result = _origSaveState();
+  if (result) _lastKnownSaveTs = Date.now();
+  return result;
+};
+
+function getSettingsState() {
+  const toggles = {};
+  const settingsEl = document.getElementById('p-settings');
+  if (!settingsEl) return { toggles };
+  settingsEl.querySelectorAll('.toggle').forEach((t, i) => { toggles['t' + i] = t.classList.contains('on'); });
+  const numInputs = settingsEl.querySelectorAll('input[type="number"]');
+  const selects = settingsEl.querySelectorAll('select');
+  return {
+    toggles,
+    lang: selects[selects.length - 1]?.value || 'en',
+    maxTasks: numInputs[0]?.value || '8',
+    timeout: numInputs[1]?.value || '300'
+  };
+}
+
+function applySettings(s) {
+  if (!s) return;
+  if (s.toggles) {
+    document.querySelectorAll('#p-settings .toggle').forEach((t, i) => {
+      if (s.toggles['t' + i] !== undefined) t.classList.toggle('on', s.toggles['t' + i]);
+    });
+  }
+}
+
+/* ══ Language switching ══ */
+const LANG = {
+  en: {
+    dashboard: 'Dashboard', trending: 'Trending', crawler: 'Channels', skills: 'Skills', agents: 'Agents',
+    myProjects: 'My projects', activeProject: 'Active project', settings: 'Settings',
+    overview: 'OVERVIEW', library: 'LIBRARY', workspace: 'WORKSPACE', system: 'SYSTEM',
+    newProject: '+ New project', sync: '\u27f3 Sync', search: 'Search skills, agents, projects... (Ctrl+K)',
+    totalSkills: 'TOTAL SKILLS', activeAgents: 'ACTIVE AGENTS', projects: 'PROJECTS', successRate: 'SUCCESS RATE',
+    activity: 'Activity', welcomeTitle: 'Welcome to AgentHub', welcomeDesc: 'Complete setup to start building with AI agents',
+    createProject: 'Create new project', projectName: 'Project name', whatBuild: 'What do you want to build?',
+    priority: 'Priority', cancel: 'Cancel', createDeploy: 'Create & deploy agents',
+    noSkills: 'No skills loaded', noAgents: 'No agents yet', noProjects: 'No projects yet', noActivity: 'No activity yet',
+    noData: 'No data yet', noIssues: 'No issues yet', noDeliverables: 'No deliverables yet',
+    emptyAction: 'Connect OpenClaw to load real data', emptyProjectAction: 'Create your first project to start building with AI agents',
+    connectOC: 'Connect OpenClaw', createAgent: '+ Create agent',
+    offline: 'Offline', save: 'Save all', clearCache: 'Clear cache',
+    installed: '1. Installed', connectStep: '2. Connect OpenClaw', createStep: '3. Create project', skillsSynced: '4. Skills synced'
+  },
+  zh: {
+    dashboard: '\u4eea\u8868\u76d8', trending: '\u70ed\u95e8\u8d8b\u52bf', crawler: '\u6e20\u9053', skills: '\u6280\u80fd', agents: '\u667a\u80fd\u4f53',
+    myProjects: '\u6211\u7684\u9879\u76ee', activeProject: '\u6d3b\u8dc3\u9879\u76ee', settings: '\u8bbe\u7f6e',
+    overview: '\u6982\u89c8', library: '\u8d44\u6e90\u5e93', workspace: '\u5de5\u4f5c\u533a', system: '\u7cfb\u7edf',
+    newProject: '+ \u65b0\u5efa\u9879\u76ee', sync: '\u27f3 \u540c\u6b65', search: '\u641c\u7d22\u6280\u80fd\u3001\u667a\u80fd\u4f53\u3001\u9879\u76ee... (Ctrl+K)',
+    totalSkills: '\u6280\u80fd\u603b\u6570', activeAgents: '\u6d3b\u8dc3\u667a\u80fd\u4f53', projects: '\u9879\u76ee\u6570', successRate: '\u6210\u529f\u7387',
+    activity: '\u52a8\u6001', welcomeTitle: '\u6b22\u8fce\u4f7f\u7528 AgentHub', welcomeDesc: '\u5b8c\u6210\u8bbe\u7f6e\uff0c\u5f00\u59cb\u4f7f\u7528 AI \u667a\u80fd\u4f53',
+    createProject: '\u521b\u5efa\u65b0\u9879\u76ee', projectName: '\u9879\u76ee\u540d\u79f0', whatBuild: '\u4f60\u60f3\u6784\u5efa\u4ec0\u4e48\uff1f',
+    priority: '\u4f18\u5148\u7ea7', cancel: '\u53d6\u6d88', createDeploy: '\u521b\u5efa\u5e76\u90e8\u7f72\u667a\u80fd\u4f53',
+    noSkills: '\u6682\u65e0\u6280\u80fd', noAgents: '\u6682\u65e0\u667a\u80fd\u4f53', noProjects: '\u6682\u65e0\u9879\u76ee', noActivity: '\u6682\u65e0\u52a8\u6001',
+    noData: '\u6682\u65e0\u6570\u636e', noIssues: '\u6682\u65e0\u95ee\u9898', noDeliverables: '\u6682\u65e0\u4ea4\u4ed8\u7269',
+    emptyAction: '\u8fde\u63a5 OpenClaw \u52a0\u8f7d\u771f\u5b9e\u6570\u636e', emptyProjectAction: '\u521b\u5efa\u4f60\u7684\u7b2c\u4e00\u4e2a\u9879\u76ee\uff0c\u5f00\u59cb\u4f7f\u7528 AI \u667a\u80fd\u4f53',
+    connectOC: '\u8fde\u63a5 OpenClaw', createAgent: '+ \u521b\u5efa\u667a\u80fd\u4f53',
+    offline: '\u79bb\u7ebf', save: '\u4fdd\u5b58\u6240\u6709', clearCache: '\u6e05\u9664\u7f13\u5b58',
+    installed: '1. \u5df2\u5b89\u88c5', connectStep: '2. \u8fde\u63a5 OpenClaw', createStep: '3. \u521b\u5efa\u9879\u76ee', skillsSynced: '4. \u6280\u80fd\u5df2\u540c\u6b65'
+  }
+};
+let currentLang = 'en';
+
+/* FIX F-26: unified empty state builder — consistent look across all pages */
+function _emptyState(icon, msgKey, subKey, btnLabel, btnAction, opts) {
+  const L = LANG[currentLang] || LANG.en;
+  const msg = L[msgKey] || msgKey;
+  const sub = subKey ? (L[subKey] || subKey) : '';
+  const pad = (opts && opts.compact) ? '30px 14px' : '60px 20px';
+  const col = (opts && opts.col) ? 'grid-column:1/-1;' : '';
+  let html = '<div style="text-align:center;padding:'+pad+';'+col+'"><div style="font-size:32px;margin-bottom:12px;opacity:.3">'+icon+'</div><div style="font-size:14px;color:var(--t2);margin-bottom:4px">'+msg+'</div>';
+  if (sub) html += '<div style="font-size:12px;color:var(--t4);margin-bottom:16px">'+sub+'</div>';
+  if (btnLabel && btnAction) html += '<button class="btn btn-p btn-sm" onclick="'+btnAction+'">'+btnLabel+'</button>';
+  html += '</div>';
+  return html;
+}
+/* FIX F-27: format large numbers — 1K, 2.5M etc */
+function _fmtNum(n) {
+  if (typeof n !== 'number' || isNaN(n)) return '0';
+  if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1e4) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  if (n >= 1e3) return n.toLocaleString();
+  return String(n);
+}
+/* FIX F-28: locale-aware timestamp */
+function _fmtTime(date) {
+  const d = date || new Date();
+  const locale = currentLang === 'zh' ? 'zh-CN' : 'en';
+  return d.toLocaleTimeString(locale, { hour12: false });
+}
+
+function switchLang(lang) {
+  currentLang = lang;
+  const L = LANG[lang] || LANG.en;
+  // Section labels
+  document.querySelectorAll('.ns-l').forEach((el,i) => {
+    const keys = ['overview','library','workspace','system'];
+    if (keys[i] && L[keys[i]]) el.textContent = L[keys[i]];
+  });
+  // Top bar
+  const searchInput = document.getElementById('gs');
+  if (searchInput) searchInput.placeholder = L.search;
+  // Stat labels
+  document.querySelectorAll('.sc-l').forEach((el,i) => {
+    const keys = ['totalSkills','activeAgents','projects','successRate'];
+    if (keys[i] && L[keys[i]]) el.textContent = L[keys[i]];
+  });
+  // Dashboard headers
+  document.querySelectorAll('#p-dash h3').forEach((el,i) => {
+    if (i===0 && L.activity) el.textContent = L.activity;
+    if (i===1 && L.projects) el.textContent = L.projects;
+  });
+  // Onboarding
+  const obSteps = document.querySelectorAll('.ob-step');
+  if(obSteps[0]) obSteps[0].textContent = L.installed;
+  if(obSteps[1]) obSteps[1].textContent = L.connectStep;
+  if(obSteps[2]) obSteps[2].textContent = L.createStep;
+  if(obSteps[3]) obSteps[3].textContent = L.skillsSynced;
+  const obTitle = document.querySelector('.onboard h2');
+  if(obTitle) obTitle.textContent = L.welcomeTitle;
+  const obDesc = document.querySelector('.onboard p');
+  if(obDesc) obDesc.textContent = L.welcomeDesc;
+  // Buttons in top bar
+  document.querySelectorAll('.tb .btn').forEach(b => {
+    if(b.textContent.includes('Sync') || b.textContent.includes('\u540c\u6b65')) b.textContent = L.sync;
+    if(b.textContent.includes('New project') || b.textContent.includes('\u65b0\u5efa')) b.textContent = L.newProject;
+  });
+  // Demo mode label
+  const clawLabel = document.getElementById('claw-label');
+  if(clawLabel && clawLabel.textContent.includes('Offline')) clawLabel.textContent = L.offline;
+
+  // Re-render to update empty states
+  renderAll();
+}
+
+class OpenClawClient {
+  constructor() {
+    this.ws = null;
+    this.connected = false;
+    this.connecting = false;
+    this.destroyed = false;       // FIX: intentional teardown flag
+    this._intentionalClose = false; // FIX: distinguish reconnect() from unexpected close
+    this.reqId = 0;
+    this.pending = new Map();
+    this._pendingTimers = new Map(); // FIX: track timeout handles for cleanup
+    this.listeners = {};
+    this.reconnectDelay = 3000;
+    this.maxReconnectDelay = 30000;
+    this.reconnectTimer = null;
+    this._heartbeatTimer = null;  // FIX: connection health check
+    this.serverVersion = '';
+    const saved = localStorage.getItem(CLAW_CONFIG_KEY);
+    if (saved) {
+      try { const c = JSON.parse(saved); this.url = c.url || 'ws://127.0.0.1:18789'; this.token = c.token || ''; } catch(e) { this.url = 'ws://127.0.0.1:18789'; this.token = ''; }
+    } else { this.url = 'ws://127.0.0.1:18789'; this.token = ''; }
+  }
+
+  updateUI(state) {
+    const el = document.getElementById('claw-status');
+    const lb = document.getElementById('claw-label');
+    if (!el || !lb) return;
+    el.className = 'claw-status ' + state;
+    if (state === 'live') lb.textContent = 'OpenClaw' + (this.serverVersion ? ' ' + this.serverVersion : '');
+    else if (state === 'connecting') lb.textContent = 'Connecting...';
+    else lb.textContent = 'Offline';
+  }
+
+  connect() {
+    if (this.destroyed || this.connected || this.connecting) return;
+    /* FIX F-30: don't attempt WebSocket when browser is offline */
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      this.updateUI('off');
+      const lb = document.getElementById('claw-label');
+      if (lb) lb.textContent = 'No network';
+      this.scheduleReconnect();
+      return;
+    }
+    this.connecting = true;
+    this._intentionalClose = false;
+    this.updateUI('connecting');
+    try {
+      this.ws = new WebSocket(this.url);
+    } catch(e) { this.connecting = false; this.updateUI('off'); return; }
+
+    this.ws.onopen = () => {};
+
+    this.ws.onmessage = (evt) => {
+      let frame;
+      try { frame = JSON.parse(evt.data); } catch(e) { return; }
+
+      // Handle challenge
+      if (frame.type === 'event' && frame.event === 'connect.challenge') {
+        const params = {
+          minProtocol: 3, maxProtocol: 3,
+          client: { id: 'gateway-client', version: '2026.3.13', platform: navigator.platform.includes('Win') ? 'windows' : navigator.platform.includes('Mac') ? 'macos' : 'linux', mode: 'backend' },
+          role: 'operator',
+          scopes: ['operator.read', 'operator.write', 'operator.admin']
+        };
+        if (this.token) params.auth = { token: this.token };
+        try { this.ws.send(JSON.stringify({ type: 'req', id: 'connect-' + Date.now(), method: 'connect', params })); } catch(e) {}
+        return;
+      }
+
+      // Handle connect response
+      if (frame.type === 'res' && frame.ok && frame.payload && frame.payload.type === 'hello-ok') {
+        this.connected = true;
+        this.connecting = false;
+        this.reconnectDelay = 3000;
+        this.serverVersion = frame.payload.server?.version || '';
+        this.updateUI('live');
+        this._startHeartbeat();
+        this.emit('connected', frame.payload);
+        return;
+      }
+
+      // Handle RPC responses
+      if (frame.type === 'res' && frame.id && this.pending.has(frame.id)) {
+        const { resolve, reject } = this.pending.get(frame.id);
+        this.pending.delete(frame.id);
+        // FIX: clear the timeout timer for this request
+        const timer = this._pendingTimers.get(frame.id);
+        if (timer) { clearTimeout(timer); this._pendingTimers.delete(frame.id); }
+        if (frame.ok) resolve(frame.payload);
+        else reject(frame.error || { message: 'Unknown error' });
+        return;
+      }
+
+      // Handle events
+      if (frame.type === 'event') {
+        this.emit(frame.event, frame.payload);
+        return;
+      }
+
+      // Handle connect failure
+      if (frame.type === 'res' && !frame.ok) {
+        this.connecting = false;
+        this.updateUI('off');
+      }
+    };
+
+    this.ws.onclose = () => {
+      const wasConnected = this.connected;
+      this.connected = false;
+      this.connecting = false;
+      this._stopHeartbeat();
+      this.updateUI('off');
+      // FIX: reject all pending and clear their timers
+      this._rejectAllPending('Connection closed');
+      if (wasConnected) this.emit('disconnected');
+      // FIX: only auto-reconnect on unexpected close
+      if (!this._intentionalClose && !this.destroyed) {
+        this.scheduleReconnect();
+      }
+    };
+
+    this.ws.onerror = () => {
+      // onerror always fires before onclose; just update UI, onclose handles state
+      this.updateUI('off');
+    };
+  }
+
+  // FIX: centralized pending cleanup
+  _rejectAllPending(reason) {
+    this.pending.forEach(({ reject }, id) => {
+      const timer = this._pendingTimers.get(id);
+      if (timer) clearTimeout(timer);
+      reject({ message: reason });
+    });
+    this.pending.clear();
+    this._pendingTimers.clear();
+  }
+
+  // FIX: heartbeat — detect stale connections (server gone without TCP close)
+  _startHeartbeat() {
+    this._stopHeartbeat();
+    this._heartbeatTimer = setInterval(() => {
+      if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        this._stopHeartbeat();
+        if (this.connected) {
+          this.connected = false;
+          this.updateUI('off');
+          this.emit('disconnected');
+          if (!this.destroyed) this.scheduleReconnect();
+        }
+      }
+    }, 15000);
+  }
+
+  _stopHeartbeat() {
+    clearInterval(this._heartbeatTimer);
+    this._heartbeatTimer = null;
+  }
+
+  /* FIX F-23: auto-reconnect with exponential backoff + user-visible countdown */
+  scheduleReconnect() {
+    if (this.destroyed) return;
+    clearTimeout(this.reconnectTimer);
+    const delaySec = Math.round(this.reconnectDelay / 1000);
+    this.updateUI('off');
+    const lb = document.getElementById('claw-label');
+    if (lb) lb.textContent = 'Reconnecting in ' + delaySec + 's...';
+    this.reconnectTimer = setTimeout(() => {
+      if (!this.destroyed) {
+        this.connect();
+        this.reconnectDelay = Math.min(this.reconnectDelay * 1.5, this.maxReconnectDelay);
+      }
+    }, this.reconnectDelay);
+  }
+
+  /* FIX F-25: reconnect() returns a Promise so callers can await result */
+  reconnect() {
+    clearTimeout(this.reconnectTimer);
+    this.reconnectDelay = 3000;
+    this.destroyed = false; // re-enable if previously destroyed
+    // FIX: mark as intentional so onclose doesn't double-reconnect
+    this._intentionalClose = true;
+    if (this.ws) { try { this.ws.close(); } catch(e) {} }
+    this.connected = false;
+    this.connecting = false;
+    this.url = document.getElementById('oc-url')?.value || this.url;
+    this.token = document.getElementById('oc-token')?.value || this.token;
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        this.off('connected', onOk);
+        reject({ message: 'Reconnect timed out' });
+      }, 15000);
+      const onOk = (payload) => {
+        clearTimeout(timeout);
+        resolve(payload);
+      };
+      this.once('connected', onOk);
+      this.connect();
+    });
+  }
+
+  send(method, params = {}) {
+    return new Promise((resolve, reject) => {
+      // FIX: check readyState, not just boolean flags
+      if (!this.connected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        reject({ message: 'Not connected' }); return;
+      }
+      const id = 'req-' + (++this.reqId);
+      this.pending.set(id, { resolve, reject });
+      try {
+        this.ws.send(JSON.stringify({ type: 'req', id, method, params }));
+      } catch(e) {
+        this.pending.delete(id);
+        reject({ message: 'Send failed: ' + e.message });
+        return;
+      }
+      // FIX: store timer handle so it can be cleared on response or close
+      const timer = setTimeout(() => {
+        if (this.pending.has(id)) {
+          this.pending.delete(id);
+          this._pendingTimers.delete(id);
+          reject({ message: 'Timeout' });
+        }
+      }, 15000);
+      this._pendingTimers.set(id, timer);
+    });
+  }
+
+  async invoke(tool, args = {}) {
+    const proxyUrl = '/api/tools/invoke';
+    const directUrl = this.url.replace('ws://', 'http://').replace('wss://', 'https://') + '/tools/invoke';
+    const headers = { 'Content-Type': 'application/json' };
+    if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
+    const body = JSON.stringify({ tool, args });
+    // FIX: proper error handling on both fetch paths
+    let res;
+    try {
+      res = await fetch(proxyUrl, { method: 'POST', headers, body });
+    } catch(e) {
+      try {
+        res = await fetch(directUrl, { method: 'POST', headers, body });
+      } catch(e2) {
+        throw { message: 'Network error: both proxy and direct requests failed' };
+      }
+    }
+    let data;
+    try { data = await res.json(); } catch(e) { throw { message: 'Invalid JSON response from invoke' }; }
+    if (!data.ok) throw data.error || { message: 'Invoke failed' };
+    return data.result;
+  }
+
+  // FIX #18: on() supports optional key for named dedup; warns on excessive listeners
+  on(event, fn, key) {
+    const list = this.listeners[event] = this.listeners[event] || [];
+    if (key) {
+      // Replace existing listener with same key
+      const idx = list.findIndex(f => f._key === key);
+      if (idx >= 0) list[idx] = fn;
+      else list.push(fn);
+      fn._key = key;
+    } else {
+      if (!list.includes(fn)) list.push(fn);
+    }
+    if (list.length > 20) console.warn('OpenClawClient: >20 listeners on "' + event + '", possible leak');
+  }
+  once(event, fn) {
+    const wrapped = (data) => { this.off(event, wrapped); fn(data); };
+    wrapped._orig = fn;
+    this.on(event, wrapped);
+  }
+  off(event, fn) {
+    if (!this.listeners[event]) return;
+    this.listeners[event] = this.listeners[event].filter(f => f !== fn && f._orig !== fn);
+  }
+  emit(event, data) { (this.listeners[event] || []).slice().forEach(fn => { try { fn(data); } catch(e) {} }); }
+
+  destroy() {
+    this.destroyed = true;
+    this._intentionalClose = true;
+    clearTimeout(this.reconnectTimer);
+    this._stopHeartbeat();
+    this._rejectAllPending('Client destroyed');
+    if (this.ws) {
+      try { this.ws.close(); } catch(e) {}
+      this.ws = null;
+    }
+    this.connected = false;
+    this.connecting = false;
+    this.listeners = {};
+  }
+}
+
+const claw = new OpenClawClient();
+/* FIX F-30: network reachability detection via navigator.onLine */
+window.addEventListener('offline', () => {
+  claw.updateUI('off');
+  const lb = document.getElementById('claw-label');
+  if (lb) lb.textContent = 'No network';
+  toast('Network offline');
+});
+window.addEventListener('online', () => {
+  toast('Network restored');
+  if (!claw.connected && !claw.connecting && !claw.destroyed) {
+    claw.reconnect().catch(() => {});
+  }
+});
+// FIX: clean shutdown on page unload — prevents WebSocket/timer leaks
+// beforeunload: desktop browsers; pagehide: mobile Safari/Chrome (beforeunload often skipped)
+window.addEventListener('beforeunload', () => claw.destroy());
+window.addEventListener('pagehide', () => claw.destroy());
+// Global error handlers — catch uncaught exceptions and unhandled rejections
+window.addEventListener('error', (e) => {
+  console.error('Runtime error:', e.message, e.filename, e.lineno);
+  if (typeof toast === 'function') toast('Runtime error — check console');
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('Unhandled rejection:', e.reason);
+  if (typeof toast === 'function') toast('Async error — check console');
+});
+// Also handle visibilitychange for mobile browsers that skip beforeunload
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    // Save state before potential background kill (mobile)
+    saveState();
+  }
+});
+
+/* ── OpenClaw Settings helpers ── */
+/* FIX F-24: configurable connection test timeout (reads from timeout input or defaults to 10s) */
+function testClawConnection() {
+  const st = document.getElementById('oc-status');
+  if(st){st.textContent = 'Testing...'; st.style.color = 'var(--am)';}
+  claw.url = document.getElementById('oc-url')?.value || 'ws://127.0.0.1:18789';
+  claw.token = document.getElementById('oc-token')?.value || '';
+  if (claw.ws) { try { claw.ws.close(); } catch(e) {} }
+  claw.connected = false; claw.connecting = false;
+  const timeoutMs = parseInt(document.getElementById('oc-timeout')?.value) || 10000;
+  const onOk = () => { clearTimeout(timer); st.textContent = '\u25cf Connected to OpenClaw ' + claw.serverVersion; st.style.color = 'var(--gn)'; };
+  claw.once('connected', onOk);
+  claw.connect();
+  const timer = setTimeout(() => { if (!claw.connected) { st.textContent = '\u2717 Connection failed (timeout ' + (timeoutMs/1000) + 's) \u2014 is OpenClaw gateway running?'; st.style.color = 'var(--co)'; claw.off('connected', onOk); } }, timeoutMs);
+}
+function saveClawConfig() {
+  const btn = document.querySelector('button[onclick="saveClawConfig()"]');
+  if (btn) { btn.style.pointerEvents='none'; btn.textContent='Connecting...'; }
+  const url = document.getElementById('oc-url').value || 'ws://127.0.0.1:18789';
+  const token = document.getElementById('oc-token').value || '';
+  localStorage.setItem(CLAW_CONFIG_KEY, JSON.stringify({ url, token }));
+  claw.url = url; claw.token = token;
+  toast('OpenClaw config saved');
+  claw.reconnect();
+  setTimeout(() => { if(btn){btn.textContent='Save & connect';btn.style.pointerEvents=''} }, 3000);
+}
+
+async function syncAll() {
+  const L = LANG[currentLang] || LANG.en;
+  toast(L.syncing || 'Syncing from OpenClaw...');
+  const syncBtn = document.querySelector('.tb .btn:not(.btn-p)');
+  if (syncBtn) { syncBtn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:1.5px;display:inline-block"></span> Syncing'; syncBtn.style.pointerEvents = 'none'; }
+  // FIX #17: Use allSettled so one failure doesn't block others
+  const results = await Promise.allSettled([loadRealSkills(), loadRealAgents(), loadRealConfig()]);
+  const failures = results.filter(r => r.status === 'rejected');
+  if (claw.connected) {
+    const extra = await Promise.allSettled([loadRealSessions(), loadRealStatus()]);
+    failures.push(...extra.filter(r => r.status === 'rejected'));
+  }
+  renderAll(); updateStats(); updateWizard();
+  if (failures.length) {
+    console.warn('syncAll: partial failures', failures.map(f => f.reason));
+    toast('Sync partially failed (' + failures.length + ' error' + (failures.length > 1 ? 's' : '') + ')');
+  } else {
+    toast(L.syncDone || 'Sync complete');
+  }
+  if (syncBtn) { syncBtn.innerHTML = '\u27f3 Sync'; syncBtn.style.pointerEvents = ''; }
+}
+
+/* ══ Trending actions (with button feedback) ══ */
+function extractSkills(btn, repoName, lang) {
+  btn.style.pointerEvents = 'none';
+  btn.innerHTML = '<span class="spin">\u27f3</span> Extracting...';
+  setTimeout(() => {
+    const langCat = {Python:'ai',TypeScript:'code',JavaScript:'ui',Go:'infra',Rust:'infra'}[lang] || 'code';
+    const parts = repoName.split('/');
+    const name = parts[parts.length - 1].toLowerCase();
+    const skillName = name + '-skill';
+    if (SKS.some(s => s.n === skillName)) {
+      btn.textContent = '\u2713 Already added'; btn.className = 'btn btn-sm'; btn.style.background = 'var(--bg5)'; btn.style.color = 'var(--t4)';
+      return;
+    }
+    SKS.push({ n: skillName, s: 'github/' + repoName, d: 'Auto-extracted skill from ' + repoName, t: [lang.toLowerCase(), 'extracted'], i: '\u26a1', b: 'var(--amb)', c: 'var(--am)', r: '\u2014', src: 'github', cat: langCat });
+    renderSk(); updateStats();
+    const skB = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skB) skB.textContent = SKS.length;
+    autoSave();
+    btn.textContent = '\u2713 Extracted'; btn.className = 'btn btn-sm'; btn.style.background = 'var(--gnb)'; btn.style.color = 'var(--gn)';
+    toast('Extracted 1 skill from ' + repoName);
+  }, 1200);
+}
+
+function addToLibrary(btn, repoName, desc, lang) {
+  const langCat = {Python:'ai',TypeScript:'code',JavaScript:'ui',Go:'infra',Rust:'infra'}[lang] || 'code';
+  const parts = repoName.split('/');
+  const name = parts[parts.length - 1].toLowerCase();
+  if (SKS.some(s => s.n === name)) {
+    btn.textContent = '\u2713 In library'; btn.style.background = 'var(--bg5)'; btn.style.color = 'var(--t4)'; btn.style.pointerEvents = 'none';
+    toast(name + ' already in library'); return;
+  }
+  btn.style.pointerEvents = 'none';
+  SKS.push({ n: name, s: 'github/' + repoName, d: desc, t: [lang.toLowerCase(), 'trending'], i: '\u2605', b: 'var(--tlb)', c: 'var(--tl)', r: '\u2014', src: 'trending', cat: langCat });
+  renderSk(); updateStats();
+  const skB = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skB) skB.textContent = SKS.length;
+  autoSave();
+  btn.textContent = '\u2713 Added'; btn.style.background = 'var(--gnb)'; btn.style.color = 'var(--gn)';
+  toast(name + ' added to skill library');
+}
+
+/* ── FIX F-06: On connect — load data with auto-retry on failure ── */
+async function _loadWithRetry(fn, name, maxRetries) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      await fn();
+      return { ok: true };
+    } catch(e) {
+      if (attempt < maxRetries) {
+        const delay = 2000 * (attempt + 1);
+        console.warn(name + ': attempt ' + (attempt + 1) + ' failed, retrying in ' + delay + 'ms', e.message);
+        await new Promise(r => setTimeout(r, delay));
+      } else {
+        console.error(name + ': all ' + (maxRetries + 1) + ' attempts failed');
+        return { ok: false, error: e };
+      }
+    }
+  }
+}
+claw.on('connected', async (payload) => {
+  const ver = document.getElementById('oc-ver');
+  if (ver) ver.textContent = 'v' + (payload.server?.version || '');
+  toast('OpenClaw connected \u2014 loading real data...');
+  const results = await Promise.allSettled([
+    _loadWithRetry(loadRealSkills, 'skills', 2),
+    _loadWithRetry(loadRealAgents, 'agents', 2),
+    _loadWithRetry(loadRealConfig, 'config', 1)
+  ]);
+  const extra = await Promise.allSettled([
+    _loadWithRetry(loadRealStatus, 'status', 1),
+    _loadWithRetry(loadRealSessions, 'sessions', 2)
+  ]);
+  const allResults = [...results, ...extra];
+  const failures = allResults.filter(r => r.status === 'rejected' || (r.value && !r.value.ok));
+  if (failures.length) {
+    toast('Some data failed to load (' + failures.length + ' error' + (failures.length > 1 ? 's' : '') + ')');
+  }
+  updateStats(); updateWizard(); renderAll();
+});
+
+claw.on('disconnected', () => {
+  toast('OpenClaw disconnected');
+  updateWizard();
+});
+
+/* ── Load real skills from OpenClaw (via server /api/skills) ── */
+async function loadRealSkills() {
+  const res = await fetch('/api/skills');
+  if (!res.ok) throw new Error('Skills API returned ' + res.status);
+  const data = await res.json();
+  const skillsData = data.skills || [];
+  if (!skillsData.length) return;
+  const realSkills = [];
+  const catMap = { 'coding-agent': 'code', 'browser': 'ui', 'canvas': 'ui', 'cron': 'infra', 'webhooks': 'infra', 'email': 'doc', 'calendar': 'doc', 'github-issues': 'code', 'gemini': 'ai', 'discord': 'infra', 'telegram': 'infra', 'slack': 'infra', 'whatsapp': 'infra' };
+  const colorMap = { ready: { b: 'var(--gnb)', c: 'var(--gn)' }, missing: { b: 'var(--cob)', c: 'var(--co)' } };
+  skillsData.forEach(sk => {
+    const ready = sk.eligible && !sk.disabled;
+    const status = ready ? 'ready' : 'missing';
+    const cm = colorMap[status] || colorMap.missing;
+    const name = sk.name || 'unknown';
+    realSkills.push({
+      n: name, s: 'openclaw/' + (sk.source || 'bundled'),
+      d: sk.description || name + ' skill',
+      t: [status, 'openclaw', sk.source || 'bundled'],
+      i: sk.emoji || (ready ? '\u25c9' : '\u25c7'), b: cm.b, c: cm.c,
+      r: ready ? '5.0' : '\u2014', src: 'clawhub',
+      cat: catMap[name] || 'infra', real: true
+    });
+  });
+  if (realSkills.length > 0) {
+    // FIX F-08: Remove all existing real-tagged skills first, then add fresh data
+    const localOnly = SKS.filter(s => !s.real);
+    SKS.length = 0; SKS.push(...realSkills, ...localOnly);
+    renderSk(); updateStats();
+    const skBadge = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skBadge) skBadge.textContent = SKS.length;
+    toast(realSkills.length + ' OpenClaw skills loaded');
+    addActivity('\u26a1', '<strong>Skills</strong> \u2014 ' + realSkills.length + ' loaded from OpenClaw');
+    renderSettingsConfig(window._lastAgentDefaults || {});
+  }
+}
+
+/* ── Load real agents from OpenClaw ── */
+async function loadRealAgents() {
+  const res = await fetch('/api/agents');
+  if (!res.ok) throw new Error('Agents API returned ' + res.status);
+  const data = await res.json();
+  if (!Array.isArray(data) || !data.length) return;
+  const realAgents = data.map(a => ({
+    n: a.id || a.name || 'Agent',
+    d: 'Model: ' + (a.model || 'default'),
+    sk: [], c: a.isDefault ? 'var(--ac)' : 'var(--tl)',
+    st: 'active', tp: 'dev', real: true
+  }));
+  // FIX F-08: Clear existing real agents before merging — prevents duplicates
+  const userAgents = AGS.filter(a => !a.real);
+  AGS.length = 0;
+  AGS.push(...realAgents, ...userAgents);
+  renderAg(); updateStats();
+  const agB = document.querySelector('.ni[data-p="lib-ag"] .bd');
+  if (agB) agB.textContent = AGS.length;
+}
+
+/* ── Load real config from OpenClaw ── */
+async function loadRealConfig() {
+  const res = await fetch('/api/config');
+  if (!res.ok) throw new Error('Config API returned ' + res.status);
+  const data = await res.json();
+  if (data.agents) renderModelsFromConfig(data.agents);
+  if (data.channels) {
+    renderChannelStatus(data.channels);
+    renderSettingsChannels(data.channels);
+  }
+  if (data.agents?.defaults) { window._lastAgentDefaults = data.agents.defaults; renderSettingsConfig(data.agents.defaults); }
+}
+
+function renderSettingsConfig(defaults) {
+  const el = document.getElementById('settings-skills-status');
+  if (!el) return;
+  const ready = SKS.filter(s => s.real && s.t && s.t.includes('ready')).length;
+  const total = SKS.filter(s => s.real).length;
+  if (!defaults || (!defaults.maxConcurrent && !defaults.compaction)) defaults = defaults || {};
+  const concurrent = defaults?.maxConcurrent || '?';
+  const subagents = defaults?.subagents?.maxConcurrent || '?';
+  el.innerHTML =
+    '<div class="builtin-item"><div class="bi-icon" style="background:var(--gnb);color:var(--gn)">\u2713</div><div class="bi-info"><div class="bi-name">' + total + ' skills loaded</div><div class="bi-desc">' + ready + ' ready, ' + (total - ready) + ' missing dependencies</div></div><div class="bi-status on">Synced</div></div>' +
+    '<div class="builtin-item"><div class="bi-icon" style="background:var(--acb2);color:var(--ac)">\u2699</div><div class="bi-info"><div class="bi-name">Max concurrent tasks</div><div class="bi-desc">' + concurrent + ' agents, ' + subagents + ' subagents</div></div><div class="bi-status on">' + concurrent + '</div></div>' +
+    '<div class="builtin-item"><div class="bi-icon" style="background:var(--amb);color:var(--am)">\u2696</div><div class="bi-info"><div class="bi-name">Compaction mode</div><div class="bi-desc">' + (defaults?.compaction?.mode || 'default') + '</div></div><div class="bi-status on">Active</div></div>';
+}
+
+function renderSettingsChannels(channels) {
+  const el = document.getElementById('settings-channels-status');
+  if (!el) return;
+  let chArr = channels;
+  if (chArr && !Array.isArray(chArr)) chArr = Object.entries(chArr).map(([k, v]) => ({ name: k, ...v }));
+  if (!chArr || !chArr.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t4);font-size:12px">No channels configured</div>';
+    return;
+  }
+  const colors = {feishu:'var(--bl)',slack:'var(--ac)',discord:'var(--pk)',telegram:'var(--tl)',whatsapp:'var(--gn)',web:'var(--am)'};
+  el.innerHTML = chArr.map(ch => {
+    const name = ch.name || 'Channel';
+    const enabled = ch.enabled !== false;
+    const color = colors[name.toLowerCase()] || 'var(--t2)';
+    return '<div class="builtin-item"><div class="bi-icon" style="background:' + color + '22;color:' + color + '">' + name[0].toUpperCase() + '</div><div class="bi-info"><div class="bi-name">' + name + '</div><div class="bi-desc">' + (ch.appId ? 'App: ' + ch.appId : 'Channel endpoint') + '</div></div><div class="bi-status ' + (enabled ? 'on' : '') + '">' + (enabled ? 'Enabled' : 'Disabled') + '</div></div>';
+  }).join('');
+}
+
+function renderModelsFromConfig(agentsConfig) {
+  try { _renderModelsFromConfig(agentsConfig); } catch(e) { console.error('renderModelsFromConfig:', e); }
+}
+function _renderModelsFromConfig(agentsConfig) {
+  const list = document.getElementById('model-list');
+  if (!list) return;
+  list.innerHTML = '';
+  // Parse the config structure: { defaults: { model: { primary: "..." }, models: { "model/id": {} } } }
+  const defaults = agentsConfig?.defaults || agentsConfig || {};
+  const primary = defaults?.model?.primary || '';
+  const modelsObj = defaults?.models || {};
+  const modelEntries = Object.keys(modelsObj);
+  if (!primary && !modelEntries.length) {
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--t3);font-size:13px">No models configured in OpenClaw.<br><span style="font-size:11px;color:var(--t4)">Run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw configure</code> to add models.</span></div>';
+    return;
+  }
+  const allModels = modelEntries.length ? modelEntries : [primary];
+  allModels.forEach(modelId => {
+    const isPrimary = modelId === primary;
+    const provider = modelId.split('/')[0] || 'unknown';
+    const name = modelId.split('/').pop() || modelId;
+    const html = '<div class="model-row" data-id="' + name + '" style="pointer-events:auto"><div class="mr-left"><div class="mr-icon" style="background:var(--acb2);color:var(--ac)">' + name[0].toUpperCase() + '</div><div><div class="mr-name">' + name + '</div><div class="mr-provider">' + provider + ' <span class="auth-badge key">' + modelId + '</span></div></div></div><div class="mr-mid"><div class="mr-status ok">' + (isPrimary ? 'Primary' : 'Configured') + '</div></div><div class="mr-right"><span style="font-size:11px;color:var(--t3);font-family:var(--fm)">read-only</span></div></div>';
+    list.insertAdjacentHTML('beforeend', html);
+  });
+  // Add config hint
+  list.insertAdjacentHTML('beforeend', '<div style="text-align:center;padding:16px 0 8px;color:var(--t4);font-size:11px">Models managed by OpenClaw \u2014 Run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw configure</code> to change.</div>');
+}
+
+function renderChannelStatus(channels) {
+  try { _renderChannelStatus(channels); } catch(e) { console.error('renderChannelStatus:', e); }
+}
+function _renderChannelStatus(channels) {
+  const cards = document.getElementById('cr-cards');
+  const log = document.getElementById('cr-log');
+  if (!cards) return;
+  // Convert object { feishu: {...}, slack: {...} } to array [{name:'feishu',...}, ...]
+  if (channels && !Array.isArray(channels)) {
+    channels = Object.entries(channels).map(([k, v]) => ({ name: k, ...v }));
+  }
+  if (!channels || !channels.length) {
+    cards.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--t3);font-size:13px">No channels configured<br><span style="font-size:11px;color:var(--t4)">Run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw setup</code> to add channels.</span></div>';
+    if (log) log.innerHTML = '<div style="color:var(--t4)">No channel events yet</div>';
+    return;
+  }
+  const channelColors = {feishu:'var(--bl)',slack:'var(--ac)',discord:'var(--pk)',telegram:'var(--tl)',whatsapp:'var(--gn)',web:'var(--am)'};
+  cards.innerHTML = channels.map(ch => {
+    const name = ch.name || ch.type || 'Channel';
+    const color = channelColors[name.toLowerCase()] || 'var(--t2)';
+    const isActive = ch.status === 'Active' || ch.status === 'running' || ch.running || ch.configured || ch.enabled;
+    const status = isActive ? 'Active' : (ch.configured ? 'Configured' : 'Disabled');
+    const statusColor = isActive ? 'var(--gn)' : ch.configured ? 'var(--am)' : 'var(--t4)';
+    const detail = ch.appId ? 'App: ' + ch.appId : ch.probe?.appId ? 'App: ' + ch.probe.appId : ch.description || 'Channel endpoint';
+    return '<div style="background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:28px;height:28px;border-radius:8px;background:' + color + '15;color:' + color + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">' + name[0].toUpperCase() + '</div><span style="font-size:13px;font-weight:500">' + name + '</span><span style="margin-left:auto;font-size:10px;padding:2px 7px;border-radius:5px;background:' + statusColor + '15;color:' + statusColor + ';font-family:var(--fm)">' + status + '</span></div><div style="font-size:12px;color:var(--t3)">' + detail + '</div></div>';
+  }).join('');
+}
+
+/* ── Load real gateway status ── */
+async function loadRealStatus() {
+  if (!claw.connected) return;
+  try {
+    const health = await claw.send('health');
+    if (health) {
+      // Update dashboard stats
+      const statCards = document.querySelectorAll('.sc');
+      if (health.uptime && statCards[3]) {
+        statCards[3].querySelector('.sc-c').textContent = '\u2191 uptime: ' + Math.floor(health.uptime / 60) + 'm';
+      }
+    }
+  } catch(e) {}
+}
+
+/* ── FIX F-07: Load real sessions with error boundary and fallback ── */
+async function loadRealSessions() {
+  if (!claw.connected) return;
+  try {
+    const result = await claw.invoke('sessions_list', {});
+    const sessions = result?.details?.sessions || result?.sessions || [];
+    if (sessions.length > 0) {
+      const sessionColors = ['var(--tl)', 'var(--bl)', 'var(--pk)', 'var(--am)', 'var(--gn)'];
+      sessions.forEach((sess, i) => {
+        const exists = PROJS.some(p => p.sessionKey === sess.key);
+        if (!exists) {
+          PROJS.push({
+            _id: _uid(),
+            n: sess.name || sess.key || 'Session ' + (i + 1),
+            d: 'OpenClaw session' + (sess.channel ? ' via ' + sess.channel : ''),
+            p: 0, c: sessionColors[i % sessionColors.length], ph: 'Active',
+            sessionKey: sess.key, real: true, _chatHtml: ''
+          });
+        }
+      });
+      renderProjs(); renderDashProjs();
+    }
+  } catch(e) {
+    console.error('loadRealSessions failed:', e);
+    // FIX F-07: Don't wipe existing projects on failure — keep local data intact
+    // Show an inline error hint if projects list is empty
+    if (PROJS.length === 0) {
+      const el = document.getElementById('pj-list');
+      if (el) el.innerHTML = '<div style="text-align:center;padding:40px 20px;grid-column:1/-1;color:var(--t3)"><div style="font-size:14px;margin-bottom:8px">Could not load sessions from OpenClaw</div><div style="font-size:12px;color:var(--t4);margin-bottom:14px">Your local projects are still available. Try re-syncing.</div><button class="btn btn-sm" onclick="syncAll()">Retry sync</button></div>';
+    }
+    throw e; // re-throw so _loadWithRetry can retry
+  }
+}
+
+/* ── FIX F-11: Real chat via OpenClaw — timeout + retry w/ exponential backoff ── */
+const _OPENCLAW_TIMEOUT = 30000;   // 30s per attempt
+const _OPENCLAW_MAX_RETRIES = 2;   // up to 2 retries (3 total attempts)
+async function sendToOpenClaw(text) {
+  if (!claw.connected) return { ok: false, error: 'Not connected to OpenClaw' };
+  let lastErr = 'Request failed';
+  for (let attempt = 0; attempt <= _OPENCLAW_MAX_RETRIES; attempt++) {
+    if (attempt > 0) await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt - 1))); // 1s, 2s backoff
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), _OPENCLAW_TIMEOUT);
+    try {
+      const r = await fetch('/api/agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, agent: 'main' }),
+        signal: ctrl.signal
+      });
+      clearTimeout(timer);
+      let data;
+      try { data = await r.json(); } catch(e) {
+        lastErr = 'Invalid response from server'; continue;
+      }
+      if (!r.ok) { lastErr = data.error || 'Server error (' + r.status + ')'; continue; }
+      return data;
+    } catch(e) {
+      clearTimeout(timer);
+      if (e.name === 'AbortError') { lastErr = 'Request timed out (30s)'; continue; }
+      lastErr = 'Network error: ' + (e.message || 'fetch failed'); continue;
+    }
+  }
+  return { ok: false, error: lastErr + ' (after ' + (_OPENCLAW_MAX_RETRIES + 1) + ' attempts)' };
+}
+
+let currentSessionKey = 'main';
+
+/* ══ Nav ══ */
+document.querySelectorAll('.ni[data-p]').forEach(n=>n.onclick=()=>go(n.dataset.p));
+function go(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
+  const e=document.getElementById('p-'+p);if(e)e.classList.add('on');
+  document.querySelectorAll('.ni').forEach(n=>{if(n.dataset.p===p)n.classList.add('on')});
+  if(p==='trend'){ loadTrending(); }
+  if(p==='ws'){
+    if(!activeProjectId || !_projById(activeProjectId) || PROJS.length===0){
+      const demoAct=document.getElementById('demo-activity');const wsEmpty=document.getElementById('ws-empty');
+      if(demoAct)demoAct.style.display='none';if(wsEmpty)wsEmpty.style.display='';
+    }
+    setTimeout(()=>{const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight},50);
+  }
+}
+/* FIX M-07: Ctrl+K shortcut */
+const KB_SHORTCUTS=[
+  {group:'General',items:[
+    {desc:'Search',keys:['Ctrl','K']},
+    {desc:'Keyboard shortcuts',keys:['?']},
+    {desc:'Close dialog',keys:['Esc']},
+    {desc:'Toggle dark / light mode',keys:['Ctrl','Shift','L']}
+  ]},
+  {group:'Navigation',items:[
+    {desc:'Dashboard',keys:['G','D'],action:()=>go('dash')},
+    {desc:'Skills library',keys:['G','S'],action:()=>go('lib-sk')},
+    {desc:'Agents library',keys:['G','A'],action:()=>go('lib-ag')},
+    {desc:'Settings',keys:['G',','],action:()=>go('settings')}
+  ]},
+  {group:'Actions',items:[
+    {desc:'New project',keys:['N'],action:()=>openMo()},
+    {desc:'Sync data',keys:['Ctrl','Shift','S'],action:()=>syncAll()}
+  ]}
+];
+function showKbModal(){
+  const el=document.getElementById('kb-list');
+  if(!el)return;
+  el.innerHTML=KB_SHORTCUTS.map(g=>'<div class="kb-group"><div class="kb-group-title">'+g.group+'</div>'+g.items.map(i=>'<div class="kb-row">'+i.desc+i.keys.map(k=>'<kbd>'+k+'</kbd>').join('')+'</div>').join('')+'</div>').join('');
+  _openModal('kb-modal');
+}
+let _gPressed=false,_gTimer=null;
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement?.tagName;
+  const inInput=tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();const gs=document.getElementById('gs');if(gs)gs.focus();return}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='L'){e.preventDefault();toggleTheme();return}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='S'){e.preventDefault();syncAll();return}
+  if(e.key==='Escape'){const open=document.querySelector('.mo.open');if(open){if(open.id==='modal')closeMo();else _closeModal(open.id);}return}
+  if(inInput)return;
+  if(e.key==='?'){e.preventDefault();const m=document.getElementById('kb-modal');if(m&&m.classList.contains('open'))_closeModal('kb-modal');else showKbModal();return}
+  if(e.key==='n'||e.key==='N'){openMo();return}
+  if(e.key==='g'||e.key==='G'){_gPressed=true;clearTimeout(_gTimer);_gTimer=setTimeout(()=>{_gPressed=false},800);return}
+  if(_gPressed){_gPressed=false;clearTimeout(_gTimer);
+    if(e.key==='d')go('dash');else if(e.key==='s')go('lib-sk');else if(e.key==='a')go('lib-ag');else if(e.key===',')go('settings');
+    return;
+  }
+});
+
+/* ══ Toast — FIX C-05: clear previous timer, FIX: null guard ══ */
+let toastTimer=null;
+function toast(msg){
+  clearTimeout(toastTimer);
+  const t=document.getElementById('toast-el');
+  if(!t)return;
+  t.textContent=msg;t.classList.add('show');
+  toastTimer=setTimeout(()=>{const el=document.getElementById('toast-el');if(el)el.classList.remove('show')},2200);
+}
+
+/* ══ Modal — FIX M-05: clear fields, FIX #16: focus trap + restore ══ */
+let _lastFocused=null;
+let _activeTrapModal=null;
+const _FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
+
+function _restoreFocus(){
+  if(_lastFocused&&typeof _lastFocused.focus==='function'&&document.body.contains(_lastFocused)){
+    setTimeout(()=>{try{_lastFocused.focus()}catch(e){}finally{_lastFocused=null}},80);
+  }else{
+    _lastFocused=null;
+    setTimeout(()=>{const fb=document.querySelector('.ni.on')||document.querySelector('.tb button');if(fb)fb.focus()},80);
+  }
+}
+function _trapFocus(e){
+  if(!_activeTrapModal)return;
+  if(e.key==='Escape'){
+    // Close the active modal on Escape
+    const id=_activeTrapModal.id;
+    if(id==='modal')closeMo();else _closeModal(id);
+    return;
+  }
+  if(e.key!=='Tab')return;
+  const focusable=Array.from(_activeTrapModal.querySelectorAll(_FOCUSABLE)).filter(el=>el.offsetParent!==null);
+  if(!focusable.length){e.preventDefault();return}
+  const first=focusable[0],last=focusable[focusable.length-1];
+  if(e.shiftKey){if(document.activeElement===first){e.preventDefault();last.focus()}}
+  else{if(document.activeElement===last){e.preventDefault();first.focus()}}
+}
+document.addEventListener('keydown',_trapFocus);
+
+function _activateModal(m){
+  _lastFocused=document.activeElement;
+  m.classList.add('open');
+  _activeTrapModal=m;
+  m.setAttribute('aria-modal','true');
+  m.setAttribute('role','dialog');
+  const first=m.querySelector(_FOCUSABLE);
+  if(first)setTimeout(()=>first.focus(),80);
+}
+function _deactivateModal(m){
+  m.classList.remove('open');
+  if(_activeTrapModal===m)_activeTrapModal=null;
+  /* FIX F-16: clear form fields and validation state when modal closes */
+  m.querySelectorAll('input:not([type="hidden"]),textarea,select').forEach(el=>{
+    if(el.type==='checkbox'||el.type==='radio'){el.checked=el.defaultChecked}
+    else{el.value=el.defaultValue||''}
+  });
+  m.querySelectorAll('.ff').forEach(w=>w.classList.remove('has-error','valid'));
+  _restoreFocus();
+}
+function openMo(){_activateModal(document.getElementById('modal'))}
+function closeMo(){_deactivateModal(document.getElementById('modal'))}
+function _openModal(id){const m=document.getElementById(id);if(m)_activateModal(m)}
+function _closeModal(id){const m=document.getElementById(id);if(m)_deactivateModal(m)}
+const PROJS=[];
+const projColors=['var(--bl)','var(--pk)','var(--tl)','var(--co)','var(--am)','var(--gn)','var(--ac)'];
+/* FIX F-01: UUID generator for stable project identity */
+function _uid(){return 'p-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8)}
+function _projById(id){return PROJS.find(p=>p._id===id)}
+function _projIdxById(id){return PROJS.findIndex(p=>p._id===id)}
+/* ══ Form validation — FIX F-15: modal-scoped validation ══ */
+function validateField(input,wrapperId,errMsg,scope){
+  const root=scope||document;
+  const w=root.querySelector?root.querySelector('#'+wrapperId):document.getElementById(wrapperId);
+  if(!w)return true;
+  const val=input.value.trim();
+  const minLen=parseInt(input.getAttribute('minlength'))||0;
+  if(input.required&&!val){w.classList.add('has-error');w.classList.remove('valid');return false}
+  if(minLen&&val.length<minLen){w.classList.add('has-error');w.classList.remove('valid');return false}
+  w.classList.remove('has-error');if(val)w.classList.add('valid');else w.classList.remove('valid');return true;
+}
+function validateForm(fields,modalId){
+  /* FIX F-15: scope validation to a specific modal so state doesn't leak */
+  const scope=modalId?document.getElementById(modalId):document;
+  let ok=true;
+  fields.forEach(f=>{
+    const input=scope?scope.querySelector('#'+f.id):document.getElementById(f.id);if(!input)return;
+    if(!validateField(input,f.wrapper,f.err,scope)){ok=false;if(!scope.querySelector('.ff.has-error input:focus,.ff.has-error textarea:focus'))input.focus()}
+  });
+  return ok;
+}
+function clearValidation(wrapperIds,modalId){
+  const scope=modalId?document.getElementById(modalId):document;
+  wrapperIds.forEach(id=>{const w=scope?scope.querySelector('#'+id):document.getElementById(id);if(w){w.classList.remove('has-error','valid')}});
+}
+
+function createProj(){
+  /* FIX F-15: scope validation to 'modal' */
+  if(!validateForm([
+    {id:'mo-name',wrapper:'ff-mo-name',err:'Project name is required'},
+    {id:'mo-desc',wrapper:'ff-mo-desc',err:'Please describe your project'}
+  ],'modal')){toast('Please fill in the required fields');return}
+  const btn = document.querySelector('#modal .btn-p');
+  if (btn) { btn.style.pointerEvents='none'; btn.textContent='Creating...'; }
+  const nm=document.getElementById('mo-name').value||'New Project';
+  const ds=document.getElementById('mo-desc').value||'Custom project';
+  const pri=document.getElementById('mo-pri').value;
+  const projId = _uid();
+  const newProj = {_id:projId,n:nm,d:ds,p:0,c:projColors[PROJS.length%projColors.length],ph:'Analyze',_chatHistory:[]};
+  if (claw.connected) {
+    const sk = 'project-' + Date.now();
+    newProj.sessionKey = sk;
+    newProj.real = true;
+    claw.send('sessions.spawn', { name: nm, sessionKey: sk }).catch(() => {});
+  }
+  PROJS.push(newProj);
+  setTimeout(()=>{ if(btn){btn.style.pointerEvents='';btn.textContent='Create & deploy agents'} },500);
+  closeMo();clearValidation(['ff-mo-name','ff-mo-desc'],'modal');toast('"'+nm+'" created \u2014 PM-Agent deploying...');
+  document.getElementById('mo-name').value='';
+  document.getElementById('mo-desc').value='';
+  renderProjs();renderDashProjs();
+  document.querySelector('.sc:nth-child(3) .sc-v').textContent=PROJS.length;
+  document.querySelector('.ni[data-p="projs"] .bd').textContent=PROJS.length;
+  setTimeout(()=>{switchProject(projId);go('ws')},600);
+  autoSave();
+}
+
+/* ══ Mode ══ */
+let mode='plan';
+function setM(m){mode=m;document.getElementById('m-plan').classList.toggle('on',m==='plan');document.getElementById('m-auto').classList.toggle('on',m==='auto');toast(m==='auto'?'Auto mode — agents execute immediately':'Plan mode — review before execution')}
+
+/* ══ Chat fallback replies ══ */
+const replies=[
+  {k:['status','progress','how','update'],r:'Checking project status...'},
+  {k:['fix','bug','error','issue'],r:'Looking into the issue...'},
+  {k:['add','feature','include','want','need'],r:'Added to the backlog. Will plan in the next cycle.'},
+  {k:['deploy','ship','launch','release'],r:'Deploy requires review first. Run through the pipeline.'},
+  {k:['test','coverage','qa'],r:'Running test suite...'},
+  {k:['hello','hi','hey'],r:'Hey! I\'m PM-Agent. Connect OpenClaw for real AI responses.'},
+  {k:['help','what can','how do'],r:'Connect OpenClaw to get real AI agent responses. Without it, I can only give placeholder replies.'}
+];
+function getReply(txt){
+  const low=txt.toLowerCase();
+  for(const r of replies){if(r.k.some(k=>low.includes(k)))return r.r}
+  return 'Message received. Connect OpenClaw for real AI responses.';
+}
+
+/* ══ Chat — FIX C-01 XSS, FIX M-06 animation fill ══ */
+/* FIX F-12: sequence counter for concurrent message ordering */
+let _msgSeq = 0;
+/* FIX F-10: track in-flight send to prevent concurrent sends */
+let _sendingMsg = false;
+const _MSG_MAX_LEN = 4000; /* FIX F-13 */
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function _setSendEnabled(enabled){
+  const btn=document.getElementById('send-btn');
+  if(btn){btn.disabled=!enabled;btn.style.opacity=enabled?'1':'0.5';btn.style.cursor=enabled?'pointer':'not-allowed'}
+}
+function sendMsg(){
+  /* FIX F-10: block concurrent sends */
+  if(_sendingMsg)return;
+  const inp=document.getElementById('ci');if(!inp)return;
+  const txt=inp.value.trim();
+  /* FIX F-13: input validation — empty + max length */
+  if(!txt){toast('Please enter a message');return}
+  if(txt.length>_MSG_MAX_LEN){toast('Message too long (max '+_MSG_MAX_LEN+' chars)');return}
+  const log=document.getElementById('build-phase');if(!log)return;
+  /* FIX F-12: stamp with sequence number */
+  const seq = ++_msgSeq;
+  /* FIX F-10: enter loading state */
+  _sendingMsg=true;_setSendEnabled(false);
+  const d=document.createElement('div');d.className='ai usr';d.style.animation='fadeUp .25s ease both';
+  d.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--co),var(--am));color:#090a0e">Y</div><div class="ab"><div class="an" style="color:var(--t1)">You \u2192 PM-Agent</div><div class="am">'+esc(txt)+'</div><div class="at">'+now()+'</div></div>';
+  log.appendChild(d);inp.value='';scrollLog();
+
+  if (claw.connected) {
+    const thinking = document.createElement('div');
+    thinking.className='ai';thinking.style.animation='fadeUp .25s ease both';
+    thinking.dataset.seq=seq; /* FIX F-12 */
+    thinking.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am" style="display:flex;align-items:center;gap:8px"><div class="spinner" style="width:14px;height:14px;border-width:1.5px"></div><span class="pulse" style="color:var(--t3)">Thinking...</span></div></div>';
+    log.appendChild(thinking);scrollLog();
+    sendToOpenClaw(txt).then(result => {
+      /* FIX F-12: skip stale response */
+      if(parseInt(thinking.dataset.seq)!==seq)return;
+      if (result && result.ok !== false && (result.text || result.message || result.content)) {
+        const reply = result.text || result.message || (Array.isArray(result.content) ? result.content.map(c=>c.text||'').join('') : String(result.content));
+        thinking.querySelector('.am').innerHTML = reply.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+      } else if (result && result.ok === false) {
+        thinking.querySelector('.am').innerHTML = '<span style="color:var(--co)">\u26a0 ' + esc(result.error || 'Agent request failed') + '</span>';
+      } else {
+        thinking.querySelector('.am').innerHTML = getReply(txt) + ' <span style="font-size:9px;color:var(--t4)">(fallback)</span>';
+      }
+      thinking.querySelector('.ab').insertAdjacentHTML('beforeend','<div class="at">'+now()+'</div>');
+      scrollLog(); saveChatToProject();
+    }).catch((e) => {
+      if(parseInt(thinking.dataset.seq)!==seq)return; /* FIX F-12 */
+      thinking.querySelector('.am').innerHTML = '<span style="color:var(--co)">\u26a0 ' + esc(e.message || 'Request failed') + '</span>';
+      thinking.querySelector('.ab').insertAdjacentHTML('beforeend','<div class="at">'+now()+'</div>');
+      scrollLog(); saveChatToProject();
+    }).finally(() => {
+      /* FIX F-10: restore send state */
+      _sendingMsg=false;_setSendEnabled(true);
+    });
+  } else {
+    // Demo mode fallback
+    setTimeout(()=>{
+      const r=document.createElement('div');r.className='ai';r.style.animation='fadeUp .25s ease both';
+      r.innerHTML='<div class="aa" style="background:linear-gradient(135deg,var(--ac),var(--tl));color:#090a0e">PM</div><div class="ab"><div class="an" style="color:var(--ac)">PM-Agent</div><div class="am">'+getReply(txt)+'</div><div class="at">'+now()+'</div></div>';
+      log.appendChild(r);scrollLog();saveChatToProject();
+      /* FIX F-10: restore send state */
+      _sendingMsg=false;_setSendEnabled(true);
+    },600+Math.random()*600);
+  }
+}
+/* FIX F-28: locale-aware timestamp via _fmtTime */
+function now(){return _fmtTime()}
+function scrollLog(){const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight}
+function saveChatToProject(){
+  if(activeProjectId){
+    const p=_projById(activeProjectId);
+    if(p){const bp=document.getElementById('build-phase');if(bp)p._chatHtml=bp.innerHTML;}
+  }
+}
+
+/* ══ Fix — FIX C-04: immediate disable + FIX L-03: update count ══ */
+/* FIX F-14: project-scoped state instead of global variables */
+function _projState(){
+  if(!activeProjectId)return{issuesFixed:0,approved:false};
+  const p=_projById(activeProjectId);
+  if(!p)return{issuesFixed:0,approved:false};
+  if(typeof p._issuesFixed==='undefined')p._issuesFixed=0;
+  if(typeof p._approved==='undefined')p._approved=false;
+  return p;
+}
+function fixLog(b){b.style.pointerEvents='none';b.innerHTML='<span class="spin">⟳</span>';setTimeout(()=>{b.innerHTML='Fixed';b.className='btn btn-s btn-sm';b.style.pointerEvents='';const p=b.closest('.ai');p.style.borderColor='rgba(90,224,138,.15)';p.style.background='var(--gnb)'},1800)}
+function fixP(id,b){b.style.pointerEvents='none';b.innerHTML='<span class="spin">⟳</span>';const e=document.getElementById('wi'+id);setTimeout(()=>{e.style.borderColor='rgba(90,224,138,.15)';e.style.background='var(--gnb)';e.querySelector('.itx').style.color='var(--gn)';b.innerHTML='Done';b.className='btn btn-s btn-sm';const ps=_projState();ps._issuesFixed=(ps._issuesFixed||0)+1;const fc=ps._issuesFixed;document.getElementById('issue-count').innerHTML=fc>=2?'<span style="color:var(--gn)">✓</span> All issues resolved':'<span style="color:var(--co)">!</span> Issues ('+(2-fc)+')';toast('Issue fixed')},1500)}
+/* FIX C-03: approve with state preservation — FIX F-14: project-scoped */
+function approve(){const ps=_projState();if(ps._approved)return;ps._approved=true;document.getElementById('plx').innerHTML='<span style="font-size:11px;color:var(--gn);font-family:var(--fm)">✓ Plan approved — agents executing</span>';toast('Plan approved — 5 agents deploying')}
+
+/* ══ Library — FIX M-01: separate source/category groups, FIX L-06: real counts ══ */
+const SKS=[];
+let skSrc='all',skCat='all';
+function fltSk(el){
+  const g=el.dataset.g,f=el.dataset.f;
+  if(g==='src'){skSrc=f;el.closest('.lsb').querySelectorAll('.lci[data-g="src"]').forEach(x=>x.classList.remove('on'))}
+  else{skCat=f;el.closest('.lsb').querySelectorAll('.lci[data-g="cat"]').forEach(x=>x.classList.remove('on'))}
+  el.classList.add('on');_saveFilters();renderSk();
+}
+function skCard(s){return '<div class="lcd" onclick="viewSkill('+SKS.indexOf(s)+')"><div class="lh"><div class="li" style="background:'+s.b+';color:'+s.c+'">'+s.i+'</div><div><div class="ln">'+s.n+'</div><div class="ls">'+s.s+'</div></div></div><div class="ld">'+s.d+'</div><div style="display:flex;gap:4px;margin-bottom:6px">'+s.t.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div><div class="lf"><span>★ '+s.r+'</span></div></div>'}
+function renderSk(){
+  let f=SKS;
+  if(skSrc!=='all')f=f.filter(s=>s.src===skSrc);
+  if(skCat!=='all')f=f.filter(s=>s.cat===skCat);
+  const parts=[];if(skSrc!=='all')parts.push(skSrc.charAt(0).toUpperCase()+skSrc.slice(1));if(skCat!=='all')parts.push(skCat);
+  document.getElementById('sk-title').textContent=parts.length?parts.join(' ')+' skills':'All skills';
+  document.getElementById('sk-count').textContent=f.length+' results';
+  /* FIX F-26: unified empty state */
+  document.getElementById('sk-grid').innerHTML=f.length?f.map(s=>skCard(s)).join(''):SKS.length===0?_emptyState('\u26a1','noSkills','emptyAction',(LANG[currentLang]||LANG.en).connectOC,"go('settings')"):_emptyState('\ud83d\udd0d','No skills match this filter',null,null,null,{compact:true});
+  /* FIX F-19: counts reflect AND-filtered base so users see how many remain per dimension */
+  const srcBase=skCat!=='all'?SKS.filter(s=>s.cat===skCat):SKS;
+  const catBase=skSrc!=='all'?SKS.filter(s=>s.src===skSrc):SKS;
+  ['github','clawhub','trending'].forEach(v=>{const el=document.getElementById('sk-cnt-'+v);if(el)el.textContent=srcBase.filter(s=>s.src===v).length});
+  ['code','test','infra','data','sec','doc','ai','ui'].forEach(v=>{const el=document.getElementById('sk-cnt-'+v);if(el)el.textContent=catBase.filter(s=>s.cat===v).length});
+  const ae=document.getElementById('sk-cnt-all');if(ae)ae.textContent=(skCat!=='all'?srcBase.length:SKS.length);
+  const cae=document.getElementById('sk-cnt-cat-all');if(cae)cae.textContent=(skSrc!=='all'?catBase.length:SKS.length);
+}
+
+const AGS=[];
+let agTp='all',agSt='all';
+function fltAg(el){
+  const g=el.dataset.g,f=el.dataset.f;
+  if(g==='tp'){agTp=f;el.closest('.lsb').querySelectorAll('.lci[data-g="tp"]').forEach(x=>x.classList.remove('on'))}
+  else{agSt=f;el.closest('.lsb').querySelectorAll('.lci[data-g="st"]').forEach(x=>x.classList.remove('on'))}
+  el.classList.add('on');_saveFilters();renderAg();
+}
+function agCard(a){return '<div class="lcd" onclick="viewAgent('+AGS.indexOf(a)+')"><div class="lh"><div class="li" style="background:'+a.c+'15;color:'+a.c+';border-radius:50%;font-weight:700;font-size:13px">'+a.n[0]+'</div><div><div class="ln">'+a.n+'</div><div class="ls">'+a.sk.length+' skills</div></div></div><div class="ld">'+a.d+'</div><div style="display:flex;gap:4px;margin-bottom:6px">'+a.sk.map(s=>'<span class="tag">'+s+'</span>').join('')+'</div><div class="lf"><span style="color:'+(a.st==='Active'?'var(--gn)':'var(--t4)')+'">'+a.st+'</span></div></div>'}
+function renderAg(){
+  let f=AGS;
+  if(agTp!=='all')f=f.filter(a=>a.tp===agTp);
+  if(agSt!=='all')f=f.filter(a=>a.st.toLowerCase()===agSt);
+  const parts=[];if(agTp!=='all')parts.push(agTp.charAt(0).toUpperCase()+agTp.slice(1));if(agSt!=='all')parts.push(agSt);
+  document.getElementById('ag-title').textContent=parts.length?parts.join(' ')+' agents':'All agents';
+  document.getElementById('ag-count').textContent=f.length+' agents';
+  /* FIX F-26: unified empty state */
+  document.getElementById('ag-grid').innerHTML=f.length?f.map(a=>agCard(a)).join(''):AGS.length===0?_emptyState('\ud83e\udd16','noAgents','emptyAction',(LANG[currentLang]||LANG.en).createAgent,"openCreateAgent()"):_emptyState('\ud83d\udd0d','No agents match this filter',null,null,null,{compact:true});
+  /* FIX F-19: counts reflect AND-filtered base for agent filters */
+  const tpBase=agSt!=='all'?AGS.filter(a=>a.st.toLowerCase()===agSt):AGS;
+  const stBase=agTp!=='all'?AGS.filter(a=>a.tp===agTp):AGS;
+  ['dev','ops','qa','sec','data','doc'].forEach(v=>{const el=document.getElementById('ag-cnt-'+v);if(el)el.textContent=tpBase.filter(a=>a.tp===v).length});
+  ['active','idle'].forEach(v=>{const el=document.getElementById('ag-cnt-'+v);if(el)el.textContent=stBase.filter(a=>a.st.toLowerCase()===v).length});
+  const ae=document.getElementById('ag-cnt-all');if(ae)ae.textContent=(agSt!=='all'?tpBase.length:AGS.length);
+  const sae=document.getElementById('ag-cnt-st-all');if(sae)sae.textContent=(agTp!=='all'?stBase.length:AGS.length);
+}
+
+/* ══ Global search — FIX C-01: handle 0 match, FIX C-02: reset state ══ */
+/* FIX F-17: Persist filter state to localStorage (survives page refresh) */
+const _FILTER_KEY = 'ah_filters';
+function _saveFilters(){
+  try{localStorage.setItem(_FILTER_KEY,JSON.stringify({skSrc,skCat,agTp,agSt,q:document.getElementById('gs')?.value||''}))}catch(e){}
+}
+function _restoreFilters(){
+  try{
+    /* FIX F-17: read from localStorage; also migrate old sessionStorage data */
+    let raw=localStorage.getItem(_FILTER_KEY);
+    if(!raw){raw=sessionStorage.getItem(_FILTER_KEY);if(raw){localStorage.setItem(_FILTER_KEY,raw);sessionStorage.removeItem(_FILTER_KEY)}}
+    if(!raw)return;
+    const f=JSON.parse(raw);
+    if(f.skSrc)skSrc=f.skSrc;if(f.skCat)skCat=f.skCat;if(f.agTp)agTp=f.agTp;if(f.agSt)agSt=f.agSt;
+    if(f.q){const gs=document.getElementById('gs');if(gs)gs.value=f.q}
+    // Sync sidebar UI with restored state
+    document.querySelectorAll('.lci[data-g="src"]').forEach(x=>x.classList.toggle('on',x.dataset.f===skSrc));
+    document.querySelectorAll('.lci[data-g="cat"]').forEach(x=>x.classList.toggle('on',x.dataset.f===skCat));
+    document.querySelectorAll('.lci[data-g="tp"]').forEach(x=>x.classList.toggle('on',x.dataset.f===agTp));
+    document.querySelectorAll('.lci[data-g="st"]').forEach(x=>x.classList.toggle('on',x.dataset.f===agSt));
+  }catch(e){}
+}
+
+/* FIX F-18: Real cross-tab global search — searches skills, agents, AND projects */
+function globalSearch(q){
+  if(!q){skSrc='all';skCat='all';agTp='all';agSt='all';
+    document.querySelectorAll('.lci').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.lci[data-f="all"]').forEach(x=>x.classList.add('on'));
+    _saveFilters();renderSk();renderAg();return}
+  const low=q.toLowerCase();
+  const skm=SKS.filter(s=>(s.n||'').toLowerCase().includes(low)||(s.d||'').toLowerCase().includes(low)||(s.t||[]).some(t=>(t||'').toLowerCase().includes(low)));
+  const agm=AGS.filter(a=>(a.n||'').toLowerCase().includes(low)||(a.d||'').toLowerCase().includes(low)||(a.sk||[]).some(s=>(s||'').toLowerCase().includes(low)));
+  const pjm=PROJS.filter(p=>(p.n||'').toLowerCase().includes(low)||(p.d||'').toLowerCase().includes(low)||(p.ph||'').toLowerCase().includes(low));
+  _saveFilters();
+  const total=skm.length+agm.length+pjm.length;
+  if(total===0){toast('No results for "'+q+'"');return}
+  /* Navigate to tab with most results; render all matching tabs */
+  if(skm.length>0){document.getElementById('sk-grid').innerHTML=skm.map(s=>skCard(s)).join('');document.getElementById('sk-count').textContent=skm.length+' results';document.getElementById('sk-title').textContent='Search: '+q}
+  if(agm.length>0){document.getElementById('ag-grid').innerHTML=agm.map(a=>agCard(a)).join('');document.getElementById('ag-count').textContent=agm.length+' results';document.getElementById('ag-title').textContent='Search: '+q}
+  if(pjm.length>0){document.getElementById('pj-list').innerHTML=pjm.map(p=>'<div class="lcd" style="position:relative" onclick="switchProject(\''+p._id+'\');go(\'ws\')"><div class="lh"><div class="li" style="background:'+p.c+'15;color:'+p.c+';font-size:16px;font-weight:600">'+p.n[0]+'</div><div><div class="ln">'+esc(p.n)+'</div><div class="ls">'+esc(p.ph)+'</div></div></div><div class="ld">'+esc(p.d)+'</div><div class="lf"><span>'+p.p+'% complete</span></div></div>').join('')}
+  /* Go to the tab with the most matches */
+  if(skm.length>=agm.length&&skm.length>=pjm.length)go('lib-sk');
+  else if(agm.length>=pjm.length)go('lib-ag');
+  else go('projs');
+  toast(total+' result'+(total!==1?'s':'')+' for "'+q+'"');
+}
+
+/* ══ Settings: model management — read-only from OpenClaw config ══ */
+let modelCounter=0;
+
+function filterModels(type){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+type).classList.add('on');
+  document.querySelectorAll('.model-row').forEach(r=>{
+    if(type==='all')r.style.display='';
+    else r.style.display=r.dataset.auth===type?'':'none';
+  });
+}
+async function syncModels(btn){
+  if(btn){btn.style.pointerEvents='none';btn.innerHTML='<span class="spin">\u27f3</span> Syncing...';}
+  try{
+    await loadRealConfig();
+    toast('\u2713 Models synced from OpenClaw');
+  }catch(e){toast('Sync failed');}
+  if(btn){setTimeout(()=>{btn.innerHTML='\u27f3 Sync models';btn.style.pointerEvents='';},1500);}
+}
+function removeModel(btn){
+  toast('Models are managed by OpenClaw. Run: openclaw configure');
+}
+
+/* ══ View detail modals ══ */
+function viewSkill(idx){
+  const s=SKS[idx];if(!s)return;
+  const catNames={code:'Code gen',test:'Testing',infra:'DevOps',data:'Data / DB',sec:'Security',doc:'Docs',ai:'AI / ML',ui:'Frontend'};
+  const srcNames={github:'GitHub',clawhub:'ClawHub',trending:'Trending'};
+  document.getElementById('detail-content').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div style="width:48px;height:48px;border-radius:12px;background:'+s.b+';color:'+s.c+';display:flex;align-items:center;justify-content:center;font-size:22px">'+s.i+'</div><div><h2 style="margin:0">'+s.n+'</h2><div class="ms" style="margin:0">'+s.s+'</div></div></div><p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">'+s.d+'</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'+s.t.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px"><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600;color:var(--am)">★ '+s.r+'</div><div style="font-size:10px;color:var(--t4)">Rating</div></div><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600">'+(srcNames[s.src]||s.src)+'</div><div style="font-size:10px;color:var(--t4)">Source</div></div><div style="background:var(--bg4);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:600">'+(catNames[s.cat]||s.cat)+'</div><div style="font-size:10px;color:var(--t4)">Category</div></div></div><div class="mf"><button class="btn" onclick="_closeModal(\'detail-modal\')">Close</button><button class="btn btn-p" onclick="toast(\''+s.n+' added to project\');_closeModal(\'detail-modal\')">+ Add to project</button></div>';
+  _openModal('detail-modal');
+}
+function viewAgent(idx){
+  const a=AGS[idx];if(!a)return;
+  const tpNames={dev:'Development',ops:'DevOps',qa:'QA',sec:'Security',data:'Data',doc:'Docs'};
+  document.getElementById('detail-content').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div style="width:48px;height:48px;border-radius:50%;background:'+a.c+'15;color:'+a.c+';display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700">'+a.n[0]+'</div><div><h2 style="margin:0">'+a.n+'</h2><div class="ms" style="margin:0">'+(tpNames[a.tp]||a.tp)+' agent</div></div><span style="margin-left:auto;font-size:11px;padding:4px 10px;border-radius:6px;background:'+(a.st==='Active'?'var(--gnb)':'var(--bg5)')+';color:'+(a.st==='Active'?'var(--gn)':'var(--t4)')+'">'+a.st+'</span></div><p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">'+a.d+'</p><div style="margin-bottom:16px"><div style="font-size:12px;font-weight:500;margin-bottom:8px">Equipped skills ('+a.sk.length+')</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+a.sk.map(s=>'<span class="tag" style="cursor:pointer" onclick="event.stopPropagation();_closeModal(\'detail-modal\');const i=SKS.findIndex(x=>x.n===\''+s+'\');if(i>=0)viewSkill(i);else toast(\'Skill not found\')">'+s+'</span>').join('')+'</div></div><div class="mf"><button class="btn" onclick="_closeModal(\'detail-modal\')">Close</button><button class="btn btn-p" onclick="toast(\''+a.n+' assigned to project\');_closeModal(\'detail-modal\')">Assign to project</button></div>';
+  _openModal('detail-modal');
+}
+
+/* ══ Create agent ══ */
+function openCreateAgent(){_openModal('agent-create-modal')}
+function createAgent(){
+  /* FIX F-15: scope to agent-create-modal */
+  if(!validateForm([
+    {id:'ca-name',wrapper:'ff-ca-name',err:'Agent name is required'},
+    {id:'ca-desc',wrapper:'ff-ca-desc',err:'Description is required'}
+  ],'agent-create-modal')){toast('Please fill in the required fields');return}
+  const nm=(document.getElementById('ca-name').value||'New-Agent').trim();
+  // FIX F-05: Check for duplicate agent names (case-insensitive)
+  if(AGS.some(a=>a.n.toLowerCase()===nm.toLowerCase())){
+    const w=document.getElementById('ff-ca-name');if(w)w.classList.add('has-error');
+    toast('Agent "'+nm+'" already exists');return;
+  }
+  const btn = document.querySelector('#agent-create-modal .btn-p');
+  if (btn) { btn.style.pointerEvents='none'; btn.textContent='Creating...'; }
+  const ds=document.getElementById('ca-desc').value||'Custom agent';
+  const tp=document.getElementById('ca-type').value;
+  const sks=(document.getElementById('ca-skills').value||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const colors={dev:'var(--ac)',ops:'var(--bl)',qa:'var(--tl)',sec:'var(--co)',data:'var(--am)',doc:'var(--gn)'};
+  AGS.push({n:nm,d:ds,sk:sks.length?sks:['general'],c:colors[tp]||'var(--ac)',st:'Idle',tp:tp});
+  setTimeout(()=>{ if(btn){btn.style.pointerEvents='';btn.textContent='Create agent'} },500);
+  _closeModal('agent-create-modal');clearValidation(['ff-ca-name','ff-ca-desc'],'agent-create-modal');
+  document.getElementById('ca-name').value='';document.getElementById('ca-desc').value='';document.getElementById('ca-skills').value='';
+  renderAg();toast('\u2713 "'+nm+'" created');
+  autoSave();
+  document.querySelector('.ni[data-p="lib-ag"] .bd').textContent=AGS.length;
+}
+
+/* ══ Projects — FIX F-01: UUID-based identity ══ */
+let activeProjectId = null;
+
+function switchProject(id){
+  // FIX F-01: Accept UUID (string) or legacy index (number, for backward compat during load)
+  let p;
+  if (typeof id === 'number') { p = PROJS[id]; if (p) id = p._id; }
+  else { p = _projById(id); }
+  if(!p)return;
+  // Ensure project has an _id (migration for old data)
+  if (!p._id) p._id = _uid();
+  activeProjectId = p._id;
+
+  // Update header
+  document.getElementById('ws-proj-name').textContent=p.n;
+  document.getElementById('ws-pct').textContent=p.p+'%';
+  document.getElementById('ws-bar').style.width=p.p+'%';
+  const offset=251.3*(1-p.p/100);
+  document.getElementById('ring-fill').setAttribute('stroke-dashoffset',offset);
+  document.getElementById('ring-pct').textContent=p.p+'%';
+
+  // Session key for chat
+  if (p.sessionKey) currentSessionKey = p.sessionKey;
+  else currentSessionKey = 'main';
+
+  // Show workspace, hide empty state
+  const demoAct = document.getElementById('demo-activity');
+  const wsEmpty = document.getElementById('ws-empty');
+  if (demoAct) demoAct.style.display = '';
+  if (wsEmpty) wsEmpty.style.display = 'none';
+
+  // Update pipeline stages
+  const phases = ['Analyze','Plan','Assign','Build','Review','Deliver'];
+  const phaseMap = {'Active':'Analyze','active':'Analyze','Analyze':'Analyze','Plan':'Plan','Assign':'Assign','Build':'Build','Review':'Review','Deliver':'Deliver','Done':'Deliver'};
+  const currentPhase = phaseMap[p.ph] || 'Analyze';
+  const phaseIdx = phases.indexOf(currentPhase);
+  const allStages = document.querySelectorAll('.pps');
+  const allConns = document.querySelectorAll('.ppc');
+  allStages.forEach((s, i) => {
+    s.classList.remove('dn','ac');
+    if (i < phaseIdx) { s.classList.add('dn'); }
+    else if (i === phaseIdx) { s.classList.add('ac'); }
+  });
+  allConns.forEach((c, i) => {
+    c.classList.remove('dn');
+    if (i < phaseIdx) c.classList.add('dn');
+  });
+
+  // Update agent team panel
+  const teamEl = document.getElementById('ws-agent-team');
+  if (teamEl) {
+    if (AGS.length > 0) {
+      teamEl.innerHTML = AGS.map(a => '<div class="agc"><div class="ah"><div class="aav" style="background:'+a.c+'15;color:'+a.c+'">'+a.n[0]+'</div><div class="anm">'+esc(a.n)+'</div><div class="ast" style="background:var(--gnb);color:var(--gn)">'+a.st+'</div></div><div class="atx">'+esc(a.d)+'</div></div>').join('');
+    } else {
+      teamEl.innerHTML = '<div style="font-size:12px;color:var(--t4);padding:8px 0">No agents assigned. <a href="#" onclick="go(\'lib-ag\');return false" style="color:var(--ac)">Create agents</a> to assign them.</div>';
+    }
+  }
+
+  // Update issues/deliverables
+  document.getElementById('ws-issues').innerHTML = '<div style="font-size:12px;color:var(--t4);padding:4px 0">No issues for this project</div>';
+  document.getElementById('ws-deliverables').innerHTML = '<div style="font-size:12px;color:var(--t4);padding:4px 0">Send messages to PM-Agent to generate deliverables</div>';
+
+  // FIX F-03: Save current chat before switching, restore target project's chat
+  _saveChatForActiveProject();
+  const bp = document.getElementById('build-phase');
+  if (bp) {
+    if (p._chatHtml) { bp.innerHTML = p._chatHtml; }
+    else { bp.innerHTML = '<div class="agh"><span class="pt" style="background:var(--gnb);color:var(--gn)">Chat</span><div class="ln"></div><span class="st" style="color:var(--tl)">Ready</span></div>'; }
+  }
+}
+/* FIX F-22: Update project progress and persist immediately */
+function updateProjectProgress(id, pct) {
+  const p = _projById(id || activeProjectId);
+  if (!p) return;
+  p.p = Math.max(0, Math.min(100, typeof pct === 'number' ? pct : parseInt(pct) || 0));
+  /* Update UI if this is the active project */
+  if (p._id === activeProjectId) {
+    const pctEl = document.getElementById('ws-pct');
+    const barEl = document.getElementById('ws-bar');
+    const ringFill = document.getElementById('ring-fill');
+    const ringPct = document.getElementById('ring-pct');
+    if (pctEl) pctEl.textContent = p.p + '%';
+    if (barEl) barEl.style.width = p.p + '%';
+    if (ringFill) ringFill.setAttribute('stroke-dashoffset', 251.3 * (1 - p.p / 100));
+    if (ringPct) ringPct.textContent = p.p + '%';
+  }
+  /* Auto-advance phase based on progress */
+  const phases = ['Analyze','Plan','Assign','Build','Review','Deliver'];
+  const phaseIdx = Math.min(Math.floor(p.p / 100 * phases.length), phases.length - 1);
+  p.ph = phases[phaseIdx];
+  renderDashProjs(); autoSave();
+}
+
+/* FIX F-03: Save chat HTML for the currently active project before switching away */
+function _saveChatForActiveProject() {
+  if (!activeProjectId) return;
+  const prev = _projById(activeProjectId);
+  if (!prev) return;
+  const bp = document.getElementById('build-phase');
+  if (bp) prev._chatHtml = bp.innerHTML;
+}
+function renderDashProjs(){
+  /* FIX F-26: unified empty state */
+  if(PROJS.length===0){document.getElementById('d-proj').innerHTML=_emptyState('\ud83d\udcc1','noProjects','emptyProjectAction','+ '+(LANG[currentLang]||LANG.en).createProject,"openMo()",{compact:true});return}
+  // FIX F-01: Use _id instead of array index in onclick handlers
+  PROJS.forEach(p=>{if(!p._id)p._id=_uid()}); // migrate legacy projects
+  document.getElementById('d-proj').innerHTML=PROJS.map(p=>'<div style="position:relative;background:var(--bg3);border:1px solid var(--b0);border-radius:14px;padding:14px;cursor:pointer;margin-bottom:8px;transition:border-color .15s" onclick="switchProject(\''+p._id+'\');go(\'ws\')" onmouseover="this.style.borderColor=\'var(--b2)\'" onmouseout="this.style.borderColor=\'var(--b0)\'"><span style="position:absolute;top:6px;right:8px;cursor:pointer;color:var(--t4);font-size:14px;z-index:1" onclick="event.stopPropagation();deleteProj(\''+p._id+'\')">\u00d7</span><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:13.5px;font-weight:500">'+esc(p.n)+'</span><span style="font-size:10px;padding:2px 7px;border-radius:5px;background:'+p.c+'12;color:'+p.c+';font-family:var(--fm)">'+p.p+'%</span></div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div style="font-size:10.5px;color:var(--t4)">'+esc(p.ph)+'</div></div>').join('');
+}
+function renderProjs(){
+  /* FIX F-26: unified empty state */
+  if(PROJS.length===0){document.getElementById('pj-list').innerHTML=_emptyState('\ud83d\udcc1','noProjects','emptyProjectAction','+ '+(LANG[currentLang]||LANG.en).createProject,"openMo()",{col:true});return}
+  // FIX F-01: Use _id instead of array index
+  PROJS.forEach(p=>{if(!p._id)p._id=_uid()});
+  document.getElementById('pj-list').innerHTML=PROJS.map(p=>'<div class="lcd" style="position:relative" onclick="switchProject(\''+p._id+'\');go(\'ws\')"><span style="position:absolute;top:6px;right:8px;cursor:pointer;color:var(--t4);font-size:14px;z-index:1" onclick="event.stopPropagation();deleteProj(\''+p._id+'\')">\u00d7</span><div class="lh"><div class="li" style="background:'+p.c+'15;color:'+p.c+';font-size:16px;font-weight:600">'+p.n[0]+'</div><div><div class="ln">'+esc(p.n)+'</div><div class="ls">'+esc(p.ph)+'</div></div></div><div class="ld">'+esc(p.d)+'</div><div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin:8px 0"><div style="height:100%;width:'+p.p+'%;background:'+p.c+';border-radius:2px"></div></div><div class="lf"><span>'+p.p+'% complete</span></div></div>').join('');
+}
+
+/* FIX F-01: deleteProj uses UUID — no index shift corruption */
+function deleteProj(id) {
+  const idx = _projIdxById(id);
+  if (idx < 0) return;
+  if (!confirm('Delete "' + PROJS[idx].n + '"?')) return;
+  PROJS.splice(idx, 1);
+  // Reset workspace if we deleted the active project
+  if (activeProjectId === id) {
+    activeProjectId = null;
+    document.getElementById('ws-proj-name').textContent = 'No project selected';
+    document.getElementById('ws-pct').textContent = '0%';
+    document.getElementById('ws-bar').style.width = '0%';
+    document.getElementById('ring-fill').setAttribute('stroke-dashoffset', '251.3');
+    document.getElementById('ring-pct').textContent = '0%';
+    const demoAct = document.getElementById('demo-activity');
+    const wsEmpty = document.getElementById('ws-empty');
+    if (demoAct) demoAct.style.display = 'none';
+    if (wsEmpty) wsEmpty.style.display = '';
+    document.getElementById('ws-agent-team').innerHTML = '<div style="font-size:12px;color:var(--t4);padding:8px 0">Select a project to see assigned agents</div>';
+    document.querySelectorAll('.pps').forEach(s => { s.classList.remove('dn','ac'); });
+    document.querySelectorAll('.ppc').forEach(c => { c.classList.remove('dn'); });
+  }
+  // No need to adjust activeProjectId — UUIDs are stable regardless of array position
+  renderProjs(); renderDashProjs(); updateStats();
+  /* FIX F-29: immediate save — destructive ops must persist synchronously, not debounced */
+  saveState();
+  toast('Project deleted');
+  go('projs');
+}
+
+/* FIX F-21: dedup arrays by name — keeps first occurrence, removes later duplicates */
+function _dedup(arr, key) {
+  const seen = new Set();
+  let i = 0;
+  while (i < arr.length) {
+    const k = (arr[i][key] || '').toLowerCase();
+    if (seen.has(k)) { arr.splice(i, 1); }
+    else { seen.add(k); i++; }
+  }
+}
+
+/* FIX F-20: renderAll with user-visible error feedback per component */
+function renderAll() {
+  /* FIX F-21: dedup before every render pass */
+  _dedup(SKS, 'n');
+  _dedup(AGS, 'n');
+  const _components = [
+    { name: 'Skills',     fn: renderSk },
+    { name: 'Agents',     fn: renderAg },
+    { name: 'Projects',   fn: renderProjs },
+    { name: 'Dashboard',  fn: renderDashProjs },
+    { name: 'Activity',   fn: renderDashActivity },
+    { name: 'Stats',      fn: updateStats },
+    { name: 'Wizard',     fn: updateWizard }
+  ];
+  const failures = [];
+  _components.forEach(c => {
+    try { c.fn(); } catch(e) {
+      console.error('renderAll: ' + c.name + ' failed:', e);
+      failures.push(c.name);
+    }
+  });
+  const skB = document.querySelector('.ni[data-p="lib-sk"] .bd'); if(skB) skB.textContent = SKS.length || '0';
+  const agB = document.querySelector('.ni[data-p="lib-ag"] .bd'); if(agB) agB.textContent = AGS.length || '0';
+  const pjB = document.querySelector('.ni[data-p="projs"] .bd'); if(pjB) pjB.textContent = PROJS.length || '0';
+  if (failures.length) {
+    toast('Render error in: ' + failures.join(', '));
+  }
+}
+function updateStats() {
+  const L = LANG[currentLang] || LANG.en;
+  const cards = document.querySelectorAll('.sc');
+  /* FIX F-27: formatted numbers */
+  if(cards[0]) cards[0].querySelector('.sc-v').textContent = _fmtNum(SKS.length);
+  if(cards[1]) cards[1].querySelector('.sc-v').textContent = _fmtNum(AGS.length);
+  if(cards[2]) cards[2].querySelector('.sc-v').textContent = _fmtNum(PROJS.length);
+  if(cards[3]) cards[3].querySelector('.sc-v').textContent = '\u2014';
+  /* FIX F-26: unified "no data" text */
+  const readyCount = SKS.filter(s => s.t && s.t.includes('ready')).length;
+  if(cards[0]) cards[0].querySelector('.sc-c').textContent = SKS.length ? readyCount + ' ready' : L.emptyAction;
+  if(cards[1]) cards[1].querySelector('.sc-c').textContent = AGS.length ? _fmtNum(AGS.length) + ' configured' : L.emptyAction;
+  if(cards[2]) cards[2].querySelector('.sc-c').textContent = PROJS.length ? '' : L.emptyProjectAction;
+  if(cards[3]) cards[3].querySelector('.sc-c').textContent = L.noData;
+}
+
+function updateWizard() {
+  const steps = document.querySelectorAll('.ob-step');
+  if (!steps.length) return;
+  // Step 1: always done
+  steps[0].classList.add('done');
+  // Step 2: OpenClaw connected
+  if (claw.connected) steps[1].classList.add('done'); else steps[1].classList.remove('done');
+  // Step 3: has projects
+  if (PROJS.length > 0) steps[2].classList.add('done'); else steps[2].classList.remove('done');
+  // Step 4: skills loaded
+  if (SKS.length > 0) steps[3].classList.add('done'); else steps[3].classList.remove('done');
+  // Auto-dismiss when all done
+  if ([...steps].every(s => s.classList.contains('done'))) {
+    const ob = document.querySelector('.onboard');
+    if (ob) setTimeout(() => ob.style.display = 'none', 2000);
+  }
+}
+
+/* ══ Render all ══ */
+renderSk();renderAg();updateStats();
+
+/* Dashboard — Activity log from real events */
+const activityLog = [];
+function addActivity(icon, text) {
+  /* FIX F-28: locale-aware timestamp */
+  const time = _fmtTime();
+  activityLog.unshift({icon, text, time});
+  if (activityLog.length > 30) activityLog.length = 30;
+  renderDashActivity();
+}
+function renderDashActivity(){
+  const el = document.getElementById('d-act');
+  if (!el) return;
+  /* FIX F-26: unified empty state */
+  if(activityLog.length === 0){
+    el.innerHTML=_emptyState('\ud83d\udcac','noActivity','emptyAction',null,null,{compact:true});
+    return;
+  }
+  el.innerHTML=activityLog.slice(0,10).map(a=>'<div style="display:flex;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .12s" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'transparent\'"><div style="width:7px;height:7px;border-radius:50%;background:var(--tl);margin-top:7px;flex-shrink:0"></div><div><div style="font-size:12.5px;color:var(--t2);line-height:1.5">' + a.icon + ' ' + a.text+'</div><div style="font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:2px">'+a.time+'</div></div></div>').join('');
+}
+renderDashActivity();
+
+/* Hook into WebSocket events for activity */
+claw.on('health.tick', () => {
+  // Don't spam activity with ticks
+});
+claw.on('connected', () => {
+  addActivity('\u26a1', '<strong>OpenClaw</strong> connected');
+});
+
+/* FIX M-04: dynamic project rendering */
+renderDashProjs();
+
+/* Trending — loaded from real API */
+async function loadTrending() {
+  const el = document.getElementById('tr-list');
+  if (!el) return;
+  el.innerHTML = '<div class="loading-overlay"><div class="load-row"><div class="spinner"></div>Loading trending repos...</div><div class="loading-progress"><div class="bar"></div></div><div class="load-hint" id="load-hint"></div></div><div class="skeleton-grid">' + Array(6).fill('<div class="skeleton skeleton-card"></div>').join('') + '</div>';
+  /* Show progressive hints for slow loads */
+  const hintEl=document.getElementById('load-hint');
+  const hintTimer=setTimeout(()=>{if(hintEl){hintEl.textContent='Still loading — checking server connection...';hintEl.classList.add('show')}},4000);
+  const hintTimer2=setTimeout(()=>{if(hintEl){hintEl.textContent='Taking longer than usual — server may be busy'}},10000);
+  const controller=new AbortController();
+  const timeoutId=setTimeout(()=>controller.abort(),20000);
+  try {
+    const res = await fetch('/api/trending',{signal:controller.signal});
+    clearTimeout(timeoutId);clearTimeout(hintTimer);clearTimeout(hintTimer2);
+    const data = await res.json();
+    const repos = Array.isArray(data) ? data : (data.repos || data.items || []);
+    if (!repos.length) {
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">No trending data available.<br><span style="font-size:11px;color:var(--t4)">Connect OpenClaw or check back later.</span></div>';
+      return;
+    }
+    renderTrending(repos);
+  } catch(e) {
+    clearTimeout(timeoutId);clearTimeout(hintTimer);clearTimeout(hintTimer2);
+    const isTimeout=e.name==='AbortError';
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">'+(isTimeout?'Request timed out.':'Could not load trending data.')+'<br><span style="font-size:11px;color:var(--t4)">'+(isTimeout?'Server did not respond within 20s. ':'')+'Connect OpenClaw to fetch GitHub trending repos.</span><br><button class="btn" style="margin-top:12px" onclick="loadTrending()">Retry</button></div>';
+  }
+}
+function formatStars(n) {
+  if (typeof n === 'string') return n;
+  if (n >= 1000) return (n/1000).toFixed(1) + 'k';
+  return String(n);
+}
+function renderTrending(repos) {
+  const el = document.getElementById('tr-list');
+  if (!el) return;
+  const langColors = {Python:'#3572A5',TypeScript:'#3178c6',JavaScript:'#f1e05a',Go:'#00ADD8',Rust:'#dea584',Java:'#b07219',C:'#555555','C++':'#f34b7d',Ruby:'#701516',Swift:'#ffac45'};
+  el.innerHTML = repos.map((t,i) => {
+    const name = t.name || t.full_name || t.repo || '';
+    const lang = t.language || t.lang || '';
+    const lc = langColors[lang] || '#888';
+    const desc = t.description || t.desc || '';
+    const stars = formatStars(t.stars || t.stargazers_count || 0);
+    const trend = t.todayStars || t.trending || '';
+    const shortName = name.split('/').pop().toLowerCase();
+    const alreadyInLib = SKS.some(s => s.n === shortName);
+    const libBtn = alreadyInLib
+      ? '<button class="btn btn-sm" style="background:var(--bg5);color:var(--t4);pointer-events:none">\u2713 In library</button>'
+      : '<button class="btn btn-p btn-sm" onclick="addToLibrary(this,\'' + esc(name) + '\',\'' + esc(desc).replace(/'/g, "\\'") + '\',\'' + esc(lang) + '\')">+ Library</button>';
+    return '<div class="tc"><div style="font-size:10.5px;font-family:var(--fm);color:var(--am);margin-bottom:6px">★ #' + (i+1) + ' trending</div><div style="font-size:14px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:' + lc + '"></span>' + esc(name) + '</div><div style="font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:10px">' + esc(desc) + '</div><div style="display:flex;gap:12px;font-size:10.5px;color:var(--t4);font-family:var(--fm);margin-bottom:10px"><span>★ ' + stars + '</span>' + (trend ? '<span style="color:var(--gn)">▲ ' + trend + '</span>' : '') + '<span>' + esc(lang) + '</span></div><div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--b0)"><button class="btn btn-sm" onclick="extractSkills(this,\'' + esc(name) + '\',\'' + esc(lang) + '\')">Extract skills</button>' + libBtn + '</div></div>';
+  }).join('');
+}
+// Show empty state initially
+document.getElementById('tr-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">Trending repos load from OpenClaw.<br><span style="font-size:11px;color:var(--t4)">Click ⟳ to sync, or connect OpenClaw for auto-sync.</span></div>';
+
+/* Channel Status — populated from real data */
+document.getElementById('cr-cards').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--t3);font-size:13px">No channels configured<br><span style="font-size:11px;color:var(--t4)">Connect OpenClaw to see channel status, or run <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--fm)">openclaw setup</code> to add channels.</span></div>';
+document.getElementById('cr-log').innerHTML='<div style="color:var(--t4)">No events yet \u2014 connect OpenClaw to see real-time events</div>';
+
+/* WebSocket event log for channels */
+const wsEventLog = [];
+function addWsEvent(source, message) {
+  /* FIX F-28 */
+  const time = _fmtTime();
+  wsEventLog.unshift({source, message, time});
+  if (wsEventLog.length > 50) wsEventLog.length = 50;
+  renderWsEventLog();
+}
+function renderWsEventLog() {
+  const el = document.getElementById('cr-log');
+  if (!el) return;
+  if (!wsEventLog.length) { el.innerHTML = '<div style="color:var(--t4)">No events yet</div>'; return; }
+  el.innerHTML = wsEventLog.slice(0, 20).map(e => '<div><span style="color:var(--tl)">[' + e.source + ']</span> <span style="color:var(--t4)">' + e.time + '</span> ' + e.message + '</div>').join('');
+}
+
+claw.on('health', (payload) => {
+  if (payload && payload.channels) {
+    renderChannelStatus(payload.channels);
+    renderSettingsChannels(payload.channels);
+  }
+});
+claw.on('health.tick', (payload) => {
+  addWsEvent('health', 'tick \u2014 uptime: ' + (payload && payload.uptime ? Math.floor(payload.uptime/60) + 'm' : 'unknown'));
+});
+claw.on('session.message', (payload) => {
+  addWsEvent('session', (payload && payload.sessionKey ? payload.sessionKey : 'unknown') + ' \u2014 new message');
+});
+
+/* Projects list */
+renderProjs();
+
+setTimeout(()=>{const s=document.querySelector('.wsc');if(s)s.scrollTop=s.scrollHeight},100);
+
+/* ══ Load saved state ══ */
+const hadState = loadState();
+_restoreFilters(); // FIX #20: restore search/filter state from sessionStorage
+if (hadState) { renderAll(); }
+updateStorageIndicator();
+
+/* ══ Initial data load ══ */
+updateWizard();
+
+/* ══ OpenClaw auto-connect ══ */
+setTimeout(() => {
+  const urlInput = document.getElementById('oc-url');
+  const tokenInput = document.getElementById('oc-token');
+  if (urlInput) urlInput.value = claw.url;
+  if (tokenInput) tokenInput.value = claw.token;
+  claw.connect();
+  // Load real data via HTTP — retry with backoff until CLI cache is ready
+  async function loadAllData(attempt) {
+    attempt = attempt || 1;
+    await Promise.allSettled([loadRealSkills(), loadRealAgents(), loadRealConfig()]);
+    renderAll(); updateStats(); updateWizard();
+    // Retry up to 3 times with increasing delay if real skills didn't load
+    if (SKS.filter(s => s.real).length === 0 && attempt <= 3) {
+      const delay = attempt * 3000; // 3s, 6s, 9s
+      setTimeout(() => loadAllData(attempt + 1), delay);
+    }
+  }
+  setTimeout(loadAllData, 500);
+}, 200);
+</script>
+</body>
+</html>
